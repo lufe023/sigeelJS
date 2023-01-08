@@ -9,7 +9,7 @@ const userRouter = require('./users/users.router')
 const authRouter = require('./auth/auth.router')
 const initModels = require('./models/initModels')
 
-//? Initial Configs
+//? Initial Configurations
 const app = express()
 
 app.use(express.json())

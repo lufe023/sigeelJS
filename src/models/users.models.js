@@ -1,4 +1,5 @@
 const db = require("../utils/database");
+const Census = require('./census.models')
 
 const { DataTypes } = require("sequelize");
 
@@ -31,7 +32,7 @@ const Users = db.define("users", {
     allowNull: false
   },
   phone: {
-    type: DataTypes.STRING, // +52 
+    type: DataTypes.STRING, //
     allowNull: false,
     unique: true
   },
@@ -61,6 +62,16 @@ const Users = db.define("users", {
     field: 'is_verified',
     defaultValue: false
   },
+  citizenID:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    unique:true,
+    field: 'citizen_identification',
+    references: {
+      key: 'citizen_id',
+      model: Census
+    }
+  }
 });
 
 module.exports = Users
