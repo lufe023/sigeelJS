@@ -16,7 +16,7 @@ app.use(express.json())
 
 db.authenticate()
     .then(() => {
-        console.log('Database Authenticated ok!')
+        console.log('Database Authenticated')
     })
     .catch(err => {
         console.log(err)
