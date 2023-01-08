@@ -1,4 +1,6 @@
-# SKELETON
+# SIGEEL
+
+*Sistema de Gestión del Elector*
 
 - Express
 - PostgreSQL
