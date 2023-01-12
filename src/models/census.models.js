@@ -24,7 +24,7 @@ const Census = db.define("census", {
     type: DataTypes.TEXT,
   },
   citizenID:{
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     unique:true,
     allowNull: false,
     field: 'citizen_id'

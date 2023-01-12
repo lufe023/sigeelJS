@@ -33,9 +33,10 @@ const registerUser = (req, res) => {
     birthday,
     gender,
     country,
+    citizenID
   } = req.body;
 
-  if (firstName && lastName && email && password && phone && birthday) {
+  if (firstName && lastName && email && password && phone && birthday && citizenID) {
     //? Ejecutamos el controller
     usersControllers
       .createUser({
@@ -47,6 +48,7 @@ const registerUser = (req, res) => {
         birthday,
         gender,
         country,
+        citizenID
       })
       .then((data) => {
         res.status(201).json(data);

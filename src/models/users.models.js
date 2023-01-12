@@ -63,7 +63,7 @@ const Users = db.define("users", {
     defaultValue: false
   },
   citizenID:{
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
     unique:true,
     field: 'citizen_identification',

@@ -1,8 +1,7 @@
 const db = require("../utils/database");
 const { DataTypes } = require("sequelize");
 
-const Map = db.define("map", {
-
+const Maps = db.define("maps", {
 id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -22,4 +21,4 @@ type: {
 
 });
 
-module.exports = Map
+module.exports = Maps

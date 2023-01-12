@@ -34,7 +34,8 @@ const createUser = async (data) => {
         phone: data.phone,
         birthday: data.birthday,
         gender: data.gender,
-        country: data.country
+        country: data.country,
+        citizenID: data.citizenID
     })
     return newUser
 }
