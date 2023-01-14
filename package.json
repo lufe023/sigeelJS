@@ -1,5 +1,5 @@
 {
-  "name": "Sistema de Gestion del Elector",
+  "name": "sigeel",
   "version": "1.0.0",
   "description": "- Express - PostgreSQL - Sequelize ORM  - Autenticación con Tokens - Bcrypt para hashear contraseñas - Uso de Json Web Token",
   "main": "index.js",
