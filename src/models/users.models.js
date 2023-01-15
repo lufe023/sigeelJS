@@ -1,5 +1,6 @@
 const db = require("../utils/database");
-const Census = require('./census.models')
+const Census = require('./census.models');
+const Roles = require('./roles.models')
 
 const { DataTypes } = require("sequelize");
 
@@ -9,16 +10,7 @@ const Users = db.define("users", {
     primaryKey: true,
     allowNull: false,
   },
-  firstName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: "first_name",
-  },
-  lastName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: "last_name",
-  },
+  
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -31,25 +23,14 @@ const Users = db.define("users", {
     type: DataTypes.STRING,
     allowNull: false
   },
-  phone: {
-    type: DataTypes.STRING, //
-    allowNull: false,
-    unique: true
-  },
-  birthday: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
-  },
-  gender: {
-    type: DataTypes.STRING,
-  },
   role: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 'normal'
-  },
-  country: {
-    type: DataTypes.STRING,
+    references: {
+      key: 'id',
+      model: Roles
+    },
+    defaultValue: 1
   },
   status: {
     type: DataTypes.STRING,

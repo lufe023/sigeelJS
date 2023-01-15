@@ -8,7 +8,7 @@ require('../middlewares/auth.middleware')(passport)
 
 //? rutas raiz
 
-router.get('/', userServices.getAllUsers)
+router.get('/', passport.authenticate('jwt', {session: false}), userServices.getAllUsers)
 
 //TODO el registerUser ira en la ruta /auth/register
 
@@ -37,7 +37,10 @@ router.route('/me')
 
 //? /api/v1/users/:id
 router.route('/:id')
-    .get(userServices.getUserById)
+    .get(
+        passport.authenticate('jwt', {session: false}),
+        userServices.getUserById)
+
     .patch(
         passport.authenticate('jwt', {session: false}),
         adminValidate,

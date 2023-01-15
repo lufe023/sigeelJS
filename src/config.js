@@ -7,7 +7,7 @@ const config = {
     jwtSecret: process.env.JWT_SECRET,
     db: {
         host: process.env.DB_HOST || 'localhost',
-        username: process.env.DB_USERNAME || 'sigeel_user',
+        username: process.env.DB_USERNAME || 'postgres',
         password: process.env.DB_PASS || 'root',
         dbName: process.env.DB_NAME
     }
