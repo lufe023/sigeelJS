@@ -49,7 +49,53 @@ const Census = db.define("census", {
       key: 'id',
       model: Map
     }
+  },
+  municipality: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references:{
+      key: 'id',
+      model: Map
+    }
+  },
+  district: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references:{
+      key: 'id',
+      model: Map
+    }
+  },
+  neighbourhood: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references:{
+      key: 'id',
+      model: Map
+    }
+  },
+  adress:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  celphone:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  telephone:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  otherPhone:{
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'other_phone'
+  },
+  leader:{
+    type: DataTypes.UUID,
+    allowNull: true
   }
+
 
 });
 

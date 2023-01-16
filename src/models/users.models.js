@@ -52,7 +52,7 @@ const Users = db.define("users", {
       key: 'citizen_id',
       model: Census
     }
-  }
+}
 });
 
 module.exports = Users

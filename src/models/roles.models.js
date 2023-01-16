@@ -16,7 +16,7 @@ roleName: {
     },
 //los niveles de usuario deberian ir desde 1 colla
 level: {
-    type: DataTypes.TEXT,
+    type: DataTypes.INTEGER,
     allowNull: false
 }
 
