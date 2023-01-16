@@ -29,6 +29,7 @@ router.route('/me')
 router.route('/:id')
     .get(
         passport.authenticate('jwt', {session: false}),
+        adminValidate,
         userServices.getUserById)
 
     .patch(

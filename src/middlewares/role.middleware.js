@@ -11,7 +11,8 @@ const adminValidate = (req, res, next) => {
     }else {
         res.status(401).json({
             message: 'Access Denied!',
-            reason: 'you do not have the required access level, require level 2'
+            reason: 'you do not have the required access level',
+            requiredLevel: 2
         })
     }
     
@@ -27,7 +28,8 @@ const superAdminValidate = (req, res, next) => {
     }else {
         res.status(401).json({
             message: 'Access Denied!',
-            reason: 'you do not have the required access level, require level 3'
+            reason: 'you do not have the required access level',
+            requiredLevel: 2
         })
     }
 }

@@ -15,14 +15,15 @@ const getAllUsers = async () => {
 
 const getUserById = async (id) => {
     const data = await Users.findOne({
+        attributes:['id', 'email', 'role', 'status', 'citizenID'],
         where: {
             id: id,
             status: 'active'
         }
     })
     return data
+    //  return [data.id, data.email, data.role]
 }
-
 
 const createUser = async (data) => {
     const newUser = await Users.create({

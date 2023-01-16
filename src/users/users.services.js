@@ -61,6 +61,7 @@ const registerUser = (req, res) => {
 
 const patchUser = (req, res) => {
   const id = req.params.id;
+  
   const { firstName, lastName, phone, gender, country } = req.body;
 
   usersControllers
