@@ -11,8 +11,8 @@ id: {
 
 roleName: {
     type: DataTypes.TEXT,
-    allowNull: false,
-    field: 'role_name',
+    allowNull: true,
+    field: 'role_name'
     },
 //los niveles de usuario deberian ir desde 1 colla
 level: {

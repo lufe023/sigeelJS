@@ -25,30 +25,19 @@ const getUserById = (req, res) => {
 
 const registerUser = (req, res) => {
   const {
-    firstName,
-    lastName,
     email,
     password,
-    phone,
-    birthday,
-    gender,
-    country,
-    citizenID
+    citizenID,
+    role
   } = req.body;
 
-  if (firstName && lastName && email && password && phone && birthday && citizenID) {
+  if (email && password && citizenID, role) {
     //? Ejecutamos el controller
-    usersControllers
-      .createUser({
-        firstName,
-        lastName,
+    usersControllers.createUser({
         email,
         password,
-        phone,
-        birthday,
-        gender,
-        country,
-        citizenID
+        citizenID,
+        role
       })
       .then((data) => {
         res.status(201).json(data);
@@ -61,12 +50,10 @@ const registerUser = (req, res) => {
     res.status(400).json({
       message: "All fields must be completed",
       fields: {
-        firstName: "string",
-        lastName: "string",
         email: "example@example.com",
         password: "string",
-        phone: "+521231231231",
-        birthday: "YYYY/MM/DD",
+        citizenID: "el id del ciudadano, cedula",
+        role: 'el rol del usuario'
       },
     });
   }
