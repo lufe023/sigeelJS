@@ -45,6 +45,9 @@ const Precinct = db.define("precinct", {
     type: DataTypes.STRING,
     allowNull: true,
   }
+}, {
+  //? Evita que sequelize cree la columna de createdAt y updatedAt
+  timestamps: false
 });
 
 module.exports = Precinct

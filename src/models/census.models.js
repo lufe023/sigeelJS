@@ -39,7 +39,7 @@ const Census = db.define("census", {
   picture:{
     type: DataTypes.TEXT,
     validate:{
-      isUrl: true
+    //  isUrl: true
     }
   },
   province: {
