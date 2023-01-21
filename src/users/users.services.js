@@ -28,16 +28,14 @@ const registerUser = (req, res) => {
     email,
     password,
     citizenID,
-    role
   } = req.body;
 
-  if (email && password && citizenID, role) {
+  if (email && password && citizenID) {
     //? Ejecutamos el controller
     usersControllers.createUser({
         email,
         password,
-        citizenID,
-        role
+        citizenID
       })
       .then((data) => {
         res.status(201).json(data);
@@ -53,7 +51,6 @@ const registerUser = (req, res) => {
         email: "example@example.com",
         password: "string",
         citizenID: "el id del ciudadano, cedula",
-        role: 'el rol del usuario'
       },
     });
   }

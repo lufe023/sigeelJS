@@ -4,7 +4,7 @@ const Municipalities = require('../models/municipalities.models')
 const Neighbourhood = require('../models/neighbourhood.models')
 const Provinces = require('../models/provinces.models')
 const Users = require('../models/users.models')
-const Maps = require('../models/maps.models')
+
 
 //const users = await User.findAll({ include: Map });
 
@@ -14,24 +14,24 @@ const getAllCensus = async () => {
 
             include :[
             {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'provinces'
+                model : Provinces,
+                attributes: ['name']},
+            {
+                model: Municipalities,
+                attributes: ['name', 'parent']},
+            {
+                model: Districts,
+                attributes: ['name', 'parent'],
+                required: false},
+            {
+                model: Neighbourhood,
+                attributes: ['name', 'parent'],
+                required: false
             },
             {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'municipalities'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'districts'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'neighbourhoods'
+                model: Users,
+                attributes: ['email'],
+                required: false
             }
 
         ]  

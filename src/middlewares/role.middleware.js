@@ -7,6 +7,7 @@ const adminValidate = (req, res, next) => {
     // role = 2 es admin
     //role = 3 es super admin
     if(role >= 2){
+        console.log(role)
         next()
     }else {
         res.status(401).json({

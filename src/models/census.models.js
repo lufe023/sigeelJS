@@ -1,5 +1,9 @@
 const db = require("../utils/database");
-const Map = require('./map.models')
+const Provinces = require('./provinces.models')
+const Municipalities = require("./municipalities.models");
+const Districts = require("./district.models");
+const Neighbourhood = require('./neighbourhood.models')
+const Maps = require("./maps.models");
 
 const { DataTypes } = require("sequelize");
 
@@ -47,7 +51,7 @@ const Census = db.define("census", {
     allowNull: false,
     references:{
       key: 'id',
-      model: Map
+      model: Maps
     }
   },
   municipality: {
@@ -55,23 +59,24 @@ const Census = db.define("census", {
     allowNull: false,
     references:{
       key: 'id',
-      model: Map
+      model: Maps
     }
   },
   district: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references:{
-      key: 'id',
-      model: Map
+      model: Maps,
+      key: 'id'
     }
+
   },
   neighbourhood: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references:{
-      key: 'id',
-      model: Map
+      model: Maps,
+      key: 'id'
     }
   },
   adress:{
@@ -91,12 +96,12 @@ const Census = db.define("census", {
     allowNull: true,
     field: 'other_phone'
   },
-  leader:{
+  //referencia a usuarios llave foranea de users
+  usersId:{
     type: DataTypes.UUID,
-    allowNull: true
+    allowNull: true,
+    field: 'leader'
   }
-
-
 });
 
 module.exports = Census

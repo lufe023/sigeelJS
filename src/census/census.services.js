@@ -7,7 +7,7 @@ const getAllCensus = (req, res) => {
       res.status(200).json(data);
     })
     .catch((err) => {
-      res.status(400).json({ message: err.message });
+      res.status(400).json({ message: err });
     });
 };
 

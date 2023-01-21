@@ -1,9 +1,11 @@
 const db = require("../utils/database");
-const Map = require('./map.models')
+const Provinces = require('./provinces.models')
+const Municipalities = require("./municipalities.models");
+const Districts = require("./district.models");
 
 const { DataTypes } = require("sequelize");
 
-const Precinct = db.define("precinct", {
+const Precincts = db.define("precincts", {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
@@ -14,7 +16,7 @@ const Precinct = db.define("precinct", {
     allowNull: false,
     references:{
       key: 'id',
-      model: Map
+      model: Provinces
     }
   },
   municipality: {
@@ -22,7 +24,7 @@ const Precinct = db.define("precinct", {
     allowNull: false,
     references:{
       key: 'id',
-      model: Map
+      model: Municipalities
     }
   },
   district: {
@@ -30,7 +32,7 @@ const Precinct = db.define("precinct", {
     allowNull: true,
     references:{
       key: 'id',
-      model: Map
+      model: Districts
     }
   },
   address:{
@@ -50,4 +52,4 @@ const Precinct = db.define("precinct", {
   timestamps: false
 });
 
-module.exports = Precinct
+module.exports = Precincts

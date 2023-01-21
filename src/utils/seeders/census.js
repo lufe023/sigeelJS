@@ -8,7 +8,7 @@ const randomNumber = (min, max)=>{
 }
 
 
-for(let i = 0; i<100; i++){
+for(let i = 0; i<50; i++){
     Census.create(
         {
             id: uuid.v4(),
@@ -19,6 +19,7 @@ for(let i = 0; i<100; i++){
             gender: faker.name.gender(),
             province: 2,
             municipality: 44,
+            district: 211, 
             adress: faker.address.streetAddress(),
             celphone: faker.phone.number('+1829-###-####')
         }

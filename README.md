@@ -1,6 +1,15 @@
 # SIGEEL
 
-*Sistema de Gestión del Elector*
+*Sistema de Gestión del Elector SIGEEL*
+
+-Front
+    - Obtener datos de ciudadanos
+    - crear usuario
+    - ver usuarios
+    - editar usuarios
+    - asignar electores a usuarios
+    - seguimiento de usuarios nivel colaborador por parte de un usuario administrador
+    -listar electores por colaborador
 
 - Express
 - PostgreSQL

@@ -5,7 +5,7 @@ const Roles = require('./roles.models')
 const { DataTypes } = require("sequelize");
 
 const Users = db.define("users", {
-  id: {
+  id: { 
     type: DataTypes.UUID,
     primaryKey: true,
     allowNull: false,
@@ -29,8 +29,7 @@ const Users = db.define("users", {
     references: {
       key: 'id',
       model: Roles
-    },
-    defaultValue: 1
+    }
   },
   status: {
     type: DataTypes.STRING,
