@@ -1,7 +1,5 @@
 const db = require("../utils/database");
-const Provinces = require('./provinces.models')
-const Municipalities = require("./municipalities.models");
-const Districts = require("./district.models");
+const Maps = require("./maps.models");
 
 const { DataTypes } = require("sequelize");
 
@@ -16,7 +14,7 @@ const Precincts = db.define("precincts", {
     allowNull: false,
     references:{
       key: 'id',
-      model: Provinces
+      model: Maps
     }
   },
   municipality: {
@@ -24,7 +22,7 @@ const Precincts = db.define("precincts", {
     allowNull: false,
     references:{
       key: 'id',
-      model: Municipalities
+      model: Maps
     }
   },
   district: {
@@ -32,7 +30,7 @@ const Precincts = db.define("precincts", {
     allowNull: true,
     references:{
       key: 'id',
-      model: Districts
+      model: Maps
     }
   },
   address:{
