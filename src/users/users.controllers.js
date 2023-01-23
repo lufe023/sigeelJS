@@ -30,7 +30,8 @@ const createUser = async (data) => {
         id: uuid.v4(),
         email: data.email,
         password: hashPassword(data.password),
-        citizenID: data.citizenID
+        citizenID: data.citizenID,
+        role: data.role
     })
     return newUser
 }
