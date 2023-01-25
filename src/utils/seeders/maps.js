@@ -414,3 +414,7 @@ Maps.bulkCreate([
     {id:411, name:' Jaibón', parent:186, type: 'Distrito Municipal'},
     {id:412, name:' La Caya', parent:186, type: 'Distrito Municipal'}
 ])
+
+module.exports = {
+    Maps
+}

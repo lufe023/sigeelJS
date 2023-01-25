@@ -1,6 +1,3 @@
-//? Tarea importante hacer un middleware que compruebe que esa tarea este o creada por el usuario que la accede o que este sea el responsable o que sea superadministrador para poder verla o editarla
-
-
 const router = require('express').Router()
 const passport = require('passport')
 const adminValidate = require('../middlewares/role.middleware')
