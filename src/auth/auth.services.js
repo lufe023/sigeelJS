@@ -20,7 +20,7 @@ const login = (req, res) => {
                     res.status(200).json({
                         message: 'Correct Credentials',
                         token,
-                        id
+                        id: response.id
                     })
                 } else {
                     res.status(401).json({
