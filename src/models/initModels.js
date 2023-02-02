@@ -26,6 +26,8 @@ const initModels = () => {
     //relacionando la tabla beneficios para obtener la informacion de beneficios que ha obtenido la persona
     Census.hasMany(Benefit, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'Beneficios'})
 
+    Users.hasOne(Census, {foreignKey:'citizenID', sourceKey: 'citizenID', as: 'usuario'})
+
     //relacionando la tabla jobs para obtener la informacion de empleo que ha obtenido la persona, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Job, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'Empleos'})
 
@@ -38,6 +40,8 @@ const initModels = () => {
     //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encustas'})
 
+    Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'responsible', as: 'Responsible'})
+    Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'createdBy', as: 'Creador'})
 }
 
 

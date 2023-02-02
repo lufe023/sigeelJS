@@ -1,5 +1,6 @@
 //? Dependencies
 const uuid = require('uuid')
+const Census = require('../models/census.models')
 
 const Users = require('../models/users.models')
 const { hashPassword } = require('../utils/crypto')
@@ -63,7 +64,14 @@ const getUserByEmail = async(email) => {
         where: {
             email: email,
             status: 'active'
-        }
+        },
+        include :[
+            {
+                model : Census,
+                attributes: ['first_name', 'last_name', 'picture'],
+                as: 'usuario'
+            }
+        ]
     })
     return data
 }
