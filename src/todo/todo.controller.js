@@ -44,8 +44,26 @@ const getTaskById = async (taskid, userid) => {
     return data
 }
 
+
+const updateTask = async (userid, taskId, data) => {
+    const result = await Todo.update(data, {
+        where: {
+            [Op.or]: [
+                { responsible: userid },
+                { createdBy: userid }
+            ],
+            [Op.and]:[
+                {
+                id: taskId}
+            ]
+            }
+    })
+    return result
+}
+
 module.exports = {
     createTask,
     getAlltasks,
-    getTaskById
+    getTaskById,
+    updateTask
 } 

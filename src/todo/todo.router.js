@@ -18,6 +18,10 @@ router.route('/')
 router.route('/:id')  
     .get(
         passport.authenticate('jwt', {session: false}),
-        todoServices.getTaskById)  
+        todoServices.getTaskById)
+
+    .patch(
+        passport.authenticate('jwt', {session: false}),
+        todoServices.patchTask)      
 
     module.exports = router 

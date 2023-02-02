@@ -72,8 +72,34 @@ const getAlltasks = (req, res) => {
     }
   }
 
+
+  const patchTask = (req, res) => {
+    const taskId = req.params.id
+    const userid = req.user.id
+    
+    const {title, description, limit, isActive } = req.body;
+  
+    todoControllers
+      .updateTask(userid, taskId, { title, description, limit, isActive})
+      .then((data) => {
+        if (data[0]) {
+          res
+            .status(200)
+            .json({ message: `Task with ID: ${taskId}, has edited succesfully!` });
+        } else {
+          res.status(404).json({ message: "Invalid ID" });
+        }
+      })
+      .catch((err) => {
+        res.status(400).json({ message: err.message });
+      });
+  };
+
+
+
   module.exports = {
     getAlltasks,
     createTask,
-    getTaskById
+    getTaskById,
+    patchTask
   } 
