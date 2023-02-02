@@ -15,4 +15,9 @@ router.route('/')
             passport.authenticate('jwt', {session: false}),
             todoServices.createTask)
 
+router.route('/:id')  
+    .get(
+        passport.authenticate('jwt', {session: false}),
+        todoServices.getTaskById)  
+
     module.exports = router 

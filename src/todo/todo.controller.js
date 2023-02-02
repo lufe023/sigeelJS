@@ -1,6 +1,6 @@
 const Todo = require('../models/todo.models')
 const uuid = require('uuid')
-const {Op} = require("sequelize")
+const {Op, and} = require("sequelize")
 
 const createTask = async (data) => {
     const newTask = await Todo.create({
@@ -28,7 +28,24 @@ const getAlltasks = async (id) => {
     return data
 }
 
+const getTaskById = async (taskid, userid) => {
+    const data = await Todo.findAll({
+        where: {
+            [Op.or]: [
+                { responsible: userid },
+                { createdBy: userid }
+            ],
+            [Op.and]:[
+                {
+                id: taskid}
+            ]
+            }
+    })
+    return data
+}
+
 module.exports = {
     createTask,
-    getAlltasks
+    getAlltasks,
+    getTaskById
 } 

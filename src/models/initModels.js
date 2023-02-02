@@ -22,11 +22,11 @@ const initModels = () => {
     
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
+    Users.hasOne(Census, {foreignKey:'citizenID', sourceKey: 'citizenID', as: 'usuario'})
 
     //relacionando la tabla beneficios para obtener la informacion de beneficios que ha obtenido la persona
     Census.hasMany(Benefit, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'Beneficios'})
 
-    Users.hasOne(Census, {foreignKey:'citizenID', sourceKey: 'citizenID', as: 'usuario'})
 
     //relacionando la tabla jobs para obtener la informacion de empleo que ha obtenido la persona, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Job, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'Empleos'})

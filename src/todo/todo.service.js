@@ -12,6 +12,21 @@ const getAlltasks = (req, res) => {
       });
   };
 
+  //conseguir una tarea por id
+  const getTaskById = (req, res) => {
+    const taskid = req.params.id;
+    const userId = req.user.id
+    todoControllers
+      .getTaskById(taskid, userId)
+      .then((data) => {
+        res.status(200).json(data);
+      })
+      .catch((err) => {
+        res.status(404).json({ message: err.message });
+      });
+  };
+
+
   const createTask = (req, res) => {
     const {
       title,
@@ -59,5 +74,6 @@ const getAlltasks = (req, res) => {
 
   module.exports = {
     getAlltasks,
-    createTask
+    createTask,
+    getTaskById
   } 
