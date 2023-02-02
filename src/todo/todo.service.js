@@ -60,4 +60,4 @@ const getAlltasks = (req, res) => {
   module.exports = {
     getAlltasks,
     createTask
-  }
+  } 

@@ -31,4 +31,4 @@ const getAlltasks = async (id) => {
 module.exports = {
     createTask,
     getAlltasks
-}
+} 
