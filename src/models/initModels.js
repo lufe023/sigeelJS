@@ -1,7 +1,5 @@
 const Roles = require('./roles.models')
 const Users = require('./users.models')
-const Ballot = require('./ballot.models')
-const Precinct = require('./precinct.models')
 const Gps = require('./gps.models')
 const Poll = require('./poll.models')
 const Benefit = require('./benefit.models')
@@ -24,6 +22,8 @@ const initModels = () => {
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
     Users.hasOne(Census, {foreignKey:'citizenID', sourceKey: 'citizenID', as: 'usuario'})
 
+    Users.hasOne(Roles, {foreignKey: 'id',sourceKey: 'role', as: 'nivel'})
+
     //relacionando la tabla beneficios para obtener la informacion de beneficios que ha obtenido la persona
     Census.hasMany(Benefit, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'Beneficios'})
 
@@ -42,6 +42,7 @@ const initModels = () => {
 
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'responsible', as: 'Responsible'})
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'createdBy', as: 'Creador'})
+    
 }
 
 

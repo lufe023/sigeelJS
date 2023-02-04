@@ -21,7 +21,8 @@ const login = (req, res) => {
                         message: 'Correct Credentials',
                         token,
                         id: response.id,
-                        user:response.usuario
+                        user:response.usuario,
+                        nivel: response.nivel
                     })
                 } else {
                     res.status(401).json({

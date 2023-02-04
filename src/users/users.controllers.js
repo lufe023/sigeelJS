@@ -1,6 +1,7 @@
 //? Dependencies
 const uuid = require('uuid')
 const Census = require('../models/census.models')
+const Roles = require('../models/roles.models')
 
 const Users = require('../models/users.models')
 const { hashPassword } = require('../utils/crypto')
@@ -69,6 +70,11 @@ const getUserByEmail = async(email) => {
                 model : Census,
                 attributes: ['first_name', 'last_name', 'picture'],
                 as: 'usuario'
+            },
+            {
+                model: Roles,
+                attributes: ['level', 'roleName'],
+                as: 'nivel'
             }
         ]
     })
