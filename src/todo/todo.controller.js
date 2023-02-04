@@ -1,6 +1,7 @@
 const Todo = require('../models/todo.models')
 const uuid = require('uuid')
 const {Op, and} = require("sequelize")
+const Users = require('../models/users.models')
 
 const createTask = async (data) => {
     const newTask = await Todo.create({
@@ -39,7 +40,19 @@ const getTaskById = async (taskid, userid) => {
                 {
                 id: taskid}
             ]
-            }
+            },
+            include:[
+                {
+                    model:Users,
+                    as: 'Responsible',
+                    attributes: ['email'],
+                },
+                {
+                    model:Users,
+                    as: 'Creador',
+                    attributes: ['email'],
+                }
+            ]
     })
     return data
 }

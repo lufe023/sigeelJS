@@ -23,7 +23,6 @@ const getUserById = async (id) => {
         }
     })
     return data
-    //  return [data.id, data.email, data.role]
 }
 
 const createUser = async (data) => {
