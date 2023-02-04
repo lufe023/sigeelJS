@@ -21,7 +21,19 @@ const getUserById = async (id) => {
         where: {
             id: id,
             status: 'active'
-        }
+        },
+        include :[
+            {
+                model : Census,
+                attributes: ['first_name', 'last_name', 'picture'],
+                as: 'usuario'
+            },
+            {
+                model: Roles,
+                attributes: ['level', 'roleName'],
+                as: 'nivel'
+            }
+        ]
     })
     return data
 }
@@ -50,7 +62,7 @@ const deleteUser = async (id) => {
     const data = await Users.destroy({
         where: {
             id
-        }
+        }       
     })
     return data
 }
