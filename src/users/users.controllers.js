@@ -48,6 +48,30 @@ const createUser = async (data) => {
     })
     return newUser
 }
+const requestForgotPassword =async (userId) => {
+    const result = await Users.update({
+        passwordRequest: uuid.v4()
+    },
+{
+        where: {
+            id:userId
+        }
+    })
+    return result
+}
+const changeForgotPassword = async (idRequest, data) => {
+    const result = await Users.update({
+        password:  hashPassword(data.newPassword),
+        passwordRequest: null
+    },
+{
+        where: {
+            passwordRequest:idRequest
+        }
+    })
+    return result
+}
+
 
 const updateUser = async (id, data) => {
     const result = await Users.update(data, {
@@ -57,6 +81,8 @@ const updateUser = async (id, data) => {
     })
     return result
 }
+
+
 
 const deleteUser = async (id) => {
     const data = await Users.destroy({
@@ -99,5 +125,8 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    getUserByEmail
+    getUserByEmail,
+    changeForgotPassword,
+    requestForgotPassword
+
 }

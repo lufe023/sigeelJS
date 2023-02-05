@@ -58,6 +58,53 @@ const registerUser = (req, res) => {
   }
 };
 
+const requestForgotPassword = (req, res)=> {
+
+usersControllers
+.requestForgotPassword(req.body.userId)
+.then((data)=>{
+  res.status(400).json({message: "Peticion enviada"})
+})
+.catch((err) => {
+  res.status(400).json({ message: err.message });
+});
+}
+
+
+const changeForgotPassword = (req, res) => {
+  const idRequest = req.params.idRequest;
+  
+  const { newPassword, confirmNewPassword } = req.body;
+
+  if(confirmNewPassword &&newPassword ){
+if(confirmNewPassword===newPassword){
+  usersControllers
+    .changeForgotPassword(idRequest, {newPassword})
+    .then((data) => {
+      if (data[0]) {
+        res
+          .status(200)
+          .json({ message: `Contraseña cambiada ssatisfactoriamente` });
+      } else {
+        res.status(404).json({ message: "esta peticion no es valida" });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ message: err.message });
+    });
+  }else{
+    res.status(400).json({ message: "Las contraseñas no coinciden"});
+  }}else{
+    res.status(400).json({ 
+      message: "Debe enviar todas las celdas",
+      fields: {
+        confirmNewPassword: 'string',
+        newPassword: 'string'
+      }
+     });
+  }
+};
+
 const patchUser = (req, res) => {
   const id = req.params.id;
   
@@ -150,5 +197,7 @@ module.exports = {
   deleteUser,
   getMyUser,
   patchMyUser,
-  deleteMyUser
+  deleteMyUser,
+  changeForgotPassword,
+  requestForgotPassword
 };

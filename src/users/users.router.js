@@ -25,6 +25,13 @@ router.route('/me')
         userServices.deleteMyUser
     )
 
+//? /api/v1/users/passwordRequest
+router.route('/passwordRequest')
+.post(userServices.requestForgotPassword)
+
+router.route('/passwordRequest/:idRequest')
+        .patch(userServices.changeForgotPassword)
+
 //? /api/v1/users/:id
 router.route('/:id')
     .get(

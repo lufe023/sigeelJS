@@ -51,6 +51,10 @@ const Users = db.define("users", {
       key: 'citizen_id',
       model: Census
     }
+},
+passwordRequest:{
+  type: DataTypes.UUID,
+  allowNull: true
 }
 });
 
