@@ -1,3 +1,4 @@
+const { enviarMail } = require("../utils/mails/sendEmail");
 const usersControllers = require("./users.controllers");
 
 const getAllUsers = (req, res) => {
@@ -61,9 +62,17 @@ const registerUser = (req, res) => {
 const requestForgotPassword = (req, res)=> {
 
 usersControllers
-.requestForgotPassword(req.body.userId)
+.requestForgotPassword(req.body.email)
 .then((data)=>{
-  res.status(400).json({message: "Peticion enviada"})
+  res.status(400).json({message: "Peticion enviada",
+data
+})
+if(data[0]!=0){
+  
+let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='http://localhost:9000/api/v1/users/passwordRequest/${data[1]}'>Recuperar Contraseña</a>  `
+
+enviarMail('no-reply@sigeel.com', req.body.email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
+}
 })
 .catch((err) => {
   res.status(400).json({ message: err.message });

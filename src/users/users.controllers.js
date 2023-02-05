@@ -48,16 +48,17 @@ const createUser = async (data) => {
     })
     return newUser
 }
-const requestForgotPassword =async (userId) => {
+const requestForgotPassword =async (email) => {
+    const codigo = uuid.v4()
     const result = await Users.update({
-        passwordRequest: uuid.v4()
+        passwordRequest:codigo
     },
 {
         where: {
-            id:userId
+            email
         }
     })
-    return result
+    return [result, codigo]
 }
 const changeForgotPassword = async (idRequest, data) => {
     const result = await Users.update({
