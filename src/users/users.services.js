@@ -65,7 +65,6 @@ usersControllers
 .requestForgotPassword(req.body.email)
 .then((data)=>{
   res.status(400).json({message: "Peticion enviada",
-data
 })
 if(data[0]!=0){
   

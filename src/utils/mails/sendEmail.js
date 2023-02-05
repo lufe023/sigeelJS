@@ -1,13 +1,14 @@
 const nodemailer = require("nodemailer")
+require('dotenv').config()
 
 enviarMail = async (from, mailReceiver, subject, text, html)=>{
 
     const config ={
-        host: 'smtp.gmail.com',
-        port: 587,
+        host: process.env.HOST_EMAIL_SENDER,
+        port: process.env.HOST_EMAIL_PORT,
         auth: {
-            user: 'lufe023@gmail.com',
-            pass: 'eddemvoqvrfzsope'
+            user: process.env.EMAIL_HOST_USER,
+            pass: process.env.PASSWORD_HOST_USER
         }
     }
 
