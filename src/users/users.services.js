@@ -64,13 +64,15 @@ const requestForgotPassword = (req, res)=> {
 usersControllers
 .requestForgotPassword(req.body.email)
 .then((data)=>{
-  res.status(400).json({message: "Peticion enviada",
-})
 if(data[0]!=0){
-  
+  res.status(201).json({message: "Peticion enviada",
+})
 let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='http://localhost:9000/api/v1/users/passwordRequest/${data[1]}'>Recuperar Contraseña</a>  `
 
 enviarMail('no-reply@sigeel.com', req.body.email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
+}
+else{
+  res.status(400).json({message: "Esta petición no pudo ser procesada",})
 }
 })
 .catch((err) => {
