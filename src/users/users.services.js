@@ -67,7 +67,7 @@ usersControllers
 if(data[0]!=0){
   res.status(201).json({message: "Peticion enviada",
 })
-let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='http://localhost:9000/api/v1/users/passwordRequest/${data[1]}'>Recuperar Contraseña</a>  `
+let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='http://127.0.0.1:5173/#/recoverypassword/${data[1]}'>Recuperar Contraseña</a>  `
 
 enviarMail('no-reply@sigeel.com', req.body.email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
 }

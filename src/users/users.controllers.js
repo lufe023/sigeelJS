@@ -10,7 +10,19 @@ const getAllUsers = async () => {
     const data = await Users.findAll({
         where: {
             status: 'active'
-        }
+        },
+        include :[
+            {
+                model : Census,
+                attributes: ['first_name', 'last_name', 'picture'],
+                as: 'usuario'
+            },
+            {
+                model: Roles,
+                attributes: ['level', 'roleName'],
+                as: 'nivel'
+            }
+        ]
     })
     return data
 }
