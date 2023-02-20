@@ -6,8 +6,10 @@ const Roles = require('../models/roles.models')
 const Users = require('../models/users.models')
 const { hashPassword } = require('../utils/crypto')
 
-const getAllUsers = async () => {
-    const data = await Users.findAll({
+const getAllUsers = async (offset, limit) => {
+    const data = await Users.findAndCountAll({
+        offset: offset,
+        limit: limit,
         where: {
             status: 'active'
         },

@@ -1,11 +1,30 @@
 const { enviarMail } = require("../utils/mails/sendEmail");
 const usersControllers = require("./users.controllers");
+const { host } = require('../config')
 
 const getAllUsers = (req, res) => {
+
+  //donde inicia 
+  const offset = Number(req.query.offset) || 0
+
+  //capacidad maxima
+  const limit =  Number(req.query.limit) || 10
+
+  const urlBase = `${host}/api/v1/users`
+
+
+
   usersControllers
-    .getAllUsers()
+    .getAllUsers(offset, limit)
     .then((data) => {
-      res.status(200).json(data);
+      const nexPage = data.count - offset >= limit ? `${urlBase}?offset=${offset + limit}&limit=${limit}` : null
+      res.status(200).json({
+        next: nexPage,
+        prev: `${urlBase}`,
+        offset,
+        limit,
+        count: data.count,
+        results: data.rows});
     })
     .catch((err) => {
       res.status(400).json({ message: err.message });
