@@ -113,7 +113,7 @@ if(confirmNewPassword===newPassword){
       if (data[0]) {
         res
           .status(200)
-          .json({ message: `Contraseña cambiada ssatisfactoriamente` });
+          .json({ message: `Contraseña cambiada satisfactoriamente` });
       } else {
         res.status(404).json({ message: "esta peticion no es valida" });
       }
@@ -130,7 +130,7 @@ if(confirmNewPassword===newPassword){
         confirmNewPassword: 'string',
         newPassword: 'string'
       }
-     });
+      });
   }
 };
 

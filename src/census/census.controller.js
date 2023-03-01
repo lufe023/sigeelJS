@@ -73,6 +73,68 @@ const getAllCensus = async () => {
     return data
 }
 
+const getMyPeople = async (leaderId) => {
+
+    const data = await Census.findAndCountAll({
+    
+        where:{
+            leader:leaderId
+        },
+            include :[
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'provinces'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'municipalities'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'districts'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'neighbourhoods'
+            },
+            {
+                model : Users,
+                attributes: ['id', 'email'],
+                as: 'leaders'
+            },
+            {
+                model : Benefit,
+                //attributes: ['id', 'email'],
+                as: 'Beneficios'
+            },
+            {
+                model : Job,
+                //attributes: ['id', 'email'],
+                as: 'Empleos'
+            },
+            {
+                model : Participation,
+                //attributes: ['id', 'email'],
+                as: 'Actividades'
+            },
+            {
+                model : Gps,
+                //attributes: ['id', 'email'],
+                as: 'geolocation'
+            },
+            {
+                model : Poll,
+                //attributes: ['id', 'email'],
+                as: 'Encustas'
+            }
+        ]  
+})
+    return data
+}
 
 const findPeople = async (findWord) => {
     const data = await Census.findAndCountAll({
@@ -125,7 +187,23 @@ const findPeople = async (findWord) => {
     return data
 }
 
+const addPeople = async (peopleId, leaderId) => {
+    const result = await Census.update({
+        leader: leaderId,
+    },
+{
+        where: {
+            id:peopleId
+        }
+    })
+    return result
+}
+
+
+
 module.exports = {
     getAllCensus,
-    findPeople
+    findPeople,
+    addPeople,
+    getMyPeople
 }
