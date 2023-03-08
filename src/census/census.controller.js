@@ -136,6 +136,74 @@ const getMyPeople = async (leaderId) => {
     return data
 }
 
+//getting one People
+const getOnePeople = async (peopleid) => {
+    const data = await Census.findOne({
+
+        where: {
+            id:peopleid
+        },
+    
+
+            include :[
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'provinces'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'municipalities'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'districts'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'neighbourhoods'
+            },
+            {
+                model : Users,
+                attributes: ['id', 'email'],
+                as: 'leaders'
+            },
+            {
+                model : Benefit,
+                //attributes: ['id', 'email'],
+                as: 'Beneficios'
+            },
+            {
+                model : Job,
+                //attributes: ['id', 'email'],
+                as: 'Empleos'
+            },
+            {
+                model : Participation,
+                //attributes: ['id', 'email'],
+                as: 'Actividades'
+            },
+            {
+                model : Gps,
+                //attributes: ['id', 'email'],
+                as: 'geolocation'
+            },
+            {
+                model : Poll,
+                //attributes: ['id', 'email'],
+                as: 'Encustas'
+            }
+
+
+
+        ]  
+})
+    return data
+}
+
 const findPeople = async (findWord) => {
     const data = await Census.findAndCountAll({
         limit: 5,
@@ -199,11 +267,29 @@ const addPeople = async (peopleId, leaderId) => {
     return result
 }
 
+const removePeople = async (peopleId, leaderId) =>{
+    const result = await Census.update({
+        leader: null
+    }, {
+        where:
+        {
+            id: peopleId,
+        [Op.and]:
+            {
+            leader: leaderId 
+            }
+        },
+    })
+    
+    return result
+}
 
 
 module.exports = {
     getAllCensus,
     findPeople,
+    getOnePeople,
     addPeople,
-    getMyPeople
+    getMyPeople,
+    removePeople
 }

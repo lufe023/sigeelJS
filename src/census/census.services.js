@@ -12,10 +12,24 @@ const getAllCensus = (req, res) => {
 };
 
 
+
+
 const getMyPeople = (req, res) => {
   const leaderId = req.user.id
   censusControllers
   .getMyPeople(leaderId)
+  .then((data) => {
+    res.status(200).json(data);
+  })
+  .catch((err) => {
+    res.status(400).json({ message: err });
+  });
+};
+
+const getOnePeople = (req, res) => {
+  const peopleId = req.params.id
+  censusControllers
+  .getOnePeople(peopleId)
   .then((data) => {
     res.status(200).json(data);
   })
@@ -75,9 +89,37 @@ const addPeople = (req, res)=>{
 
 }
 
+
+const removePeople = (req, res)=>{
+  const leaderId = req.body.leaderId
+  const peopleId = req.body.peopleId
+
+  if(peopleId && leaderId){
+  censusControllers
+  .removePeople(peopleId, leaderId)
+  .then((result) => {
+    if (result[0]) {
+      res
+        .status(200)
+        .json({ message: `Accion exitosa` });
+    } else {
+      res.status(404).json({ message: "esta peticion no es valida" });
+    }
+  })
+  .catch((err) => {
+    res.status(400).json({ message: err.message });
+  });
+  
+}else{
+  res.status(400).json({ message: "Se debe enviar peopleId y leaderid ambas de tipo UUID"});
+}
+
+}
 module.exports = {
     getAllCensus,
     findPeople,
+    getMyPeople,
+    getOnePeople,
     addPeople,
-    getMyPeople
+    removePeople
 }
