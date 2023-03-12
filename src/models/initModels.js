@@ -9,6 +9,7 @@ const Census = require('./census.models')
 const Maps = require('./maps.models')
 const Todo = require('./todo.models')
 
+
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
     //? belongsTo || belongsToMany llave foranea en primer paramentro
@@ -38,7 +39,7 @@ const initModels = () => {
     Census.hasOne(Gps, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'geolocation'})
 
     //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
-    Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encustas'})
+    Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encuestas'})
 
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'responsible', as: 'Responsible'})
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'createdBy', as: 'Creador'})

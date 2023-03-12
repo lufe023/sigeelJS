@@ -18,15 +18,17 @@ const Ballot = db.define("ballot", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  partyAcronym:{
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   nomination: {
     type: DataTypes.STRING,
     allowNull: false
   },
   picture:{
     type: DataTypes.TEXT,
-    validate:{
-      isUrl: true
-    }
+    allowNull:true
   }
 });
 

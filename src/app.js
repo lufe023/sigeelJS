@@ -10,6 +10,8 @@ const userRouter = require('./users/users.router')
 const authRouter = require('./auth/auth.router')
 const censusRouter = require('./census/census.router')
 const todoRouter = require('./todo/todo.router')
+const ballotsRouter = require('./ballots/ballots.router')
+
 
 const initModels = require('./models/initModels')
 
@@ -49,6 +51,7 @@ app.use('/api/v1/users', userRouter)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/census', censusRouter)
 app.use('/api/v1/todo', todoRouter)
+app.use('/api/v1/ballots', ballotsRouter)
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)

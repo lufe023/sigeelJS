@@ -53,7 +53,6 @@ const getAlltasks = (req, res) => {
         })
         .catch((err) => {
           res.status(400).json({
-            test: createdBy,
             Error: err.message
           });
         });
