@@ -63,7 +63,7 @@ const getAllCensus = async () => {
             {
                 model : Poll,
                 //attributes: ['id', 'email'],
-                as: 'Encustas'
+                as: 'Encuestas'
             }
 
 
@@ -129,7 +129,7 @@ const getMyPeople = async (leaderId) => {
             {
                 model : Poll,
                 //attributes: ['id', 'email'],
-                as: 'Encustas'
+                as: 'Encuestas'
             }
         ]  
 })
@@ -194,7 +194,7 @@ const getOnePeople = async (peopleid) => {
             {
                 model : Poll,
                 //attributes: ['id', 'email'],
-                as: 'Encustas'
+                as: 'Encuestas'
             }
 
 
@@ -219,7 +219,10 @@ const findPeople = async (findWord) => {
                 [Op.iLike]: `%${findWord}%`
             },
             citizenID: {
-                [Op.like]: `%${findWord}%`
+                [Op.iLike]: `%${findWord}%`
+            },
+            nickname: {
+                [Op.iLike]: `%${findWord}%`
             },
             }
         },
