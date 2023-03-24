@@ -128,7 +128,7 @@ const getMyPeople = async (leaderId) => {
             },
             {
                 model : Poll,
-                //attributes: ['id', 'email'],
+                //attributes: ['id', 'citizenID', 'campain'],
                 as: 'Encuestas'
             }
         ]  

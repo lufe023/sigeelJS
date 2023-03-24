@@ -3,33 +3,29 @@ const db = require("../utils/database");
 
 const { DataTypes } = require("sequelize");
 const Maps = require("./maps.models");
+const Users = require("./users.models");
 
-const Ballot = db.define("ballot", {
-  candidateId: {
+const Campain = db.define("campain", {
+  id: {
     type: DataTypes.UUID,
+    unique:true,
     primaryKey: true,
     allowNull: false,
-    field: 'candidate_id'
   },
   name:{
-    type: DataTypes.STRING,
-    allowNull: false
+    type:DataTypes.STRING,
+    allowNull:false
   },
-  party: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  partyAcronym:{
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  nomination: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  picture:{
-    type: DataTypes.TEXT,
+  details:{
+    type:DataTypes.TEXT,
     allowNull:true
+  },
+  neighbourhood:{
+    type: DataTypes.INTEGER,
+    references:{
+      key: 'id',
+      model: Maps
+    },
   },
   distritoMunicipal:{
     type: DataTypes.INTEGER,
@@ -52,7 +48,21 @@ const Ballot = db.define("ballot", {
       key: 'id',
       model: Maps
     },
-  }
+  },
+  active:{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
+  },
+  createdBy:{
+    type: DataTypes.UUID,
+    field: "created_by",
+    allowNull:false,
+    references:{
+      key: 'id',
+      model: Users
+    },
+  },
 });
 
-module.exports = Ballot
+module.exports = Campain

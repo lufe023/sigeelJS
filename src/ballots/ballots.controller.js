@@ -1,9 +1,25 @@
 const Ballot = require("../models/ballot.models")
 const uuid = require('uuid')
+const Maps = require("../models/maps.models")
 
 const getAllBallotsController = async () => {
     const data = await Ballot.findAndCountAll({
-
+        include :[
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'province'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'municipality'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'DistritoMunicipal'
+            }]
 })
     return data
 }
@@ -16,7 +32,10 @@ const createNewCandidateController = async (data) => {
         party: data.party,
         partyAcronym: data.partyAcronym, 
         nomination: data.nomination,
-        picture: data.picture
+        picture: data.picture,
+        distritoMunicipal: data.distritoMunicipal,
+        municipio: data.municipio,
+        provincia: data.provincia
     })
     return newCandidate
 }

@@ -1,6 +1,7 @@
 const db = require("../utils/database");
 const Census = require('./census.models')
 const Ballot = require("./ballot.models");
+const Campain = require("./campain.models");
 
 const { DataTypes } = require("sequelize");
 
@@ -13,7 +14,6 @@ const Poll = db.define("poll", {
   
   citizenID:{
     type: DataTypes.STRING,
-    unique:true,
     allowNull: false,
     references:{
       key: 'citizen_id',
@@ -21,6 +21,15 @@ const Poll = db.define("poll", {
     },
     field: 'citizen_id'
   },
+  campain:{
+    type: DataTypes.UUID,
+    allowNull: false,
+    references:{
+      key: 'id',
+      model: Campain
+    },
+  },
+
   preferedParty: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -71,7 +80,6 @@ const Poll = db.define("poll", {
     allowNull:false,
     defaultValue: false
   }
-
 });
 
 module.exports = Poll

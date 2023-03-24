@@ -11,7 +11,8 @@ const authRouter = require('./auth/auth.router')
 const censusRouter = require('./census/census.router')
 const todoRouter = require('./todo/todo.router')
 const ballotsRouter = require('./ballots/ballots.router')
-
+const mapsRouter = require('./maps/maps.router')
+const pollsRouter = require('./polls/polls.router')
 
 const initModels = require('./models/initModels')
 
@@ -29,7 +30,7 @@ db.authenticate()
         console.log(err)
     })
 
-db.sync()
+db.sync({alter:true})
     .then(() => {
         console.log('Database Synced')
     })
@@ -47,13 +48,15 @@ app.get('/',(req, res) => {
     })
 })
 
+//path of routes
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/census', censusRouter)
 app.use('/api/v1/todo', todoRouter)
 app.use('/api/v1/ballots', ballotsRouter)
+app.use('/api/v1/maps', mapsRouter)
+app.use('/api/v1/polls', pollsRouter)
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)
 })
-

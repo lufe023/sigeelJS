@@ -3,10 +3,11 @@ const { DataTypes } = require("sequelize");
 
 const Maps = db.define("maps", {
 id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.NUMBER,
     primaryKey: true,
-    allowNull: false,
-    unique:true
+    allowNull: true,
+    unique:true,
+    autoIncrement:true
     },
 
 name: {

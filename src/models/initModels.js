@@ -8,12 +8,14 @@ const Job = require('./job.models')
 const Census = require('./census.models')
 const Maps = require('./maps.models')
 const Todo = require('./todo.models')
+const Ballots = require('./ballot.models')
 
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
     //? belongsTo || belongsToMany llave foranea en primer paramentro
     //user.hasOne(models.role, {foreignKey: 'id',sourceKey: 'roleId'})
+    
     Census.hasOne(Maps, {foreignKey: 'id',sourceKey: 'province', as: 'provinces'})
     Census.hasOne(Maps, {foreignKey: 'id',sourceKey: 'municipality', as: 'municipalities'})
     Census.hasOne(Maps, {foreignKey: 'id',sourceKey: 'district', as: 'districts'})
@@ -43,6 +45,13 @@ const initModels = () => {
 
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'responsible', as: 'Responsible'})
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'createdBy', as: 'Creador'})
+
+    //union de la tabla que guarda la boleta con el mapa
+    
+    Ballots.hasMany(Maps, {foreignKey: 'id',sourceKey: 'distritoMunicipal', as: 'DistritoMunicipal'})
+    Ballots.hasMany(Maps, {foreignKey: 'id',sourceKey: 'municipio', as: 'municipality'})
+    
+    Ballots.hasMany(Maps, {foreignKey: 'id',sourceKey: 'provincia', as: 'province'})
     
 }
 

@@ -17,7 +17,10 @@ const createNewCandidateServices = (req, res) => {
         party,
         partyAcronym,
         nomination,
-        picture
+        picture,
+        distritoMunicipal,
+        municipio,
+        provincia
     } = req.body
 
 
@@ -28,7 +31,10 @@ const createNewCandidateServices = (req, res) => {
             party,
             partyAcronym,
             nomination,
-            picture
+            picture,
+            distritoMunicipal,
+            municipio,
+            provincia
         })
         .then((data) => {
             res.status(201).json(data);
