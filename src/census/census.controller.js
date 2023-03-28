@@ -136,6 +136,69 @@ const getMyPeople = async (leaderId) => {
     return data
 }
 
+const getPeopleByUser = async (leaderId) => {
+
+    const data = await Census.findAndCountAll({
+    
+        where:{
+            leader:leaderId
+        },
+            include :[
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'provinces'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'municipalities'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'districts'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'neighbourhoods'
+            },
+            {
+                model : Users,
+                attributes: ['id', 'email'],
+                as: 'leaders'
+            },
+            {
+                model : Benefit,
+                //attributes: ['id', 'email'],
+                as: 'Beneficios'
+            },
+            {
+                model : Job,
+                //attributes: ['id', 'email'],
+                as: 'Empleos'
+            },
+            {
+                model : Participation,
+                //attributes: ['id', 'email'],
+                as: 'Actividades'
+            },
+            {
+                model : Gps,
+                //attributes: ['id', 'email'],
+                as: 'geolocation'
+            },
+            {
+                model : Poll,
+                //attributes: ['id', 'citizenID', 'campain'],
+                as: 'Encuestas'
+            }
+        ]  
+})
+    return data
+}
+
 //getting one People
 const getOnePeople = async (peopleid) => {
     const data = await Census.findOne({
@@ -312,5 +375,6 @@ module.exports = {
     getOnePeople,
     addPeople,
     getMyPeople,
+    getPeopleByUser,
     removePeople
 }
