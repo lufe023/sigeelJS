@@ -59,6 +59,30 @@ const findPeople = (req, res) => {
   
 }
 
+const simpleFindPeople = (req, res) => {
+  
+  const findWord = req.body.findWord
+  
+  if(findWord){
+  
+  censusControllers
+  .simpleFindPeople(findWord)
+  .then((data) => {
+    res.status(200).json({
+      data,
+    busqueda:findWord });
+  })
+  .catch((err) => {
+    res.status(400).json({ message: err});
+  });
+  }else{
+    res.status(400).json({
+      message: 'busqueda vacia',
+    field: 'findWord' });
+  }
+  
+}
+
 const addPeople = (req, res)=>{
   const leaderId = req.user.id
   const peopleId = req.body.peopleId
@@ -115,6 +139,7 @@ const removePeople = (req, res)=>{
 module.exports = {
     getAllCensus,
     findPeople,
+    simpleFindPeople,
     getMyPeople,
     getOnePeople,
     addPeople,

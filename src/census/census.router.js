@@ -15,6 +15,9 @@ router.get('/mypeople', passport.authenticate('jwt', {session: false}), censusSe
 //busqueda en tiempo real de personas
 router.post('/search',passport.authenticate('jwt', {session: false}), censusServices.findPeople)
 
+//busqueda simple en tiempo real de personas
+router.post('/simplesearch', censusServices.simpleFindPeople)
+
 //agegar personas a mi padron personal
 router.post('/addpeople', passport.authenticate('jwt', {session: false}), censusServices.addPeople)
 

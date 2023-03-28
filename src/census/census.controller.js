@@ -258,6 +258,23 @@ const findPeople = async (findWord) => {
     return data
 }
 
+const simpleFindPeople = async (findWord) => {
+    const data = await Census.findAndCountAll({
+        limit: 5,
+        where:
+        {
+        [Op.or]:
+            {
+            citizenID: {
+                [Op.iLike]: `%${findWord}%`
+            }
+            }
+        },
+        attributes: ['firstName', 'lastName']
+})
+    return data
+}
+
 const addPeople = async (peopleId, leaderId) => {
     const result = await Census.update({
         leader: leaderId,
@@ -291,6 +308,7 @@ const removePeople = async (peopleId, leaderId) =>{
 module.exports = {
     getAllCensus,
     findPeople,
+    simpleFindPeople,
     getOnePeople,
     addPeople,
     getMyPeople,
