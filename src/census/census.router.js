@@ -14,7 +14,7 @@ router.get('/', passport.authenticate('jwt', {session: false}), censusServices.g
 router.get('/mypeople', passport.authenticate('jwt', {session: false}), censusServices.getMyPeople)
 
 //ver el padron de alguien mas si eres administrador
-router.get('/peoplebyuser', passport.authenticate('jwt', {session: false}), adminValidate, censusServices.getPeopleByUser)
+router.post('/peoplebyuser', passport.authenticate('jwt', {session: false}), adminValidate, censusServices.getPeopleByUser)
 
 //busqueda en tiempo real de personas
 router.post('/search',passport.authenticate('jwt', {session: false}), censusServices.findPeople)
