@@ -10,9 +10,6 @@ const getAllUsers = async (offset, limit) => {
     const data = await Users.findAndCountAll({
         offset: offset,
         limit: limit,
-        where: {
-            status: 'active'
-        },
         include :[
             {
                 model : Census,

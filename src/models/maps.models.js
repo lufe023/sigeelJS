@@ -3,9 +3,9 @@ const { DataTypes } = require("sequelize");
 
 const Maps = db.define("maps", {
 id: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.INTEGER,
     primaryKey: true,
-    allowNull: true,
+    allowNull: false,
     unique:true,
     autoIncrement:true
     },
@@ -18,9 +18,8 @@ name: {
     //se utilizará para tener un superior ej: un distrito de nombre z tiene como superior a un municipio de nombre y, y este municipio tiene una provincia superior x , etc
     parent:{
         type: DataTypes.INTEGER,
-        allowNull: true,
-        defaultValue: 0
-    },
+        allowNull: true
+},
 
 type: {
     type: DataTypes.TEXT,
