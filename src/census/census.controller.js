@@ -66,8 +66,6 @@ const getAllCensus = async () => {
                 as: 'Encuestas'
             }
 
-
-
         ]  
 })
     return data

@@ -2,7 +2,6 @@ const db = require("../utils/database");
 const Maps = require("./maps.models");
 
 const { DataTypes } = require("sequelize");
-const Users = require("./users.models");
 
 const Census = db.define("census", {
   id: {
@@ -96,8 +95,7 @@ const Census = db.define("census", {
   //referencia a usuarios llave foranea de users
   leader:{
     type: DataTypes.UUID,
-    allowNull: true
-  
+    allowNull: true,
   },
 });
 

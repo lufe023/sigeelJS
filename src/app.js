@@ -30,7 +30,7 @@ db.authenticate()
         console.log(err)
     })
 
-db.sync({alter:true})
+db.sync()
     .then(() => {
         console.log('Database Synced')
     })

@@ -12,8 +12,6 @@ const getAllUsers = (req, res) => {
 
   const urlBase = `${host}/api/v1/users`
 
-
-
   usersControllers
     .getAllUsers(offset, limit)
     .then((data) => {
@@ -27,7 +25,7 @@ const getAllUsers = (req, res) => {
         results: data.rows});
     })
     .catch((err) => {
-      res.status(400).json({ message: err.message });
+      res.status(400).json({ message: err });
     });
 };
 
@@ -182,7 +180,7 @@ const getMyUser = (req, res) => {
       res.status(200).json(data);
     })
     .catch((err) => {
-      res.status(400).json({ message: err.message });
+      res.status(400).json({ message: err });
     });
 };
 

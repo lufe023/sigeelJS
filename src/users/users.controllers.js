@@ -11,10 +11,11 @@ const getAllUsers = async (offset, limit) => {
         offset: offset,
         limit: limit,
         include :[
+            
             {
-                model : Census,
-                attributes: ['first_name', 'last_name', 'picture'],
-                as: 'usuario'
+            model : Census,
+            attributes: ['first_name', 'last_name', 'picture'],
+            as: 'usuario'
             },
             {
                 model: Roles,
@@ -34,10 +35,11 @@ const getUserById = async (id) => {
             status: 'active'
         },
         include :[
-            {
-                model : Census,
-                attributes: ['first_name', 'last_name', 'picture'],
-                as: 'usuario'
+        
+                {
+                    model: Census,
+                    attributes: ['first_name', 'last_name'],
+                    as: 'usuario'
             },
             {
                 model: Roles,
@@ -116,11 +118,12 @@ const getUserByEmail = async(email) => {
             status: 'active'
         },
         include :[
-            {
-                model : Census,
-                attributes: ['first_name', 'last_name', 'picture'],
-                as: 'usuario'
-            },
+            //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
+            // {
+            //     model : Census,
+            //     attributes: ['first_name', 'last_name', 'picture'],
+            //     as: 'usuario'
+            // },
             {
                 model: Roles,
                 attributes: ['level', 'roleName'],
