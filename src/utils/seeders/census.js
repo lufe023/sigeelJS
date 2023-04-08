@@ -8,7 +8,7 @@ const randomNumber = (min, max)=>{
 }
 
 
-for(let i = 0; i<50; i++){
+for(let i = 0; i<10; i++){
     Census.create(
         {
             id: uuid.v4(),
