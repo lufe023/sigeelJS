@@ -13,7 +13,6 @@ const getAllUsers = async (offset, limit) => {
         attributes: {
             exclude:['password']
         },
-       
         include :[
             {
             model : Census,
