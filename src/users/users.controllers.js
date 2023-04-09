@@ -10,41 +10,39 @@ const getAllUsers = async (offset, limit) => {
     const data = await Users.findAndCountAll({
         offset: offset,
         limit: limit,
+        attributes: {
+            exclude:['password']
+        },
+       
         include :[
-            
             {
             model : Census,
             attributes: ['first_name', 'last_name', 'picture'],
-            as: 'usuario'
+            
             },
             {
                 model: Roles,
-                attributes: ['level', 'roleName'],
-                as: 'nivel'
             }
         ]
+        
     })
     return data
 }
 
 const getUserById = async (id) => {
     const data = await Users.findOne({
-        attributes:['id', 'email', 'role', 'status', 'citizenID'],
+        attributes:['id', 'email', 'userRoleId', 'status', 'censuCitizenID'],
         where: {
             id: id,
             status: 'active'
         },
         include :[
-        
-                {
-                    model: Census,
-                    attributes: ['first_name', 'last_name'],
-                    as: 'usuario'
+            //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
+            {
+                model : Census,
             },
             {
-                model: Roles,
-                attributes: ['level', 'roleName'],
-                as: 'nivel'
+                model: Roles
             }
         ]
     })
@@ -56,8 +54,8 @@ const createUser = async (data) => {
         id: uuid.v4(),
         email: data.email,
         password: hashPassword(data.password),
-        citizenID: data.citizenID,
-        role: data.role
+        censuCitizenID: data.citizenID,
+        userRoleId: data.role
     })
     return newUser
 }
@@ -102,7 +100,7 @@ const deleteUser = async (id) => {
     const data = await Users.destroy({
         where: {
             id
-        }       
+        }
     })
     return data
 }
@@ -125,9 +123,7 @@ const getUserByEmail = async(email) => {
             //     as: 'usuario'
             // },
             {
-                model: Roles,
-                attributes: ['level', 'roleName'],
-                as: 'nivel'
+                model: Roles
             }
         ]
     })

@@ -24,9 +24,11 @@ const initModels = () => {
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
     
-    Users.hasOne(Census, {foreignKey:'citizenID', sourceKey: 'citizenID', as: 'usuario'})
+    Users.belongsTo(Census)
     
-    Users.hasOne(Roles, {foreignKey: 'id',sourceKey: 'role', as: 'nivel'})
+    Users.belongsTo(Roles)
+    //Users.hasOne(Roles, {foreignKey: 'id',sourceKey: 'role', as: 'nivel'})
+    
     //relacionando la tabla beneficios para obtener la informacion de beneficios que ha obtenido la persona
     Census.hasMany(Benefit, {foreignKey:'citicenID' , sourceKey: 'citizenID', as: 'Beneficios'})
 

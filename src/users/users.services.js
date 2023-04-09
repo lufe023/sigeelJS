@@ -173,7 +173,6 @@ const deleteUser = (req, res) => {
 
 const getMyUser = (req, res) => {
   const id = req.user.id; //? req.user contiene la informacion del token desencriptado
-
   usersControllers
     .getUserById(id)
     .then((data) => {

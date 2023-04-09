@@ -6,7 +6,6 @@ const { DataTypes } = require("sequelize");
 const Census = db.define("census", {
   id: {
     type: DataTypes.UUID,
-    primaryKey: true,
     allowNull: false,
   },
   firstName: {
@@ -27,7 +26,8 @@ const Census = db.define("census", {
     type: DataTypes.STRING,
     unique:true,
     allowNull: false,
-    field: 'citizen_id'
+    field: 'citizen_id',
+    primaryKey: true,
   },
 
   age: {

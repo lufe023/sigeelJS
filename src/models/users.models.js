@@ -23,7 +23,7 @@ const Users = db.define("users", {
     type: DataTypes.STRING,
     allowNull: false
   },
-  role: {
+  userRoleId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -42,7 +42,7 @@ const Users = db.define("users", {
     field: 'is_verified',
     defaultValue: false
   },
-  citizenID:{
+  censuCitizenID:{
     type: DataTypes.STRING,
     allowNull: false,
     unique:true,
