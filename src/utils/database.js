@@ -16,18 +16,5 @@ const db = new Sequelize({
     } : {}
 })
 
-//para conectar en local
-// const db = new Sequelize({
-//     dialect: 'postgres',
-//     host: 'localhost', //? Variable de entorno del host
-//     username: 'postgres', //? Variable de entorno del usuario
-//     password: 'MundoHolaqwsa023@', //? Variable de entorno de la contraseña
-//     database: 'sigellB', //? Variable de entorno de la base de datos
-//     dialectOptions: {
-//                 ssl: false,
-//                 rejectUnauthorized: false
-//             }
-// })
-
 
 module.exports = db
