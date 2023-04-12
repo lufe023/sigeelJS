@@ -33,6 +33,7 @@ const Ballot = db.define("ballot", {
   },
   distritoMunicipal:{
     type: DataTypes.INTEGER,
+    allowNull:true,
     field: "distrito_municipal",
     references:{
       key: 'id',
@@ -41,6 +42,7 @@ const Ballot = db.define("ballot", {
   },
   municipio:{
     type: DataTypes.INTEGER,
+    allowNull:true,
     references:{
       key: 'id',
       model: Maps
