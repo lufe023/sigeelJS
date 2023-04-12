@@ -41,7 +41,15 @@ const createNewCandidateServices = (req, res) => {
         })
         .catch((err) => {
             res.status(400).json({
-            Error: err.message
+            Error: err,
+            name,
+            party,
+            partyAcronym,
+            nomination,
+            picture,
+            distritoMunicipal,
+            municipio,
+            provincia
           });
         });
     } else {
@@ -54,6 +62,14 @@ const createNewCandidateServices = (req, res) => {
             nomination: "string",
             picture: "text but is optional"
         },
+        name,
+        party,
+        partyAcronym,
+        nomination,
+        picture,
+        distritoMunicipal,
+        municipio,
+        provincia
       })
     }
   }
