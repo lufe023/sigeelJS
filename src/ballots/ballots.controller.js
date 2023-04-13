@@ -34,7 +34,7 @@ const createNewCandidateController = async (data) => {
         party: data.party,
         partyAcronym: data.partyAcronym, 
         nomination: data.nomination,
-        picture: '',
+        picture: data.pictureName,
         distritoMunicipal: data.distritoMunicipal == 'null' ? null : data.distritoMunicipal,
         municipio: data.municipio,
         provincia: data.provincia

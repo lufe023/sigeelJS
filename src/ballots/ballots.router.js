@@ -21,10 +21,8 @@ require('../middlewares/auth.middleware')(passport)
 
     const upload = multer({storage})
 
-    
-
 //rutas
-
+let otra = "hola"
 //ver todo el padron
 router.get('/', passport.authenticate('jwt', {session: false}), ballots.getAllBallots)
 
