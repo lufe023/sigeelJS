@@ -6,16 +6,31 @@ const fs = require('fs-extra')
 const getImage = async (req, res) => {
         const type = req.params.type;
         const image = req.params.image;
-        const pathImage = path.resolve( __dirname, `../census/pictures/${image}`);
+
+        //condicionando la ruta se gun la foto que se pida
+        let pathImage
+        if(type=="citizen"){
+        pathImage = path.resolve( __dirname, `../../uploads/images/citizens/${image}`);
+        }
+
+        if(type=="candidate"){
+            pathImage = path.resolve( __dirname, `../../uploads/images/candidates/${image}`);
+        }
+
+        if(type=="user"){
+            pathImage = path.resolve( __dirname, `../../uploads/images/candidates/${image}`);
+        }
+
         if (await fs.existsSync(pathImage)) {
             res.sendFile(pathImage)
-        } else {
+        }
+        else 
+        {
             let pathNoImage = '';
-                pathNoImage = path.resolve( __dirname, `../census/pictures/nobody.jpg`);
+                pathNoImage = path.resolve( __dirname, `../../uploads/images/system/nobody.jpg`);
             res.sendFile(pathNoImage);
         }
     }
-
 
 module.exports = {
     getImage
