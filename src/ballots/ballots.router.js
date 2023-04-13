@@ -28,4 +28,7 @@ router.get('/', passport.authenticate('jwt', {session: false}), ballots.getAllBa
 
 router.post('/', passport.authenticate('jwt', {session: false}), adminValidate, upload.single('file'), ballots.createNewCandidateServices)
 
+router.get('/:id', passport.authenticate('jwt', {session: false}), ballots.getCandidateById)
+
+router.delete('/:id', passport.authenticate('jwt', {session: false}), ballots.deleteCandidateAndFiles)
 module.exports = router

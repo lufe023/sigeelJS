@@ -1,6 +1,5 @@
-const uuid = require('uuid')
 const ballotController = require('./ballots.controller');
-const multer = require('multer')
+const fs = require('fs').promises
 
 const getAllBallots = (req, res) => {
         ballotController
@@ -77,7 +76,43 @@ const pictureName = req.file.filename
   }
 }
 
+const getCandidateById = (req, res) => {
+const candidateId = req.params.id
+ballotController
+.getCandidateById(candidateId)
+.then((candidate) => {
+  res.status(200).json(candidate);
+})
+  .catch((err) => {
+    res.status(400).json(err)
+  })
+}
+
+const deleteCandidateAndFiles = (req, res) =>{
+  const candidateId = req.params.id
+  ballotController.getCandidateById(candidateId)
+  .then((candidate) => {
+
+    ballotController.deleteCandidate(candidateId)
+    .then()
+    if(candidate.picture)
+    {
+    fs.unlink(`./uploads/images/candidates/${candidate.picture}`)
+  .then(() => {
+    console.log('File removed')
+  }).catch(err => {
+    console.error('Something wrong happened removing the file', err)
+  })
+}
+    res.status(200).json({msg:'eliminado foto e informacion con exito'});
+  })
+  .catch((err) => {
+    res.status(400).json(err)
+  })
+}
 module.exports = {
     getAllBallots,
-    createNewCandidateServices
+    createNewCandidateServices,
+    getCandidateById,
+    deleteCandidateAndFiles
 }

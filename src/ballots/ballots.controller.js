@@ -2,7 +2,7 @@ const Ballot = require("../models/ballot.models")
 const uuid = require('uuid')
 const Maps = require("../models/maps.models")
 
-
+//obteniendo todos los candidatos
 const getAllBallotsController = async () => {
     const data = await Ballot.findAndCountAll({
         include :[
@@ -42,7 +42,30 @@ const createNewCandidateController = async (data) => {
     return newCandidate
 }
 
+//borrando un candidato de la ba de datos 
+const getCandidateById = async(id) =>{
+    const candidate = await Ballot.findOne({
+        where: {
+            candidate_id: id,
+        }
+    })
+    return candidate
+}
+
+const deleteCandidate = async(id) =>{
+    const data = await Ballot.destroy({
+        where: {
+            candidate_id: id,
+        }
+    })
+
+    return data
+}
+
+
 module.exports = {
     getAllBallotsController,
-    createNewCandidateController
+    createNewCandidateController,
+    getCandidateById,
+    deleteCandidate
 }
