@@ -63,6 +63,16 @@ const Campain = db.define("campain", {
       model: Users
     },
   },
+  startAt:{
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+    field: 'start_at'
+  },
+  finishAt:{
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+    field: 'finish_at'
+  },
 });
 
 module.exports = Campain
