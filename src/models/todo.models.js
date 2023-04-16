@@ -15,7 +15,7 @@ const Todo = db.define("todo", {
     allowNull: false
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true
   },
   limit: {

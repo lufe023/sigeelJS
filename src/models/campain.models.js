@@ -13,7 +13,7 @@ const Campain = db.define("campain", {
     allowNull: false,
   },
   name:{
-    type:DataTypes.STRING,
+    type:DataTypes.TEXT,
     allowNull:false
   },
   details:{
@@ -64,15 +64,19 @@ const Campain = db.define("campain", {
     },
   },
   startAt:{
-    type: DataTypes.DATEONLY,
+    type: DataTypes.DATE,
     allowNull: false,
     field: 'start_at'
   },
   finishAt:{
-    type: DataTypes.DATEONLY,
+    type: DataTypes.DATE,
     allowNull: false,
     field: 'finish_at'
   },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  }
 });
 
 module.exports = Campain

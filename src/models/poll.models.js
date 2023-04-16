@@ -32,12 +32,12 @@ const Poll = db.define("poll", {
 
   preferedParty: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     field: 'prefered_party'
   },
   electorType: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     field: 'elector_type'
   },
   president:{
@@ -77,8 +77,7 @@ const Poll = db.define("poll", {
   },
   alreadyVoted:{
     type: DataTypes.BOOLEAN,
-    allowNull:false,
-    defaultValue: false
+    allowNull:true
   }
 });
 

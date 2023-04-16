@@ -10,6 +10,23 @@ const Poll = require('../models/poll.models')
 
 const {Op} = require("sequelize")
 
+const getPeoplesByPlaces = async (province, municipality, district) => {
+    
+    const peoples = await Census.findAndCountAll({
+        where: {
+            [Op.and]: 
+            [
+                { province},
+                { municipality},
+                {district}
+            ]
+          },
+          attributes: ['firstName','lastName','citizenID','leader']
+    })
+
+    return peoples
+}
+
 const getAllCensus = async () => {
     const data = await Census.findAndCountAll({
     
@@ -374,5 +391,6 @@ module.exports = {
     addPeople,
     getMyPeople,
     getPeopleByUser,
-    removePeople
+    removePeople,
+    getPeoplesByPlaces
 }

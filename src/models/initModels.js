@@ -9,6 +9,7 @@ const Census = require('./census.models')
 const Maps = require('./maps.models')
 const Todo = require('./todo.models')
 const Ballots = require('./ballot.models')
+const Campain = require('./campain.models')
 
 
 const initModels = () => {
@@ -44,6 +45,13 @@ const initModels = () => {
 
     //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encuestas'})
+
+
+    //asociando el modelo campains con el modelo maps
+    Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'provincia', as: 'provinces'})
+    Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'municipio', as: 'municipalities'})
+    Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'distritoMunicipal', as: 'districts'})
+    Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'neighbourhood', as: 'neighbourhoods'})
 
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'responsible', as: 'Responsible'})
     Todo.hasOne(Users, {foreignKey:'id' , sourceKey: 'createdBy', as: 'Creador'})

@@ -6,6 +6,7 @@ const Roles = require('../models/roles.models')
 const Users = require('../models/users.models')
 const { hashPassword } = require('../utils/crypto')
 
+//conseguir todos los usuarios que existan en el sistema
 const getAllUsers = async (offset, limit) => {
     const data = await Users.findAndCountAll({
         offset: offset,
@@ -27,6 +28,7 @@ const getAllUsers = async (offset, limit) => {
     })
     return data
 }
+
 
 const getUserById = async (id) => {
     const data = await Users.findOne({
