@@ -55,7 +55,7 @@ const createCampains = async (data) => {
             name: data.name,
             details: data.details,
             neighbourhood: data.neighbourhood,
-            distritoMunicipal: data.distrito_municipal,
+            distrito_municipal: data.distrito_municipal,
             municipio: data.municipio,
             provincia: data.provincia,
             createdBy: data.createdBy,
