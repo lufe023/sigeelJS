@@ -214,7 +214,7 @@ const getPeopleByUser = async (leaderId) => {
     return data
 }
 
-//getting one People
+//getting one People from db
 const getOnePeople = async (peopleid) => {
     const data = await Census.findOne({
 
