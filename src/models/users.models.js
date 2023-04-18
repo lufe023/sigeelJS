@@ -52,6 +52,9 @@ const Users = db.define("users", {
       model: Census
     }
 },
+teamLeader:{
+  type: DataTypes.UUID
+},
 passwordRequest:{
   type: DataTypes.UUID,
   allowNull: true

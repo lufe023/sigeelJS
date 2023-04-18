@@ -13,7 +13,7 @@ enviarMail = async (from, mailReceiver, subject, text, html)=>{
     }
 
     const mensaje= {
-        from: 'no-reply@sigeel.com',
+        from: from,
         to: mailReceiver,
         subject: subject,
         text: text,
