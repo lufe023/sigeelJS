@@ -4,6 +4,7 @@ const uuid = require('uuid')
 const Maps = require('../models/maps.models')
 const CensusControllers = require('../census/census.controller')
 const todoControllers = require('../todo/todo.controller')
+const Census = require('../models/census.models')
 
 const getAllPolls = async () => {
     const data = await Polls.findAll({
@@ -46,6 +47,27 @@ const createPools = async(data) => {
     return poll
 }
 
+const getPollById = async (id) =>{
+    const poll = await Polls.findOne({
+        where: {
+            id: id
+        },
+        include :[
+            //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
+            {
+                model : Census,
+                as: 'citizen'
+            },
+            { 
+                model: Campain,
+                as: 'Campain'
+            }
+
+        ]
+    })
+    return poll
+}
+
 const createCampains = async (data) => {
 
 
@@ -63,8 +85,8 @@ const createCampains = async (data) => {
             finishAt: data.startAt
         })
         
-        const peoples = await  CensusControllers
-        .getPeoplesByPlaces(data.provincia, data.municipio, data.distrito_municipal)
+
+        const peoples = await  CensusControllers.getPeoplesByPlaces(data.provincia, data.municipio, data.distrito_municipal)
         
         const tareas = []
         const pools = []
@@ -80,11 +102,11 @@ const createCampains = async (data) => {
                 })
 
                 pools.push(pool)
-
-
+                
                     let tarea = await todoControllers.createTask({
                         title: `Encuesta ${peoples.rows[i].firstName}`,
-                        description: `Encuestar a ${peoples.rows[i].firstName} ${peoples.rows[i].lastName} en todos los niveles de la campaña ${newCampain.name} el detalle de la campaña es: ${newCampain.details}`,
+                        description: `${peoples.rows[i].firstName} ${peoples.rows[i].lastName}
+                        Encuesta en todos los niveles de la campaña ${newCampain.name} ${newCampain.details}`,
                         limit: newCampain.finishAt,
                         isActive: true,
                         responsible: peoples.rows[i].leader,
@@ -107,5 +129,6 @@ const createCampains = async (data) => {
 module.exports = {
     getAllPolls,
     getAllCampains,
-    createCampains
+    createCampains,
+    getPollById
 } 

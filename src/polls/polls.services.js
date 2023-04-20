@@ -1,5 +1,5 @@
 const pollsControllers = require('./polls.controller')
-const CensusControllers = require('../census/census.controller')
+
 
 const getAllPolls = (req, res) => {
     pollsControllers
@@ -10,6 +10,23 @@ const getAllPolls = (req, res) => {
     .catch((err) => {
         res.status(400).json({ message: err.message });
     });
+}
+
+//una encuesta por id
+const getPollById = (req, res) => {
+    const {id} = req.params
+    pollsControllers.getPollById(id)
+
+    .then((poll) => 
+                {
+                    res.status(201).json({poll})
+                })
+            
+            .catch((err) => {
+            res.status(400).json({
+                Error: err.err
+            })
+        })
 }
 
 //ver todas las campañas
@@ -77,6 +94,6 @@ const createNewCampain = (req, res) => {
 module.exports = {
     getAllPolls,
     getAllCampains,
-    createNewCampain
-    
+    createNewCampain,
+    getPollById
 }
