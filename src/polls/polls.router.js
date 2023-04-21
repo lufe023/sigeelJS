@@ -6,9 +6,11 @@ const pollsServices = require('./polls.services')
 require('../middlewares/auth.middleware')(passport)
 
 //? /api/v1/users/todo
-router.route('/')
+    router.route('/')
     .get(passport.authenticate('jwt', {session: false}), pollsServices.getAllPolls)
 
+    router.route('/:id')
+    .get(passport.authenticate('jwt', {session: false}), pollsServices.getPollById)
     //.post(passport.authenticate('jwt', {session:false}), adminValidate, pollsServices.createNewCampain)
 
     router.route('/campains')

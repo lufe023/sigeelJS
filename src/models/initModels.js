@@ -46,6 +46,11 @@ const initModels = () => {
     //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encuestas'})
 
+    //llamando un ciudadano por su encuesta
+    Poll.hasOne(Census,  {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'citizen'})
+
+    //relacion encuesta y campaña cada encuesta puede tener una campaña
+    Poll.hasOne(Campain,  {foreignKey:'id' , sourceKey: 'campain', as: 'Campain'})
 
     //asociando el modelo campains con el modelo maps
     Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'provincia', as: 'provinces'})

@@ -20,8 +20,8 @@ const getPeoplesByPlaces = async (province, municipality, district) => {
                 { municipality},
                 {district}
             ]
-          },
-          attributes: ['firstName','lastName','citizenID','leader']
+            },
+            attributes: ['firstName','lastName','citizenID','leader']
     })
 
     return peoples
