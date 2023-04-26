@@ -23,7 +23,7 @@ const Todo = db.define("todo", {
     allowNull: false,
   },
   isActive: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
     allowNull: false,
     field: 'is_active',
     defaultValue: true
