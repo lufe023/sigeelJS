@@ -5,6 +5,9 @@ const Maps = require('../models/maps.models')
 const CensusControllers = require('../census/census.controller')
 const todoControllers = require('../todo/todo.controller')
 const Census = require('../models/census.models')
+const Ballot = require('../models/ballot.models')
+
+const {Op} = require("sequelize")
 
 const getAllPolls = async () => {
     const data = await Polls.findAll({
@@ -65,7 +68,22 @@ const getPollById = async (id) =>{
 
         ]
     })
-    return poll
+
+
+    const candidate = await Ballot.findAndCountAll({
+        where: {
+            [Op.and]: 
+            [
+                
+                { provincia: poll.Campain.provincia},
+                { municipio: poll.Campain.municipio},
+                {distritoMunicipal: poll.Campain.distritoMunicipal}
+            ]
+    }
+})
+
+    const resultado = [poll, {"availablesCandidates": candidate}]
+    return resultado
 }
 
 const createCampains = async (data) => {
