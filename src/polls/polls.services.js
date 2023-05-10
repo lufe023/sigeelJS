@@ -91,9 +91,46 @@ const createNewCampain = (req, res) => {
         }
 }
 
+//actualizacion de las encuestas
+const updatePollService = (req, res) => {
+    const pollId = req.params.id
+    
+    const updatedBy = req.user.id
+
+    const {preferedParty, electorType, president, senator, diputy, mayor, councillor, districtDirector, districtCouncilor, alreadyVoted } = req.body;
+
+    pollsControllers
+    .updatePollController(pollId, {
+        preferedParty,
+        electorType,
+        president,
+        senator,
+        diputy,
+        mayor,
+        councillor,
+        districtDirector,
+        districtCouncilor,
+        updatedBy,
+        alreadyVoted
+    })
+    .then((data) => {
+        if (data[0]) {
+        res
+        .status(200)
+        .json({ message: 'poll has edited succesfully!'});
+        } else {
+        res.status(404).json({ message: "Invalid ID", h:data });
+        }
+    })
+    .catch((err) => {
+        res.status(400).json({ message: err});
+    });
+};
+
 module.exports = {
     getAllPolls,
     getAllCampains,
     createNewCampain,
-    getPollById
+    getPollById,
+    updatePollService
 }

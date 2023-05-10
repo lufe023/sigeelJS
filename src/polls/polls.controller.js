@@ -50,6 +50,20 @@ const createPools = async(data) => {
     return poll
 }
 
+//actualizacion de los datos de una ecuesta por id que pertenece a un elector
+const updatePollController = async(pollId, data) => {
+    const poll = await Polls.update(data,{ 
+        where: {
+            id: pollId
+        }
+        })
+    return poll
+
+    
+}
+
+
+
 const getPollById = async (id) =>{
     const poll = await Polls.findOne({
         where: {
@@ -148,5 +162,6 @@ module.exports = {
     getAllPolls,
     getAllCampains,
     createCampains,
-    getPollById
+    getPollById,
+    updatePollController
 } 

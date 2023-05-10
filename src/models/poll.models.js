@@ -4,6 +4,7 @@ const Ballot = require("./ballot.models");
 const Campain = require("./campain.models");
 
 const { DataTypes } = require("sequelize");
+const Users = require("./users.models");
 
 const Poll = db.define("poll", {
   id: {
@@ -73,6 +74,29 @@ const Poll = db.define("poll", {
     references:{
       key: 'candidate_id',
       model: Ballot
+    }
+  },
+//director de distrito
+districtDirector:{
+  type: DataTypes.UUID,
+  references:{
+    key: 'candidate_id',
+    model: Ballot
+  }
+},
+  //vocal de distrito
+  districtCouncilor:{
+    type: DataTypes.UUID,
+    references:{
+      key: 'candidate_id',
+      model: Ballot
+    }
+  },
+  updatedBy:{
+    type: DataTypes.UUID,
+    references:{
+      key: 'id',
+      model: Users
     }
   },
   alreadyVoted:{
