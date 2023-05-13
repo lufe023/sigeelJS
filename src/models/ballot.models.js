@@ -3,6 +3,7 @@ const db = require("../utils/database");
 
 const { DataTypes } = require("sequelize");
 const Maps = require("./maps.models");
+const Parties = require("./parties.models");
 
 const Ballot = db.define("ballot", {
   candidateId: {
@@ -16,8 +17,12 @@ const Ballot = db.define("ballot", {
     allowNull: false
   },
   party: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: false,
+    references:{
+      key: 'id',
+      model: Parties
+    },
   },
   partyAcronym:{
     type: DataTypes.STRING,

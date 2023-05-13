@@ -58,8 +58,6 @@ const updatePollController = async(pollId, data) => {
         }
         })
     return poll
-
-    
 }
 
 

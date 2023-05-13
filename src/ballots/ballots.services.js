@@ -12,6 +12,38 @@ const getAllBallots = (req, res) => {
             });
 }
 
+//llamar a todos los partidos
+const getAllPartysServices = (req, res) => {
+  ballotController
+  .getAllPartysController()
+  .then((parties)=>{ res.status(200).json(parties)})
+  .catch((err)=> {res.status(400).json(err)})
+}
+
+//Servicio de la creacion de un nuevo partido polito
+const createNewPartyServices = (req, res) => {
+
+const { partyName, partyAcronyms, color} = req.body
+
+if(partyName && partyAcronyms && color){
+  ballotController.createNewPartyController({partyName, partyAcronyms, color})
+  .then((data) => {res.status(201).json({data})})
+  .catch((err) => {res.status(400).json({err})})
+}
+else {
+  //? Error cuando no mandan todos los datos necesarios para crear un usuario
+  res.status(400).json({
+    message: "All fields must be completed",
+    fields: {
+      partyName: "string",
+      partyAcronyms: "string",
+      color: "string exadecimal prefered"
+    }
+  })
+}
+}
+
+//servicio para crear un nuevo candidato en la base de datos y guardar la foto en servidor
 const createNewCandidateServices = (req, res) => {
   
   const {
@@ -114,5 +146,7 @@ module.exports = {
     getAllBallots,
     createNewCandidateServices,
     getCandidateById,
-    deleteCandidateAndFiles
+    deleteCandidateAndFiles,
+    createNewPartyServices,
+    getAllPartysServices
 }

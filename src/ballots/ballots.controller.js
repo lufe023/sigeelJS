@@ -1,6 +1,7 @@
 const Ballot = require("../models/ballot.models")
 const uuid = require('uuid')
 const Maps = require("../models/maps.models")
+const Parties = require("../models/parties.models")
 
 //obteniendo todos los candidatos
 const getAllBallotsController = async () => {
@@ -25,6 +26,14 @@ const getAllBallotsController = async () => {
     return data
 }
 
+//llamar a todos los partidos
+const getAllPartysController = async () => {
+    const parties = await Parties.findAndCountAll({})
+
+    return parties
+}
+
+
 //create new candidate
 const createNewCandidateController = async (data) => {
 
@@ -40,6 +49,18 @@ const createNewCandidateController = async (data) => {
         provincia: data.provincia
     })
     return newCandidate
+}
+
+//create new political party
+const createNewPartyController = async (data) => {
+
+    const newParty = await Parties.create({
+        id: uuid.v4(),
+        partyName: data.partyName,
+        partyAcronyms: data.partyAcronyms,
+        color: data.color 
+    })
+    return newParty
 }
 
 //borrando un candidato de la ba de datos 
@@ -67,5 +88,7 @@ module.exports = {
     getAllBallotsController,
     createNewCandidateController,
     getCandidateById,
-    deleteCandidate
+    deleteCandidate,
+    createNewPartyController,
+    getAllPartysController
 }

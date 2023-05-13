@@ -119,7 +119,7 @@ const updatePollService = (req, res) => {
         .status(200)
         .json({ message: 'poll has edited succesfully!'});
         } else {
-        res.status(404).json({ message: "Invalid ID", h:data });
+        res.status(404).json({ message: "Invalid ID"});
         }
     })
     .catch((err) => {

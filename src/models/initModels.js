@@ -10,7 +10,7 @@ const Maps = require('./maps.models')
 const Todo = require('./todo.models')
 const Ballots = require('./ballot.models')
 const Campain = require('./campain.models')
-
+const Parties = require('./parties.models')
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis

@@ -21,14 +21,25 @@ require('../middlewares/auth.middleware')(passport)
 
     const upload = multer({storage})
 
-//rutas
-let otra = "hola"
+
 //ver todo el padron
 router.get('/', passport.authenticate('jwt', {session: false}), ballots.getAllBallots)
 
+
+//ruta para crear un nuevo candidato
 router.post('/', passport.authenticate('jwt', {session: false}), adminValidate, upload.single('file'), ballots.createNewCandidateServices)
 
+//ruta para crear un nuevo partido
+router.post('/party', passport.authenticate('jwt', {session: false}), adminValidate, ballots.createNewPartyServices)
+
+//ruta para ver todos los partidos
+router.get('/party', passport.authenticate('jwt', {session: false}), ballots.getAllPartysServices)
+
+//ruta para llamar a un candidato por su id
 router.get('/:id', passport.authenticate('jwt', {session: false}), ballots.getCandidateById)
 
+//ruta para eliminar a un candidato de la base de datos y su foto del servidor
 router.delete('/:id', passport.authenticate('jwt', {session: false}), ballots.deleteCandidateAndFiles)
+
+
 module.exports = router

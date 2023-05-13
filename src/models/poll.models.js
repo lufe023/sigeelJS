@@ -5,6 +5,7 @@ const Campain = require("./campain.models");
 
 const { DataTypes } = require("sequelize");
 const Users = require("./users.models");
+const Parties = require("./parties.models");
 
 const Poll = db.define("poll", {
   id: {
@@ -32,9 +33,13 @@ const Poll = db.define("poll", {
   },
 
   preferedParty: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: true,
-    field: 'prefered_party'
+    field: 'prefered_party',
+    references:{
+      key:'id',
+      model:Parties
+    }
   },
   electorType: {
     type: DataTypes.STRING,
