@@ -21,7 +21,12 @@ const getAllBallotsController = async () => {
                 model : Maps,
                 attributes: ['id', 'name', 'parent'],
                 as: 'DistritoMunicipal'
-            }]
+            },
+            {
+                model : Parties,
+                as: 'partyDetails'
+            }
+        ]
 })
     return data
 }
@@ -41,9 +46,8 @@ const createNewCandidateController = async (data) => {
         candidateId: uuid.v4(),
         name: data.name,
         party: data.party,
-        partyAcronym: data.partyAcronym, 
         nomination: data.nomination,
-        picture: data.pictureName,
+        picture: data.picture,
         distritoMunicipal: data.distritoMunicipal == 'null' ? null : data.distritoMunicipal,
         municipio: data.municipio,
         provincia: data.provincia
@@ -83,6 +87,15 @@ const deleteCandidate = async(id) =>{
     return data
 }
 
+const deletePartyController = async(id) =>{
+    const data = await Parties.destroy({
+        where: {
+            id
+        }
+    })
+
+    return data
+}
 
 module.exports = {
     getAllBallotsController,
@@ -90,5 +103,6 @@ module.exports = {
     getCandidateById,
     deleteCandidate,
     createNewPartyController,
-    getAllPartysController
+    getAllPartysController,
+    deletePartyController
 }

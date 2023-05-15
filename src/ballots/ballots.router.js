@@ -35,6 +35,9 @@ router.post('/party', passport.authenticate('jwt', {session: false}), adminValid
 //ruta para ver todos los partidos
 router.get('/party', passport.authenticate('jwt', {session: false}), ballots.getAllPartysServices)
 
+//ruta para eliminar un partido
+router.delete('/party/:id', passport.authenticate('jwt', {session: false}), ballots.deletePartyService)
+
 //ruta para llamar a un candidato por su id
 router.get('/:id', passport.authenticate('jwt', {session: false}), ballots.getCandidateById)
 

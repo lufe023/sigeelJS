@@ -24,10 +24,7 @@ const Ballot = db.define("ballot", {
       model: Parties
     },
   },
-  partyAcronym:{
-    type: DataTypes.STRING,
-    allowNull: false
-  },
+
   nomination: {
     type: DataTypes.STRING,
     allowNull: false

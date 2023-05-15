@@ -43,44 +43,49 @@ else {
 }
 }
 
+//eliminar un partido
+const deletePartyService = (req, res) => {
+  const {id} = req.params
+
+  ballotController
+  .deletePartyController(id)
+  .then(res.status(200).json({msg:`partido eliminado con exito`}))
+  .catch((err) => {res.status(400).json(err)})
+}
+
 //servicio para crear un nuevo candidato en la base de datos y guardar la foto en servidor
 const createNewCandidateServices = (req, res) => {
   
   const {
       name,
       party,
-      partyAcronym,
       nomination,
       distritoMunicipal,
-      picture,
       municipio,
       provincia
   } = req.body
-const pictureName = req.file.filename
+const picture = req.file.filename
 
-    if(name && party && partyAcronym && nomination)
+    if(name && party && nomination)
     {
       ballotController.createNewCandidateController({
           name,
           party,
-          partyAcronym,
           nomination,
-          pictureName,
+          picture,
           distritoMunicipal,
           municipio,
           provincia
       })
       .then((data) => {
-          res.status(201).json({data, pictureName});
+          res.status(201).json({data, picture});
       })
       .catch((err) => {
           res.status(400).json({
           Error: err,
           name,
           party,
-          partyAcronym,
           nomination,
-          picture,
           distritoMunicipal,
           municipio,
           provincia
@@ -108,6 +113,7 @@ const pictureName = req.file.filename
   }
 }
 
+//Servicio obtener un condidato por id
 const getCandidateById = (req, res) => {
 const candidateId = req.params.id
 ballotController
@@ -120,6 +126,7 @@ ballotController
   })
 }
 
+//servicio para eliminar un candidato y su foto
 const deleteCandidateAndFiles = (req, res) =>{
   const candidateId = req.params.id
   ballotController.getCandidateById(candidateId)
@@ -148,5 +155,6 @@ module.exports = {
     getCandidateById,
     deleteCandidateAndFiles,
     createNewPartyServices,
-    getAllPartysServices
+    getAllPartysServices,
+    deletePartyService
 }

@@ -27,6 +27,9 @@ const initModels = () => {
     
     Users.belongsTo(Census)
     
+    //relacionar los candidatos con los partidos
+    Ballots.hasOne(Parties, {foreignKey: 'id',sourceKey: 'party', as: 'partyDetails'} )
+    
     Users.belongsTo(Roles)
     //Users.hasOne(Roles, {foreignKey: 'id',sourceKey: 'role', as: 'nivel'})
     
