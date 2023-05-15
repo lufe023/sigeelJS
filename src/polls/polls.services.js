@@ -17,16 +17,9 @@ const getPollById = (req, res) => {
     const {id} = req.params
     pollsControllers.getPollById(id)
 
-    .then((poll) => 
-                {
-                    res.status(201).json({poll})
-                })
+    .then((poll) => {res.status(201).json({poll})})
             
-            .catch((err) => {
-            res.status(400).json({
-                Error: err.err
-            })
-        })
+    .catch((err) => {res.status(400).json({Error: err.err})})
 }
 
 //ver todas las campañas

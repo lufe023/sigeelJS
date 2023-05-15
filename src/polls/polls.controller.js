@@ -8,6 +8,7 @@ const Census = require('../models/census.models')
 const Ballot = require('../models/ballot.models')
 
 const {Op} = require("sequelize")
+const Parties = require('../models/parties.models')
 
 const getAllPolls = async () => {
     const data = await Polls.findAll({
@@ -94,7 +95,9 @@ const getPollById = async (id) =>{
     }
 })
 
-    const resultado = [poll, {"availablesCandidates": candidate}]
+    const parties = await Parties.findAndCountAll()
+
+    const resultado = [poll, {"availablesCandidates": candidate}, {"parties": parties}]
     return resultado
 }
 
