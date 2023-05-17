@@ -55,6 +55,8 @@ const initModels = () => {
     //relacion encuesta y campaña cada encuesta puede tener una campaña
     Poll.hasOne(Campain,  {foreignKey:'id' , sourceKey: 'campain', as: 'Campain'})
 
+    //Ballots.hasOne(Parties, {foreignKey:'id' , sourceKey: 'party', as: 'party_details'})
+
     //asociando el modelo campains con el modelo maps
     Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'provincia', as: 'provinces'})
     Campain.hasOne(Maps, {foreignKey: 'id',sourceKey: 'municipio', as: 'municipalities'})

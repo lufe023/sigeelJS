@@ -66,8 +66,9 @@ const updatePollController = async(pollId, data) => {
 const getPollById = async (id) =>{
     const poll = await Polls.findOne({
         where: {
-            id: id
+            id
         },
+        attributes: {exclude: ['password']},
         include :[
             //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
             {
@@ -78,11 +79,10 @@ const getPollById = async (id) =>{
                 model: Campain,
                 as: 'Campain'
             }
-
         ]
     })
 
-
+    
     const candidate = await Ballot.findAndCountAll({
         where: {
             [Op.and]: 
@@ -92,7 +92,14 @@ const getPollById = async (id) =>{
                 { municipio: poll.Campain.municipio},
                 {distritoMunicipal: poll.Campain.distritoMunicipal}
             ]
-    }
+    },
+     include :[
+        //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
+        {
+            model : Parties,
+            as: 'partyDetails'
+        }
+    ]
 })
 
     const parties = await Parties.findAndCountAll()
