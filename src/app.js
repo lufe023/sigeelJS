@@ -14,6 +14,7 @@ const ballotsRouter = require('./ballots/ballots.router')
 const mapsRouter = require('./maps/maps.router')
 const pollsRouter = require('./polls/polls.router')
 const imageRouter = require('./images/images.router')
+const dashboard = require('./dashboard/dashboard.router')
 
 const initModels = require('./models/initModels')
 
@@ -58,7 +59,7 @@ app.use('/api/v1/ballots', ballotsRouter)
 app.use('/api/v1/maps', mapsRouter)
 app.use('/api/v1/polls', pollsRouter)
 app.use('/api/v1/images', imageRouter);
-
+app.use('/api/v1/dashboard', dashboard)
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)
