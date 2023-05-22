@@ -221,16 +221,16 @@ for (let i=0; i < preferedDistrictCouncillor.length; i++){
 //Fin sacando los votos de los vocales distritales preferidos
 
 const result = {
-    // "ciudadanos": citizens,
-    // "Activities": activities,
-    // "Beneficios": beneficios,
-    // "Encuestas":{
-    //     "total":encuestas.length,
-    //     "Completas ":completas,
-    //     "Incompletas": incompletas,
-    //     "porciento Completada": Math.round(completas/encuestas.length*100),
-    //     "porciento Incompletada": Math.round(incompletas/encuestas.length*100)
-    // },
+    "ciudadanos": citizens,
+    "Activities": activities,
+    "Beneficios": beneficios,
+    "Encuestas":{
+        "total":encuestas.length,
+        "Completas":completas,
+        "Incompletas": incompletas,
+        "percent_complete": Math.round(completas/encuestas.length*100),
+        "percent_incomplete": Math.round(incompletas/encuestas.length*100)
+    },
     "preferedParty": preferedPartyArray,
     "preferedPresident": preferedPresidentArray,
     "preferedSenator": preferedSenatorArray,
