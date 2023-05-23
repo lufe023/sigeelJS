@@ -52,7 +52,7 @@ const Users = db.define("users", {
       model: Census
     }
 },
-teamLeader:{
+team:{
   type: DataTypes.UUID
 },
 passwordRequest:{

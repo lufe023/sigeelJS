@@ -2,17 +2,20 @@ const dashboardController = require("./dashboard.controller")
 
 
 const MyCitizensDataServices = (req, res) =>{
-const {id} = req.params
+const {userId} = req.params
+const {campainId} = req.params
+
+if(!campainId){ const campainId = null}
 
 dashboardController
-.MyCitizensDataController(id)
+.MyCitizensDataController(userId, campainId)
 .then(dashboard=>{
     res.status(200).json({
         dashboard
     })
 })
 .catch((err) => { res.status(400).json({err})});
-}
+ }
 
 
 module.exports = {

@@ -93,7 +93,7 @@ const getPollById = async (id) =>{
                 {distritoMunicipal: poll.Campain.distritoMunicipal}
             ]
     },
-     include :[
+    include :[
         //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
         {
             model : Parties,

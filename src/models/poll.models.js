@@ -107,6 +107,10 @@ districtDirector:{
   alreadyVoted:{
     type: DataTypes.BOOLEAN,
     allowNull:true
+  },
+  active:{
+    type: DataTypes.BOOLEAN,
+    default: true
   }
 });
 

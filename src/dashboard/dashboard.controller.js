@@ -6,10 +6,10 @@ const Participation = require('../models/participation.models')
 const Parties = require('../models/parties.models')
 const Poll = require('../models/poll.models')
 
-const MyTotalCitizens = async (id)=> {
+const MyTotalCitizens = async (userId, campainId)=> {
     const citizens =  await Census.findAndCountAll({
         where: {
-            leader:id
+            leader:userId
             },
             attributes: ['id','citizenID', 'district', 'firstName'],
             include:[
@@ -31,7 +31,10 @@ const MyTotalCitizens = async (id)=> {
                 },
                 {
                     model: Poll,
-                    as: "Encuestas"
+                    as: "Encuestas",
+                    where:
+                    campainId? {campain:campainId} : {active: true}
+                    
                 }
             ]
 })
@@ -247,11 +250,9 @@ return result
 }
 
 
+const MyCitizensDataController = async (userId, campainId) => {
 
-
-const MyCitizensDataController = async (id) => {
-
-const total = await MyTotalCitizens(id)
+const total = await MyTotalCitizens(userId, campainId)
 
 const result = [total]
 return result
