@@ -12,6 +12,7 @@ const Ballots = require('./ballot.models')
 const Campain = require('./campain.models')
 const Parties = require('./parties.models')
 
+
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
     //? belongsTo || belongsToMany llave foranea en primer paramentro
@@ -54,6 +55,34 @@ const initModels = () => {
 
     //relacion encuesta y campaña cada encuesta puede tener una campaña
     Poll.hasOne(Campain,  {foreignKey:'id' , sourceKey: 'campain', as: 'Campain'})
+
+
+
+/* ############################# //Inicio conectando lista de Candidatos con las encuestas */
+        //conectando lista de partidos con las encuestas
+        Poll.hasMany(Parties, {foreignKey:'id' , sourceKey: 'preferedParty', as: 'preferedPartyDetails'})
+
+        //conectando lista de Presidentes con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'president', as: 'preferedPresidentDetails'})
+
+        //conectando lista de Senadores con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'senator', as: 'preferedSenatorDetails'})
+
+        //conectando lista de Diputados con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'diputy', as: 'preferedDiputyDetails'})      
+        
+        //conectando lista de Alcaldes con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'mayor', as: 'preferedMayorDetails'})   
+
+        //conectando lista de Regidor con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'councillor', as: 'preferedCouncillorDetails'})   
+
+        //conectando lista de Director de Distrito con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'districtDirector', as: 'preferedDistrictDirectorDetails'})
+
+        //conectando lista de Vocal  de Distrito con las encuestas
+        Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'districtCouncilor', as: 'preferedDistrictCouncilorDetails'})        
+        /* ########################## // Fin conectando lista de Candidatos con las encuestas */
 
     //Ballots.hasOne(Parties, {foreignKey:'id' , sourceKey: 'party', as: 'party_details'})
 
