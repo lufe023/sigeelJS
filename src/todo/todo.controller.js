@@ -24,7 +24,19 @@ const getAlltasks = async (id) => {
                 { responsible: id },
                 { createdBy: id }
             ]
-            }
+            },
+            include:[
+                {
+                    model:Users,
+                    as: 'Responsible',
+                    attributes: ['email'],
+                },
+                {
+                    model:Users,
+                    as: 'Creador',
+                    attributes: ['email'],
+                }
+            ]
     })
     return data
 }
