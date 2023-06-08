@@ -13,4 +13,3 @@ module.exports = router
 //? esta ruta llama datos por usuario enviando el id del usuario mas el id de la campaña que se quiere ver
 router.route('/:userId/:campainId')
 .get(passport.authenticate('jwt', {session: false}), dashboardServices.MyCitizensDataServices)
-

@@ -7,7 +7,7 @@ const Participation = require('../models/participation.models')
 const Gps = require('../models/gps.models')
 const Ballot = require('../models/ballot.models')
 const Poll = require('../models/poll.models')
-
+const getUser = require('../users/users.controllers')
 const {Op} = require("sequelize")
 
 const getPeoplesByPlaces = async (province, municipality, district) => {
@@ -211,7 +211,11 @@ const getPeopleByUser = async (leaderId) => {
             }
         ]  
 })
-    return data
+
+const user = await getUser.getUserById(leaderId)
+            
+
+    return [data,user]
 }
 
 //getting one People from db
