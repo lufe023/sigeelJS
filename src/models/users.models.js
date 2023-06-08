@@ -53,7 +53,7 @@ const Users = db.define("users", {
     }
 },
 team:{
-  type: DataTypes.UUID
+  type: DataTypes.UUID,
 },
 passwordRequest:{
   type: DataTypes.UUID,

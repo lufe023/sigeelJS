@@ -1,9 +1,9 @@
 const router = require('express').Router()
 const passport = require('passport')
-const ballots = require('./ballots.services')
 const adminValidate = require('../middlewares/role.middleware')
-const uuid = require('uuid')
 const multer = require('multer')
+const ballots = require('./ballots.services')
+const uuid = require('uuid')
 
 require('../middlewares/auth.middleware')(passport)
 

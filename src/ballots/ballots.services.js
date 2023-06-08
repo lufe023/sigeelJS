@@ -64,7 +64,7 @@ const createNewCandidateServices = (req, res) => {
       municipio,
       provincia
   } = req.body
-const picture = req.file.filename
+const picture = req.file?.filename
 
     if(name && party && nomination)
     {

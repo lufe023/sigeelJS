@@ -20,6 +20,9 @@ const getImage = async (req, res) => {
         if(type=="user"){
             pathImage = path.resolve( __dirname, `../../uploads/images/candidates/${image}`);
         }
+        if(type=="teams"){
+            pathImage = path.resolve( __dirname, `../../uploads/images/teams/${image}`);
+        }
 
         if (await fs.existsSync(pathImage)) {
             res.sendFile(pathImage)

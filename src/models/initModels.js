@@ -11,7 +11,7 @@ const Todo = require('./todo.models')
 const Ballots = require('./ballot.models')
 const Campain = require('./campain.models')
 const Parties = require('./parties.models')
-
+const Teams = require('./teams.models')
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
