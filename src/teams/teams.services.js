@@ -8,6 +8,25 @@ teamsController
 .catch((err) => {res.status(400).json({ message: err })});
 }
 
+//obtener los equipos a los que un usuario pertenece enviando el id del usuario
+const getTeamsByUserService = (req, res) => {
+    const user = req.params.id
+    teamsController
+    .getTeamsByUserController(user)
+    .then((data) => {res.status(200).json(data)})
+    .catch((err) => {res.status(400).json({ message: err })});
+}
+
+//obtener los equipos a los que un usuario pertenece enviando el id del usuario
+const getMyTeamsService = (req, res) => {
+    const user = req.user.id
+    teamsController
+    .getTeamsByUserController(user)
+    .then((data) => {res.status(200).json(data)})
+    .catch((err) => {res.status(400).json({ message: err })});
+}
+
+
 const createNewTeamServices = (req, res) => {
     const leader = req.user.id
     const {name, members} = req.body
@@ -26,5 +45,7 @@ const createNewTeamServices = (req, res) => {
 
 module.exports = {
     getAllTeams,
-    createNewTeamServices
+    createNewTeamServices,
+    getTeamsByUserService,
+    getMyTeamsService
 }

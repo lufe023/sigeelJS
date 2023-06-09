@@ -23,6 +23,12 @@ require('../middlewares/auth.middleware')(passport)
 
 router.get('/', passport.authenticate('jwt', {session: false}), teams.getAllTeams)
 
+//obtener los equipos a los que pertenezco
+router.get('/myteams', passport.authenticate('jwt', {session: false}), teams.getMyTeamsService)
+
+//obtener los equipos a los que un usuario pertenece enviando el id del usuario
+router.get('/:id', passport.authenticate('jwt', {session: false}), adminValidate, teams.getTeamsByUserService)
+
 router.post('/', passport.authenticate('jwt', {session: false}), upload.single('logo'), teams.createNewTeamServices)
 
 module.exports = router
