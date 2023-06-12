@@ -12,6 +12,9 @@ const Ballots = require('./ballot.models')
 const Campain = require('./campain.models')
 const Parties = require('./parties.models')
 const Teams = require('./teams.models')
+const TeamsMembers = require('./teamsMembers.models')
+const teamsMembers = require('./teamsMembers.models')
+
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
@@ -101,6 +104,14 @@ const initModels = () => {
     Ballots.hasMany(Maps, {foreignKey: 'id',sourceKey: 'municipio', as: 'municipality'})
     Ballots.hasMany(Maps, {foreignKey: 'id',sourceKey: 'provincia', as: 'province'})
     
+    /* #### relacionando los teams ### */
+
+    //extrayendo los equipos cuando sellama un mienbro 
+    teamsMembers.hasOne(Teams, {foreignKey: 'id',sourceKey: 'teamId', as: 'team'})
+    Teams.hasMany(teamsMembers, {foreignKey: 'teamId',sourceKey: 'id', as: 'members'})
+
+    teamsMembers.hasOne(Users, {foreignKey: 'id',sourceKey: 'memberId', as: 'memberData'})
+
 }
 
 

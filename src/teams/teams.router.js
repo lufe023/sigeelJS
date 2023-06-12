@@ -29,6 +29,20 @@ router.get('/myteams', passport.authenticate('jwt', {session: false}), teams.get
 //obtener los equipos a los que un usuario pertenece enviando el id del usuario
 router.get('/:id', passport.authenticate('jwt', {session: false}), adminValidate, teams.getTeamsByUserService)
 
+//obtener un equipo por id
+router.get('/team/:teamId', passport.authenticate('jwt', {session: false}), teams.teamById)
+
+//Actualizar los miebros de un equipo deben ser numeros UUID separados por coma: UUID,UUID, UUID
+router.post('/:id', passport.authenticate('jwt', {session: false}), teams.addTeamMemberService)
+
+//crear un nuevo teams
 router.post('/', passport.authenticate('jwt', {session: false}), upload.single('logo'), teams.createNewTeamServices)
+
+//eliminar un team
+router.delete('/:id', passport.authenticate('jwt', {session: false}), teams.deleteTeamService)
+
+//eliminar un miembro de un team
+router.delete('/', passport.authenticate('jwt', {session: false}), teams.deleteTeamMemberService)
+
 
 module.exports = router

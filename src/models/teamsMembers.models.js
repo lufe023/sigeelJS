@@ -2,18 +2,23 @@ const db = require("../utils/database");
 
 const { DataTypes } = require("sequelize");
 const Users = require("./users.models");
+const Teams = require("./teams.models");
 
-const Teams = db.define("teams", {
+const teamsMembers = db.define("teamMembers", {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
     allowNull: false,
   },
-  name: {
-    type: DataTypes.STRING,
+  teamId: {
+    type: DataTypes.UUID,
     allowNull: false,
+    references:{
+      key: 'id',
+      model: Teams
+    }
   },
-  createdBy: {
+  memberId: {
     type: DataTypes.UUID,
     allowNull: false,
     references:{
@@ -21,12 +26,10 @@ const Teams = db.define("teams", {
       model: Users
     }
   },
-  logo:{
-    type: DataTypes.TEXT
-  },
-  description: {
-    type: DataTypes.TEXT
-  },
+  teamLeader:{
+    type: DataTypes.BOOLEAN,
+    defaultValue:false
+  }
 });
 
-module.exports = Teams
+module.exports = teamsMembers
