@@ -7,7 +7,7 @@ const Roles = require("../models/roles.models");
 const teamsMembers = require("../models/teamsMembers.models");
 
 //llamar todos los equipos
-const getAllTeams = async () => {
+const getAllTeams = async (role) => {
 const allTeams = await Teams.findAll({
     include:[
         {
@@ -24,6 +24,9 @@ const allTeams = await Teams.findAll({
                     },
                     {
                         model:Census,
+                        attributes:{  
+                            exclude: role <= 1 ? ['celphone','adress','telephone', 'otherPhone'] : []
+                        }
                     }
                 ]
             }
@@ -119,7 +122,7 @@ const addMembersTeam = async (teamId, members, teamLeader) => {
 }
 
 //obtener los equipos a los que un usuario pertenece enviando el id del usuario
-    const getTeamsByUserController = async (memberId) => {
+    const getTeamsByUserController = async (memberId, role) => {
 
         const teams = await teamsMembers.findAll({
             where: {

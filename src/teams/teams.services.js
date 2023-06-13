@@ -2,8 +2,9 @@ const teamsController = require("./teams.controller")
 
 //llamar a todos los partidos
 const getAllTeams = (req, res) => {
+    const role = req.user.role
 teamsController
-.getAllTeams()
+.getAllTeams(role)
 .then((data) => {res.status(200).json(data)})
 .catch((err) => {res.status(400).json({ message: err })});
 }
