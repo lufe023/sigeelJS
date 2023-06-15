@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const Census = require("../models/census.models");
 const Roles = require("../models/roles.models");
 const teamsMembers = require("../models/teamsMembers.models");
+const Todo = require("../models/todo.models");
 
 //llamar todos los equipos
 const getAllTeams = async (role) => {
@@ -46,6 +47,19 @@ const getOneTeamController = async(id) => {
         },
         include:[
             {
+                model:Users,
+                as: 'woner',
+                attributes:['email'],
+                    include:[
+                        {
+                            model: Roles
+                        },
+                        {
+                            model:Census,
+                        }
+                    ]
+            },
+            {
                 model: teamsMembers,
                 as: 'members',
                 include:[
@@ -59,6 +73,10 @@ const getOneTeamController = async(id) => {
                         },
                         {
                             model:Census,
+                        },
+                        {
+                            model: Todo,
+                            as: 'tasks'
                         }
                     ]
                 }
@@ -133,6 +151,19 @@ const addMembersTeam = async (teamId, members, teamLeader) => {
                     model:Teams,
                     as: 'team',
                     include:[
+                        {
+                            model:Users,
+                            as: 'woner',
+                            attributes:['email'],
+                                include:[
+                                    {
+                                        model: Roles
+                                    },
+                                    {
+                                        model:Census,
+                                    }
+                                ]
+                        },
                         {
                             model: teamsMembers,
                             as: 'members',

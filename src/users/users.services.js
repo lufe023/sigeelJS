@@ -215,6 +215,31 @@ const deleteMyUser = (req, res) => {
       });
 };
 
+const simpleFindUser = (req, res) => {
+  
+  const findUser = req.body.findUser
+  
+  if(findUser){
+  
+    usersControllers.findUserController(findUser)
+    .then((data) => {
+    res.status(200).json({
+      data,
+      busqueda:findUser });
+      })
+    .catch((err) => {
+    res.status(400).json({err});
+    });
+    }else{
+    res.status(400).json({
+      message: 'busqueda vacia',
+    field: 'findUser' });
+  }
+  
+}
+
+
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -225,5 +250,6 @@ module.exports = {
   patchMyUser,
   deleteMyUser,
   changeForgotPassword,
-  requestForgotPassword
+  requestForgotPassword,
+  simpleFindUser
 };

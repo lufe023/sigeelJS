@@ -12,6 +12,7 @@ const Teams = db.define("teams", {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique:true
   },
   createdBy: {
     type: DataTypes.UUID,

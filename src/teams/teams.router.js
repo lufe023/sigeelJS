@@ -32,7 +32,7 @@ router.get('/:id', passport.authenticate('jwt', {session: false}), adminValidate
 //obtener un equipo por id
 router.get('/team/:teamId', passport.authenticate('jwt', {session: false}), teams.teamById)
 
-//Actualizar los miebros de un equipo deben ser numeros UUID separados por coma: UUID,UUID, UUID
+//agregar miembros a un equipo deben ser numeros UUID separados por coma: UUID,UUID, UUID
 router.post('/:id', passport.authenticate('jwt', {session: false}), teams.addTeamMemberService)
 
 //crear un nuevo teams

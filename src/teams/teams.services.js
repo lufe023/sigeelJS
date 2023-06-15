@@ -30,6 +30,7 @@ const getMyTeamsService = (req, res) => {
 const createNewTeamServices = (req, res) => {
     const createdBy = req.user.id
     const {name, description} = req.body
+    const logo = req.file?.filename
     const members = []
     if(req.body.members){
         members.push(req.body.members)
@@ -39,8 +40,6 @@ const createNewTeamServices = (req, res) => {
         members.push(createdBy)
     }
 
-    console.log(members)
-    const logo = req.file?.filename
     let teams
     if(name){
     teamsController
@@ -100,7 +99,7 @@ const deleteTeamService = (req, res) => {
     .getOneTeamController(id)
     .then(
         (data) =>{
-        if(data.createdBy==who || isAdmin){
+        if(data?.createdBy==who || isAdmin){
             teamsController.deleteTeamController(id)
             .then((data) => {res.status(200).json(data)})
             .catch((err) => {res.status(400).json(err)});
@@ -114,11 +113,15 @@ const deleteTeamService = (req, res) => {
 //eliminar miembro de un equipo
 const deleteTeamMemberService = (req, res)=> {
     const {teamId, memberId} = req.body
-
+    
+    if(teamId, memberId){
     teamsController
     .deleteTeamMemberController(teamId, memberId)
     .then((data) => {res.status(200).json(data)})
     .catch((err) => {res.status(400).json({ message: err })});
+}else{
+    res.status(400).json({ message: "debe enviar teamId:UUID, y memberId: UUID",teamId, memberId})
+}
 }
 
 

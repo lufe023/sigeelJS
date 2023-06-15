@@ -28,6 +28,8 @@ const initModels = () => {
     
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
+
+    Census.hasOne(Users, {foreignKey: 'censuCitizenID',sourceKey: 'citizenID', as: 'colaborador'})
     
     Users.belongsTo(Census)
     
@@ -60,6 +62,13 @@ const initModels = () => {
     Poll.hasOne(Campain,  {foreignKey:'id' , sourceKey: 'campain', as: 'Campain'})
 
 
+/* ###### Inicio ligando tareas a usuarios ####*/
+
+Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
+//Todo.hasOne(Users, {foreignKey: 'id', sourceKey: 'responsible', as: 'tasks'})
+ /* ########################## // Fin ligando tareas a usuarios */
+//Users.hasMany(Todo)
+
 
 /* ############################# //Inicio conectando lista de Candidatos con las encuestas */
         //conectando lista de partidos con las encuestas
@@ -85,7 +94,7 @@ const initModels = () => {
 
         //conectando lista de Vocal  de Distrito con las encuestas
         Poll.hasMany(Ballots, {foreignKey:'candidateId' , sourceKey: 'districtCouncilor', as: 'preferedDistrictCouncilorDetails'})        
-        /* ########################## // Fin conectando lista de Candidatos con las encuestas */
+ /* ########################## // Fin conectando lista de Candidatos con las encuestas */
 
     //Ballots.hasOne(Parties, {foreignKey:'id' , sourceKey: 'party', as: 'party_details'})
 
@@ -109,7 +118,7 @@ const initModels = () => {
     //extrayendo los equipos cuando sellama un mienbro 
     teamsMembers.hasOne(Teams, {foreignKey: 'id',sourceKey: 'teamId', as: 'team'})
     Teams.hasMany(teamsMembers, {foreignKey: 'teamId',sourceKey: 'id', as: 'members'})
-
+    Teams.hasOne(Users, {foreignKey: 'id', sourceKey: 'createdBy', as: 'woner'})
     teamsMembers.hasOne(Users, {foreignKey: 'id',sourceKey: 'memberId', as: 'memberData'})
 
 }

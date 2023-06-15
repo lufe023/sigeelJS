@@ -50,7 +50,8 @@ router.route('/:id')
         userServices.deleteUser
     )
 
-
+//busqueda simple en tiempo real de personas
+router.post('/userSearch', userServices.simpleFindUser)
 
 
 
