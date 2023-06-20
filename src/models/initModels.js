@@ -13,7 +13,8 @@ const Campain = require('./campain.models')
 const Parties = require('./parties.models')
 const Teams = require('./teams.models')
 const TeamsMembers = require('./teamsMembers.models')
-const teamsMembers = require('./teamsMembers.models')
+const Suffrage = require('./suffrage.models')
+const Condition = require('./condition.models')
 
 
 const initModels = () => {
@@ -116,10 +117,10 @@ Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
     /* #### relacionando los teams ### */
 
     //extrayendo los equipos cuando sellama un mienbro 
-    teamsMembers.hasOne(Teams, {foreignKey: 'id',sourceKey: 'teamId', as: 'team'})
-    Teams.hasMany(teamsMembers, {foreignKey: 'teamId',sourceKey: 'id', as: 'members'})
+    TeamsMembers.hasOne(Teams, {foreignKey: 'id',sourceKey: 'teamId', as: 'team'})
+    Teams.hasMany(TeamsMembers, {foreignKey: 'teamId',sourceKey: 'id', as: 'members'})
     Teams.hasOne(Users, {foreignKey: 'id', sourceKey: 'createdBy', as: 'woner'})
-    teamsMembers.hasOne(Users, {foreignKey: 'id',sourceKey: 'memberId', as: 'memberData'})
+    TeamsMembers.hasOne(Users, {foreignKey: 'id',sourceKey: 'memberId', as: 'memberData'})
 
 }
 

@@ -3,6 +3,7 @@ const Benefit = require('../models/benefit.models')
 const Census = require('../models/census.models')
 const Gps = require('../models/gps.models')
 const Job = require('../models/job.models')
+const Maps = require('../models/maps.models')
 const Participation = require('../models/participation.models')
 const Parties = require('../models/parties.models')
 const Poll = require('../models/poll.models')
@@ -43,19 +44,19 @@ const MyTotalCitizens = async (userId, campainId)=> {
                         {
                             model: Ballot,
                             as: "preferedPresidentDetails",
-                            include:['partyDetails'],
+                            include:['partyDetails','DistritoMunicipal', 'municipality', 'province'],
                             attributes:['candidateId','name', 'nomination']
                         },
                         {
                             model: Ballot,
                             as: "preferedSenatorDetails",
-                            include:['partyDetails'],
-                            attributes:['candidateId','name', 'nomination']
+                            include:['partyDetails','DistritoMunicipal', 'municipality', 'province'],
+                            attributes:['candidateId','name', 'nomination', ],
                         },
                         {
                             model: Ballot,
                             as: "preferedDiputyDetails",
-                            include:['partyDetails'],
+                            include:['partyDetails','DistritoMunicipal', 'municipality', 'province'],
                             attributes:['candidateId','name', 'nomination']
                         },
                         {
@@ -156,7 +157,12 @@ for (let i=0; i < preferedPresident.length; i++){
             preferedPresidentArray.push({
                 president: preferedPresident[i].candidateId,
                 presidentName: preferedPresident[i].name,
-                partyDetails: preferedPresident[i].partyDetails, 
+                partyDetails: preferedPresident[i].partyDetails,
+                locationDetails: [
+                    {'municipalDistrict': preferedPresident[i].DistritoMunicipal.length>0?preferedPresident[i].DistritoMunicipal[0].name:null},
+                    {'municipality': preferedPresident[i].municipality[0].name},
+                    {'province': preferedPresident[i].province[0].name},
+                ], 
                 total: 1
             })
         }else{
@@ -181,6 +187,11 @@ for (let i=0; i < preferedSenator.length; i++){
                 senator: preferedSenator[i].candidateId,
                 senatorName: preferedSenator[i].name,
                 partyDetails: preferedSenator[i].partyDetails, 
+                locationDetails: [
+                    {'municipalDistrict': preferedSenator[i].DistritoMunicipal.length>0?preferedSenator[i].DistritoMunicipal[0].name:null},
+                    {'municipality': preferedSenator[i].municipality[0].name},
+                    {'province': preferedSenator[i].province[0].name},
+                ],
                 total: 1
             })
         }else{
@@ -203,7 +214,12 @@ for (let i=0; i < preferedDiputy.length; i++){
             preferedDiputyArray.push({
                 diputy: preferedDiputy[i].candidateId,
                 diputyName: preferedDiputy[i].name,
-                partyDetails: preferedDiputy[i].partyDetails, 
+                partyDetails: preferedDiputy[i].partyDetails,
+                locationDetails: [
+                    {'municipalDistrict': preferedDiputy[i].DistritoMunicipal.length>0?preferedDiputy[i].DistritoMunicipal[0].name:null},
+                    {'municipality': preferedDiputy[i].municipality[0].name},
+                    {'province': preferedDiputy[i].province[0].name},
+                ], 
                 total: 1
             })
         }else{
