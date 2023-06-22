@@ -17,7 +17,8 @@ const Gps = db.define("gps", {
       key: 'citizen_id',
       model: Census
     },
-    field: "citizen_id"
+    field: "citizen_id",
+    unique: true
   },
   
   latitud:{

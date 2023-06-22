@@ -9,6 +9,8 @@ const Ballot = require('../models/ballot.models')
 const Poll = require('../models/poll.models')
 const getUser = require('../users/users.controllers')
 const {Op} = require("sequelize")
+const Campain = require('../models/campain.models')
+const Condition = require('../models/condition.models')
 
 const getPeoplesByPlaces = async (province, municipality, district) => {
     
@@ -144,7 +146,15 @@ const getMyPeople = async (leaderId) => {
             {
                 model : Poll,
                 //attributes: ['id', 'citizenID', 'campain'],
-                as: 'Encuestas'
+                as: 'Encuestas',
+                include:[
+                    {model:Campain,
+                    as: 'Campain'}
+                ]
+            },
+            {
+                model:Condition,
+                as: 'condition'
             }
         ]  
 })

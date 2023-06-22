@@ -128,8 +128,18 @@ const createCampains = async (data) => {
 
         const peoples = await  CensusControllers.getPeoplesByPlaces(data.provincia, data.municipio, data.distrito_municipal)
         
-        const tareas = []
+      
         const pools = []
+
+        const tarea = await todoControllers.createTask({
+            title: `${newCampain.name} `,
+            description: `Encuesta en todos los niveles de la campaña ${newCampain.name} a todas las personas dentro del modulo Mi Gente ${newCampain.details}`,
+            limit: newCampain.finishAt,
+            isActive: true,
+            responsible: peoples.rows[0].leader,
+            createdBy: newCampain.createdBy
+        })
+
 
             for(let i=0; i<peoples.count; i++)
             {
@@ -143,20 +153,9 @@ const createCampains = async (data) => {
 
                 pools.push(pool)
                 
-                    let tarea = await todoControllers.createTask({
-                        title: `Encuesta ${peoples.rows[i].firstName}`,
-                        description: `${peoples.rows[i].firstName} ${peoples.rows[i].lastName}
-                        Encuesta en todos los niveles de la campaña ${newCampain.name} ${newCampain.details}`,
-                        limit: newCampain.finishAt,
-                        isActive: true,
-                        responsible: peoples.rows[i].leader,
-                        createdBy: newCampain.createdBy
-                    })
-
-                        tareas.push(tarea)
                 }
             }
-        const resultado = [newCampain, peoples, tareas, pools]
+        const resultado = [newCampain, peoples, pools, tarea]
         return resultado
 
     } catch (err) {

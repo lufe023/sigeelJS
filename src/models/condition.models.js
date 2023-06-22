@@ -24,7 +24,7 @@ const Condition = db.define("condition", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  Dyslexia:{
+  dyslexia:{
     type: DataTypes.BOOLEAN,
   },
   visual:{
@@ -37,6 +37,9 @@ const Condition = db.define("condition", {
     type: DataTypes.BOOLEAN,
   },
   cognitive:{
+    type: DataTypes.BOOLEAN,
+  },
+  outside:{
     type: DataTypes.BOOLEAN,
   },
 });

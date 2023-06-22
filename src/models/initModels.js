@@ -30,6 +30,9 @@ const initModels = () => {
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
 
+     //relacionando la tabla Condition para obtener la informacion de la condicion especial de cada ciudadano
+     Census.hasOne(Condition, {foreignKey: 'citizenID',sourceKey: 'citizenID', as: 'condition'})
+
     Census.hasOne(Users, {foreignKey: 'censuCitizenID',sourceKey: 'citizenID', as: 'colaborador'})
     
     Users.belongsTo(Census)
@@ -55,6 +58,8 @@ const initModels = () => {
 
     //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encuestas'})
+    
+  
 
     //llamando un ciudadano por su encuesta
     Poll.hasOne(Census,  {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'citizen'})

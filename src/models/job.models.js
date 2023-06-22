@@ -34,7 +34,11 @@ const Job = db.define("job", {
   },
   startedAt: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: true
+  },
+  finishAt: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 },{
 createdAt:false,
