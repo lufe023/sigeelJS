@@ -168,7 +168,7 @@ const getPeopleByUser = async (leaderId) => {
         where:{
             leader:leaderId
         },
-            include :[
+        include :[
             {
                 model : Maps,
                 attributes: ['id', 'name', 'parent'],
@@ -217,9 +217,17 @@ const getPeopleByUser = async (leaderId) => {
             {
                 model : Poll,
                 //attributes: ['id', 'citizenID', 'campain'],
-                as: 'Encuestas'
+                as: 'Encuestas',
+                include:[
+                    {model:Campain,
+                    as: 'Campain'}
+                ]
+            },
+            {
+                model:Condition,
+                as: 'condition'
             }
-        ]  
+        ]   
 })
 
 const user = await getUser.getUserById(leaderId)
