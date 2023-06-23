@@ -1,6 +1,7 @@
 const Ballot = require('../models/ballot.models')
 const Benefit = require('../models/benefit.models')
 const Census = require('../models/census.models')
+const Condition = require('../models/condition.models')
 const Gps = require('../models/gps.models')
 const Job = require('../models/job.models')
 const Maps = require('../models/maps.models')
@@ -13,7 +14,7 @@ const MyTotalCitizens = async (userId, campainId)=> {
         where: {
             leader:userId
             },
-            attributes: ['id','citizenID', 'district', 'firstName'],
+            attributes: ['id','citizenID', 'district', 'firstName', 'picture'],
             include:[
                 {
                     model: Benefit,
@@ -30,6 +31,10 @@ const MyTotalCitizens = async (userId, campainId)=> {
                 {
                     model: Gps,
                     as: "geolocation"
+                },
+                {
+                    model:Condition,
+                    as: 'condition'
                 },
                 {
                     model: Poll,
