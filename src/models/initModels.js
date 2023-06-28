@@ -30,6 +30,7 @@ const initModels = () => {
     Census.hasOne(Maps, {foreignKey: 'id',sourceKey: 'district', as: 'districts'})
     Census.hasOne(Maps, {foreignKey: 'id',sourceKey: 'neighbourhood', as: 'neighbourhoods'})
     
+    
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
 
@@ -139,6 +140,8 @@ Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
     Teams.hasOne(Users, {foreignKey: 'id', sourceKey: 'createdBy', as: 'woner'})
     TeamsMembers.hasOne(Users, {foreignKey: 'id',sourceKey: 'memberId', as: 'memberData'})
 
+    //trayendo ciudadanos desde la tabla gps
+    Gps.hasOne(Census,  {foreignKey: 'citizenID',sourceKey: 'citicenID', as: 'citizen'})
 }
 
 

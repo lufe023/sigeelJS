@@ -38,7 +38,7 @@ const getAllTieTypesService = (req, res) => {
 
     tiesController
     .getAllTieTypesController()
-    .then(data => {res.status(200).json({data, "h": "hola"})})
+    .then(data => {res.status(200).json({data})})
     .catch((err) => {res.status(400).json({ err })});
 }
 

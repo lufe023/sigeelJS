@@ -18,6 +18,7 @@ const dashboard = require('./dashboard/dashboard.router')
 const teamsRouter = require('./teams/teams.router')
 const inTouchRouter = require('./inTouch/inTouch.router')
 const ties = require('./ties/ties.router')
+const gpsRouter = require('./gps/gps.router')
 
 const initModels = require('./models/initModels')
 
@@ -66,6 +67,7 @@ app.use('/api/v1/dashboard', dashboard)
 app.use('/api/v1/teams', teamsRouter)
 app.use('/api/v1/intouch', inTouchRouter)
 app.use('/api/v1/ties', ties)
+app.use('/api/v1/gps', gpsRouter)
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)
