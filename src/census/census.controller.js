@@ -11,6 +11,8 @@ const getUser = require('../users/users.controllers')
 const {Op} = require("sequelize")
 const Campain = require('../models/campain.models')
 const Condition = require('../models/condition.models')
+const Ties = require('../models/ties.models')
+const TiesTypes = require('../models/tiesTypes.models')
 
 const getPeoplesByPlaces = async (province, municipality, district) => {
     
@@ -295,14 +297,14 @@ const getOnePeople = async (peopleid) => {
                 model : Poll,
                 //attributes: ['id', 'email'],
                 as: 'Encuestas'
-            }
-
-
-
+            },
+            
         ]  
 })
+
     return data
 }
+
 
 const findPeople = async (findWord) => {
     const data = await Census.findAndCountAll({
@@ -355,6 +357,7 @@ const findPeople = async (findWord) => {
             }
         ]  
 })
+
     return data
 }
 
@@ -414,5 +417,5 @@ module.exports = {
     getMyPeople,
     getPeopleByUser,
     removePeople,
-    getPeoplesByPlaces
+    getPeoplesByPlaces,
 }

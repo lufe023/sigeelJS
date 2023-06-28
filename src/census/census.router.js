@@ -6,7 +6,6 @@ const adminValidate = require('../middlewares/role.middleware')
 //acuerdate descomentar para agregar la autentificacion 
 //router.get('/', passport.authenticate('jwt', {session: false}), censusServices.getAllCensus)
 
-
 //ver todo el padron
 router.get('/', passport.authenticate('jwt', {session: false}), censusServices.getAllCensus)
 

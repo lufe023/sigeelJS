@@ -13,9 +13,12 @@ const Campain = require('./campain.models')
 const Parties = require('./parties.models')
 const Teams = require('./teams.models')
 const TeamsMembers = require('./teamsMembers.models')
-const Suffrage = require('./suffrage.models')
 const Condition = require('./condition.models')
-
+const Suffrage = require('./suffrage.models')
+const Ties = require('./ties.models')
+const tiesTypes = require('./tiesTypes.models') 
+const TiesTypes = require('./tiesTypes.models')
+const {Op} = require("sequelize")
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
@@ -59,10 +62,19 @@ const initModels = () => {
     //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasMany(Poll, {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'Encuestas'})
     
-  
-
     //llamando un ciudadano por su encuesta
     Poll.hasOne(Census,  {foreignKey:'citizenID' , sourceKey: 'citizenID', as: 'citizen'})
+
+    //relacionando la tabla ties (los vinculos)
+    //Census.hasMany(Ties, {foreignKey: 'aCiticenID', sourceKey: 'citizenID', as: 'ties'})
+
+
+
+    //relacionando la tabla TIes con ties Types
+    Ties.hasOne(Census, {foreignKey: 'citizenID', sourceKey: 'aCiticenID', as: 'aties'})
+    Ties.hasOne(Census, {foreignKey: 'citizenID', sourceKey: 'bCiticenID', as: 'bties'})
+
+    Ties.hasOne(TiesTypes, {foreignKey: 'id', sourceKey: 'ties', as: 'tieType'})
 
     //relacion encuesta y campaña cada encuesta puede tener una campaña
     Poll.hasOne(Campain,  {foreignKey:'id' , sourceKey: 'campain', as: 'Campain'})

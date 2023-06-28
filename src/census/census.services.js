@@ -47,6 +47,7 @@ const getOnePeople = (req, res) => {
   });
 };
 
+
 const findPeople = (req, res) => {
   
   const findWord = req.body.findWord
