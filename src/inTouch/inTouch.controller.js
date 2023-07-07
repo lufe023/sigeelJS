@@ -1,7 +1,11 @@
 const Condition = require("../models/condition.models");
-const uuid = require('uuid')
+const uuid = require('uuid');
+const Participation = require("../models/participation.models");
+const Benefit = require("../models/benefit.models");
+const Job = require("../models/job.models");
 
-//create new condition
+//condition controller
+
 const createConditionController = async (citizenId,data) => {
 
   const newCondition = await Condition.create({
@@ -42,9 +46,88 @@ const deleteConditionController = async (id) => {
   return result;
 };
 
+//participation controller
+const addParticipationController = async (citicenID,activityDescription,receiveAt)=> {
+
+  const newPartitipacion = await Participation.create({
+    id: uuid.v4(),
+    citicenID,
+    activityDescription,
+    receiveAt
+  })
+
+  return newPartitipacion
+}
+
+const deleteParticipationController = async (activityId) =>{
+  const deleteParticipation = await Participation.destroy({
+    where:{
+      id:activityId
+    }
+  })
+
+  return deleteParticipation
+}
+
+//benefit controller
+const addBeneficitController = async (citicenID,benefitDescription,receiveAt)=> {
+
+  const newBenefit = await Benefit.create({
+    id: uuid.v4(),
+    citicenID,
+    benefitDescription,
+    receiveAt
+  })
+
+  return newBenefit
+}
+
+const deleteBenefitController = async (benefitId) =>{
+  const deleteBenefit = await Benefit.destroy({
+    where:{
+      id:benefitId
+    }
+  })
+
+  return deleteBenefit
+}
+
+//job controller 
+const addJobController = async (citicenID,institution, position, positionDetails, startedAt, finishAt)=> {
+
+  const newJob = await Job.create({
+    id: uuid.v4(),
+    citicenID,
+    institution,
+    position,
+    positionDetails,
+    startedAt,
+    finishAt
+  })
+
+  return newJob
+}
+
+const deleteJobController = async (JobId) =>{
+  const deleteJob = await Job.destroy({
+    where:{
+      id:JobId
+    }
+  })
+
+  return deleteJob
+}
+
+
 module.exports = {
   createConditionController,
   getConditionByIdController,
   updateConditionController,
   deleteConditionController,
+  addParticipationController,
+  deleteParticipationController,
+  addBeneficitController,
+  deleteBenefitController,
+  addJobController,
+  deleteJobController
 };

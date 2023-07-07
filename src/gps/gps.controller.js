@@ -30,7 +30,6 @@ const getCitizensNearby = async (citizenID) => {
           gps.latitud,
           gps.longitud
         );
-  
         return distance <= 500; // Filtrar aquellos dentro del radio de 500 metros
       });
   
