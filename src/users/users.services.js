@@ -135,17 +135,17 @@ if(confirmNewPassword===newPassword){
 const patchUser = (req, res) => {
   const id = req.params.id;
   
-  const { firstName, lastName, phone, gender, country } = req.body;
+  const data = req.body;
 
   usersControllers
-    .updateUser(id, { firstName, lastName, phone, gender, country })
+    .updateUser(id, data)
     .then((data) => {
       if (data[0]) {
         res
           .status(200)
           .json({ message: `User with ID: ${id}, edited succesfully!` });
       } else {
-        res.status(404).json({ message: "Invalid ID" });
+        res.status(404).json({ message: "Invalid ID h" });
       }
     })
     .catch((err) => {

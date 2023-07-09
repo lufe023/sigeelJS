@@ -12,23 +12,32 @@ const login = (req, res) => {
         loginUser(email, password)
             .then(response => {
                 if(response){
-                    const token = jwt.sign({
-                        id: response.id,
-                        email: response.email,
-                        role: response.userRoleId
-                    }, jwtSecret)
-                    res.status(200).json({
-                        message: 'Correct Credentials',
-                        token,
-                        id: response.id,
-                        usuario:response.usuario,
-                        nivel: response.userRoleId
-                    })
+                if(response.active==true){
+                    
+                        const token = jwt.sign({
+                            id: response.id,
+                            email: response.email,
+                            role: response.userRoleId
+                        }, jwtSecret)
+                        res.status(200).json({
+                            message: 'Correct credentials',
+                            token,
+                            id: response.id,
+                            usuario:response.usuario,
+                            nivel: response.userRoleId
+                        })
+                    
                 } else {
                     res.status(401).json({
-                        message: 'Invalid Credentials'
+                        message: 'Desactivado. Contacte con Centro de Computo',
                     })
+                    
                 }
+            }else{
+                res.status(401).json({
+                    message: 'Invalid credentials',
+                })
+            }
             })
             .catch(error => {
                 res.status(400).json({message: error.message})

@@ -3,6 +3,7 @@ const Census = require("./census.models");
 const tipesTypes = require('./tiesTypes.models')
 
 const { DataTypes, UUID } = require("sequelize");
+const Users = require("./users.models");
 
 const Ties = db.define("ties", {
   id: {
@@ -39,6 +40,13 @@ const Ties = db.define("ties", {
   active:{
     type:DataTypes.BOOLEAN,
     defaultValue:true
+  },
+  createdBy:{
+    type:DataTypes.UUID,
+    references:{
+      key: 'id',
+      model: Users
+    },
   }
 },{
 createdAt:false,

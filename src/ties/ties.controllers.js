@@ -59,13 +59,32 @@ const getPeoplesTiesByCitizenIdController = async (citizenID)=> {
     }
 
 //lista de tipos de enlaces
-
 const getAllTieTypesController = async () => {
     const types = await TiesTypes.findAndCountAll()
     return types
 }
+
+//lista de tipos de enlaces
+const getTieById = async (id) => {
+    const tie = await Ties.findOne({
+        where:{id}
+    })
+    return tie
+}
+
+const deleteTieController = async (id)=>{
+    const deleteTie = await Ties.destroy({
+        where:{
+          id:id
+        }
+      })
+      return deleteTie
+}
+
 module.exports = {
     newTiesController,
     getPeoplesTiesByCitizenIdController,
-    getAllTieTypesController
+    getAllTieTypesController,
+    deleteTieController,
+    getTieById
 }

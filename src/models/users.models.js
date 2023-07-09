@@ -58,6 +58,10 @@ team:{
 passwordRequest:{
   type: DataTypes.UUID,
   allowNull: true
+},
+active: {
+  type: DataTypes.BOOLEAN,
+  defaultValue:false,
 }
 });
 

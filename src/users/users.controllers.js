@@ -32,7 +32,7 @@ const getUserById = async (id) => {
     attributes: ["id", "email", "userRoleId", "status", "censuCitizenID"],
     where: {
       id: id,
-      status: "active",
+      active: true,
     },
     include: [
       //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron

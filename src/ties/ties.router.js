@@ -13,6 +13,7 @@ router.get('/types', passport.authenticate('jwt', {session: false}), tiesService
 //get people ties
 router.get('/:citizenid', passport.authenticate('jwt', {session: false}), tiesServices.getPeoplesTiesByCitizenIdServices)
 
+router.delete('/:id', passport.authenticate('jwt', {session: false}), tiesServices.deleteTiesService)
 
 
 module.exports = router
