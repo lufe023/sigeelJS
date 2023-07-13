@@ -1,6 +1,6 @@
 const db = require("../utils/database");
 const Census = require("./census.models");
-
+const Users = require('./users.models')
 
 const { DataTypes } = require("sequelize");
 
@@ -28,6 +28,16 @@ const Gps = db.define("gps", {
   longitud:{
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  mode:{
+    type: DataTypes.STRING,
+  },
+  createdBy:{
+    type: DataTypes.UUID,
+    references:{
+      key: 'id',
+      model: Users
+    }
   }
 });
 

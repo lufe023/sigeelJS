@@ -4,8 +4,8 @@ const adminValidate = require('../middlewares/role.middleware')
 const gpsServices = require('./gps.services')
 require('../middlewares/auth.middleware')(passport)
 
-//llamar a todos los tipos de enlace
-router.get('/:citizenID', passport.authenticate('jwt', {session: false}), gpsServices.getCitizensNearbyService)
+//llamar a las personas que se encuentren almenos a 500 metros del ciudadano
+router.get('/nearby/:meters/:citizenID', passport.authenticate('jwt', {session: false}), gpsServices.getCitizensNearbyService)
 
 
 

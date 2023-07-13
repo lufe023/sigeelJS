@@ -298,6 +298,10 @@ const getOnePeople = async (peopleid) => {
                 //attributes: ['id', 'email'],
                 as: 'Encuestas'
             },
+            {
+                model: Condition,
+                as: 'condition'
+            }
             
         ]  
 })

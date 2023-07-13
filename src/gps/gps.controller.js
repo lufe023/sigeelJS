@@ -3,7 +3,7 @@ const Gps = require('../models/gps.models')
 const {Op} = require("sequelize");
 
 
-const getCitizensNearby = async (citizenID) => {
+const getCitizensNearby = async (citizenID, meters) => {
     try {
       const referenceGps = await Gps.findOne({ where: { citicenID: citizenID } });
   
@@ -30,7 +30,7 @@ const getCitizensNearby = async (citizenID) => {
           gps.latitud,
           gps.longitud
         );
-        return distance <= 500; // Filtrar aquellos dentro del radio de 500 metros
+        return distance <= meters; // Filtrar aquellos dentro del radio de 500 metros
       });
   
       const nearbyCitizenData = nearbyCitizens.map((gps) => {
@@ -70,5 +70,19 @@ const getCitizensNearby = async (citizenID) => {
     return distance;
   }
 
-module.exports = { getCitizensNearby };
+
+  //guardar gps 
+  const newGPSLocationController = async (citicenID, latitud, longitud, mode, createdBy) => {
+    const newLocation = Gps.create({
+      id: UUID.v4(),
+      citicenID,
+      latitud,
+      longitud,
+      mode,
+      createdBy
+    })
+
+    return newLocation
+  }
+module.exports = { getCitizensNearby, newGPSLocationController };
 
