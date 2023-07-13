@@ -1,7 +1,7 @@
 const Census = require('../models/census.models');
 const Gps = require('../models/gps.models')
 const {Op} = require("sequelize");
-
+const uuid = require('uuid');
 
 const getCitizensNearby = async (citizenID, meters) => {
     try {
@@ -70,19 +70,27 @@ const getCitizensNearby = async (citizenID, meters) => {
     return distance;
   }
 
-
-  //guardar gps 
-  const newGPSLocationController = async (citicenID, latitud, longitud, mode, createdBy) => {
-    const newLocation = Gps.create({
-      id: UUID.v4(),
-      citicenID,
-      latitud,
-      longitud,
-      mode,
-      createdBy
-    })
-
-    return newLocation
+  //insertar si no existe o actualiar si existe lacion GPS
+  const newGPSLocationController = async (citicenID, latitud, longitud, gotAutomatic, createdBy) => {
+    // Buscar el registro existente por citicenID
+    const [location, created] = await Gps.findOrCreate({
+      where: { citicenID },
+      defaults: { id:uuid.v4(), latitud, longitud, gotAutomatic, createdBy }
+    });
+  
+    // Si el registro se creó recientemente, se devuelve tal cual
+    if (created) {
+      return location;
+    }
+  
+    // Si el registro ya existe, se actualizan los valores
+    await location.update({ latitud, longitud, gotAutomatic, createdBy },{ where: { citicenID } });
+  
+    return location;
   }
-module.exports = { getCitizensNearby, newGPSLocationController };
+  
+module.exports = { 
+  getCitizensNearby,
+  newGPSLocationController
+};
 

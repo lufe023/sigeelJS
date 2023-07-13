@@ -5,11 +5,7 @@ const Users = require('./users.models')
 const { DataTypes } = require("sequelize");
 
 const Gps = db.define("gps", {
-  id: {
-    type: DataTypes.UUID,
-    primaryKey: true,
-    allowNull: false,
-  },
+
   citicenID: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -29,8 +25,9 @@ const Gps = db.define("gps", {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  mode:{
-    type: DataTypes.STRING,
+  gotAutomatic:{
+    type: DataTypes.BOOLEAN,
+    defaultValue:false
   },
   createdBy:{
     type: DataTypes.UUID,
