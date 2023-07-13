@@ -5,7 +5,11 @@ const Users = require('./users.models')
 const { DataTypes } = require("sequelize");
 
 const Gps = db.define("gps", {
-
+  id: {
+    type: DataTypes.UUID,
+    primaryKey: true,
+    allowNull: false,
+  },
   citicenID: {
     type: DataTypes.STRING,
     allowNull: false,
