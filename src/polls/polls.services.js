@@ -22,68 +22,6 @@ const getPollById = (req, res) => {
     .catch((err) => {res.status(400).json({Error: err.err})})
 }
 
-//ver todas las campañas
-const getAllCampains = (req, res) => {
-    pollsControllers
-    .getAllCampains()
-    .then((data) => {
-        res.status(200).json(data);
-    })
-    .catch((err) => {
-        res.status(400).json({ message: err.message });
-    });
-}
-
-const createNewCampain = (req, res) => {
-    const {
-        name,
-        details,
-        neighbourhood,
-        distrito_municipal,
-        municipio,
-        provincia,
-        startAt,
-        finishAt,
-        isActive
-        } = req.body
-        
-        const createdBy = req.user.id
-
-        if( name && details && startAt && finishAt && municipio)
-        {
-
-                pollsControllers.createCampains({
-        
-                    name,
-                    details,
-                    neighbourhood,
-                    distrito_municipal,
-                    municipio,
-                    provincia,
-                    createdBy,
-                    startAt,
-                    finishAt,
-                    isActive
-                    })
-                .then((resultado) => 
-                {
-                    res.status(201).json({resultado})
-                })
-            
-            .catch((err) => {
-            res.status(400).json({
-                Error: err.err
-            });
-        });
-        
-        } else {
-        //? Error cuando no mandan todos los datos necesarios para crear un usuario
-        res.status(400).json({
-            message: "All fields must be completed"
-        })
-        }
-}
-
 //actualizacion de las encuestas
 const updatePollService = (req, res) => {
     const pollId = req.params.id
@@ -122,8 +60,6 @@ const updatePollService = (req, res) => {
 
 module.exports = {
     getAllPolls,
-    getAllCampains,
-    createNewCampain,
     getPollById,
     updatePollService
 }

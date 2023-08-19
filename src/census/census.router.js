@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const censusServices = require('./census.services')
 const passport = require('passport')
-const adminValidate = require('../middlewares/role.middleware')
+const {leaderValidate, adminValidate, itSupportValidate, superAdminValidate } = require('../middlewares/role.middleware')
 
 //acuerdate descomentar para agregar la autentificacion 
 //router.get('/', passport.authenticate('jwt', {session: false}), censusServices.getAllCensus)

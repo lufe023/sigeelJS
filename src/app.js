@@ -1,10 +1,11 @@
-//? Dependencies
 const express = require('express');
-const db = require('./utils/database')
-const cors = require('cors')
+const cors = require('cors');
+const { port } = require('./config');
+const db = require('./utils/database');
+const initModels = require('./models/initModels');
+const bodyParser = require('body-parser');
 
-//? Files
-const {port} = require('./config');
+
 //* Routes
 const userRouter = require('./users/users.router')
 const authRouter = require('./auth/auth.router')
@@ -19,14 +20,20 @@ const teamsRouter = require('./teams/teams.router')
 const inTouchRouter = require('./inTouch/inTouch.router')
 const ties = require('./ties/ties.router')
 const gpsRouter = require('./gps/gps.router')
+const jceRouter = require('./jce/jce.router')
+const campain = require('./campain/campain.router')
 
-const initModels = require('./models/initModels')
+
 
 //? Initial Configurations
 const app = express()
 
+app.use(bodyParser.json({ limit: '100mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
+
 app.use(cors())
 app.use(express.json())
+
 
 db.authenticate()
     .then(() => {
@@ -68,6 +75,10 @@ app.use('/api/v1/teams', teamsRouter)
 app.use('/api/v1/intouch', inTouchRouter)
 app.use('/api/v1/ties', ties)
 app.use('/api/v1/gps', gpsRouter)
+app.use('/api/v1/jce', jceRouter)
+app.use('/api/v1/campains', campain)
+
+
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)

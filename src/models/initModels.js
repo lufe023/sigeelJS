@@ -18,6 +18,9 @@ const Suffrage = require('./suffrage.models')
 const Ties = require('./ties.models')
 const tiesTypes = require('./tiesTypes.models') 
 const TiesTypes = require('./tiesTypes.models')
+const Precincts = require('./precinct.models')
+const College = require('./college.models')
+
 const {Op} = require("sequelize")
 
 const initModels = () => {
@@ -35,7 +38,7 @@ const initModels = () => {
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
 
      //relacionando la tabla Condition para obtener la informacion de la condicion especial de cada ciudadano
-     Census.hasOne(Condition, {foreignKey: 'citizenID',sourceKey: 'citizenID', as: 'condition'})
+    Census.hasOne(Condition, {foreignKey: 'citizenID',sourceKey: 'citizenID', as: 'condition'})
 
     Census.hasOne(Users, {foreignKey: 'censuCitizenID',sourceKey: 'citizenID', as: 'colaborador'})
     
@@ -142,6 +145,20 @@ Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
 
     //trayendo ciudadanos desde la tabla gps
     Gps.hasOne(Census,  {foreignKey: 'citizenID',sourceKey: 'citicenID', as: 'citizen'})
+
+
+    //trayendo colegios junto a los recintos
+    Precincts.hasMany(College,  {foreignKey: 'precinct',sourceKey: 'id', as: 'colegios'})
+
+    Precincts.hasMany(Maps,  {foreignKey: 'id',sourceKey: 'provincia', as: 'PrecinctsProvincia'})
+    Precincts.hasMany(Maps,  {foreignKey: 'id',sourceKey: 'municipio', as: 'PrecinctsMunicipio'})
+
+    //trayendo colegios junto a los recintos
+     Census.hasOne(College,  {foreignKey: 'id',sourceKey: 'college', as: 'colegio'})
+     College.hasMany(Census,  {foreignKey: 'college',sourceKey: 'id', as: 'ColegioCensus'})
+
+    //trayendo el recinto de cada colegio 
+    College.hasOne(Precincts,  {foreignKey: 'id',sourceKey: 'precinct', as: 'recinto'})
 }
 
 

@@ -1,4 +1,5 @@
 const db = require("../utils/database");
+const College = require("./college.models");
 const Maps = require("./maps.models");
 
 const { DataTypes } = require("sequelize");
@@ -92,6 +93,22 @@ const Census = db.define("census", {
     allowNull: true,
     field: 'other_phone'
   },
+
+  college: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references:{
+      model: College,
+      key: 'id'
+    }
+  },
+position:{
+  type: DataTypes.INTEGER,
+},
+outside:{
+  type:DataTypes.BOOLEAN,
+  allowNull:true
+},
   //referencia a usuarios llave foranea de users
   leader:{
     type: DataTypes.UUID,

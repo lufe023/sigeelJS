@@ -4,47 +4,56 @@ const Maps = require("./maps.models");
 const { DataTypes } = require("sequelize");
 
 const Precincts = db.define("precincts", {
-  id: {
-    type: DataTypes.UUID,
+  id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    unique:true,
     primaryKey: true,
+  },
+  recintoNombre: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
-  province: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references:{
-      key: 'id',
-      model: Maps
-    }
+  direccionRecinto:{
+  type: DataTypes.STRING,
   },
-  municipality: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references:{
-      key: 'id',
-      model: Maps
-    }
+  latitud:{
+  type: DataTypes.STRING,
+  allowNull: true,
   },
-  district: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references:{
-      key: 'id',
-      model: Maps
-    }
+  longitud:{
+  type: DataTypes.STRING,
+  allowNull: true,
   },
-  address:{
-    type: DataTypes.STRING,
-    allowNull: true,
+  electLocal:{
+  type: DataTypes.INTEGER,
   },
-  college:{
-    type: DataTypes.STRING,
-    allowNull: true,
+  electExterior:{
+  type: DataTypes.INTEGER,
   },
-  table:{
-    type: DataTypes.STRING,
-    allowNull: true,
+provincia:{
+  type:DataTypes.INTEGER,
+  references:{
+    key: 'id',
+    model: Maps
   }
+},
+municipio:{
+  type:DataTypes.INTEGER,
+  references:{
+    key: 'id',
+    model: Maps
+  }
+},
+
+distrito:{
+  type:DataTypes.INTEGER,
+
+  allowNull:true
+},
+circunscripcion:{
+  type:DataTypes.STRING
+},
 }, {
   //? Evita que sequelize cree la columna de createdAt y updatedAt
   timestamps: false

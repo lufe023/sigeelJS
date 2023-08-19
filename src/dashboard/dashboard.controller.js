@@ -14,7 +14,7 @@ const MyTotalCitizens = async (userId, campainId)=> {
         where: {
             leader:userId
             },
-            attributes: ['id','citizenID', 'district', 'firstName', 'picture'],
+            attributes: ['id','citizenID', 'district', 'firstName', 'lastName', 'picture'],
             include:[
                 {
                     model: Benefit,
@@ -40,7 +40,7 @@ const MyTotalCitizens = async (userId, campainId)=> {
                     model: Poll,
                     as: "Encuestas",
                     where:
-                    campainId? {campain:campainId} : {active: true},
+                    campainId? {campain:campainId, active: true } : {active: true},
                     include:[
                         {
                             model: Parties,

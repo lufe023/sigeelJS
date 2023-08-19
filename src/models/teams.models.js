@@ -28,6 +28,9 @@ const Teams = db.define("teams", {
   description: {
     type: DataTypes.TEXT
   },
+  whatsapp: {
+    type: DataTypes.TEXT
+  },
 });
 
 module.exports = Teams

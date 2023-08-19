@@ -5,7 +5,9 @@ const MyCitizensDataServices = (req, res) =>{
 const {userId} = req.params
 const {campainId} = req.params
 
-if(!campainId){ const campainId = null}
+if(!campainId){ 
+    const campainId = null
+}
 
 dashboardController
 .MyCitizensDataController(userId, campainId)
