@@ -67,7 +67,7 @@ const findPeople = (req, res) => {
   }else{
     res.status(400).json({
       message: 'busqueda vacia',
-    field: 'findWord' });
+      field: 'findWord' });
   }
   
 }
@@ -149,6 +149,53 @@ const removePeople = (req, res)=>{
 }
 
 }
+
+const updatePeopleService = (req, res)=>{
+  const citizenID = req.params.citizenID
+  const data = req.body
+
+  if(data){
+  censusControllers
+  .updatePeopleController(data,citizenID)
+  .then((result) => {res.status(200).json({ message: `Actualización exitosa`, data: result });
+    
+  })
+
+  .catch((err) => {res.status(400).json(err)});
+  
+}else{
+  res.status(400).json({ message: "Se debe enviar la cedula en la peticion"});
+}
+
+}
+
+
+const getPendingUpdatesService  = (req,res) => {
+
+  const citizenId = req.params.citizenId
+
+  censusControllers.getPendingUpdatesController(citizenId)
+  .then((result) => {res.status(200).json(result)})
+  .catch((err) => {res.status(400).json(err)});
+}
+
+const getAllCensusByCollegeService  = (req,res) => {
+
+  const collegeId = req.params.collegeId
+
+  censusControllers.getAllCensusByCollegeController(collegeId)
+  .then((result) => {res.status(200).json(result)})
+  .catch((err) => {res.status(400).json(err)});
+}
+
+const getPeoplesByPlacesServices = (req, res) => {
+  censusControllers
+  .getPeoplesByPlaces(province, municipality, district)
+  .then((result) => {res.status(200).json(result)})
+  .catch((err) => {res.status(400).json(err)});
+
+}
+
 module.exports = {
     getAllCensus,
     findPeople,
@@ -157,5 +204,8 @@ module.exports = {
     getPeopleByUser,
     getOnePeople,
     addPeople,
-    removePeople
+    removePeople,
+    updatePeopleService,
+    getPendingUpdatesService,
+    getAllCensusByCollegeService
 }

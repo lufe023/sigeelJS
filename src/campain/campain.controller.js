@@ -2,31 +2,32 @@ const Campain = require('../models/campain.models')
 const Maps = require('../models/maps.models')
 const Polls = require('../models/poll.models')
 const uuid = require('uuid')
+const CensusControllers =  require('../census/census.controller')
+const { Op, Sequelize } = require("sequelize");
+const sequelize = require('../utils/database');
 
-const getAllCampains = async()=>{
-    const campains = await Campain.findAndCountAll({
-        include:[
+const getAllCampains = async () => {
+    const campains = await Campain.findAll({
+        attributes: {
+            include: [
+                [Sequelize.literal('(SELECT COUNT(*) FROM Polls WHERE Polls.campain = Campain.id)'), 'encuestasCount'],
+                [Sequelize.literal('(SELECT COUNT(*) FROM Polls WHERE Polls.campain = Campain.id AND (prefered_party IS NOT NULL OR elector_type IS NOT NULL OR president IS NOT NULL OR senator IS NOT NULL OR diputy IS NOT NULL OR mayor IS NOT NULL OR councillor IS NOT NULL OR "districtDirector" IS NOT NULL OR "districtCouncilor" IS NOT NULL ))'), 'pollWithAnyComplete'],
+
+            ]
+        },
+        include: [
             {
-                model : Maps,
+                model: Maps,
                 as: 'provinces'
             },
             {
-                model : Maps,
+                model: Maps,
                 as: 'municipalities'
-            },
-            { 
-                model: Maps,
-                as: 'districts'
-            },
-            {
-                model: Maps,
-                as: 'neighbourhoods'
             }
         ]
-    }
-    )
+    });
 
-    return campains
+    return campains;
 }
 
 const createPools = async(data) => {
@@ -38,63 +39,89 @@ const createPools = async(data) => {
     return poll
 }
 
-const createCampains = async (data) => {
+const createCampains = async (data) =>
 
+{
 
     try {
         const newCampain = await Campain.create({
             id: uuid.v4(),
             name: data.name,
             details: data.details,
-            neighbourhood: data.neighbourhood,
-            distrito_municipal: data.distrito_municipal,
             municipio: data.municipio,
             provincia: data.provincia,
             createdBy: data.createdBy,
             startAt: data.startAt,
-            finishAt: data.startAt
+            finishAt: data.startAt,
+            active:data.isActive
         })
         
 
-        const peoples = await  CensusControllers.getPeoplesByPlaces(data.provincia, data.municipio, data.distrito_municipal)
+        const peoples = await  CensusControllers.getPeoplesByPlaces(data.provincia, data.municipio)
         
+        // //const tareas = []
         const pools = []
-
-        const tarea = await todoControllers.createTask({
-            title: `${newCampain.name} `,
-            description: `Encuesta en todos los niveles de la campaña ${newCampain.name} a todas las personas dentro del modulo Mi Gente ${newCampain.details}`,
-            limit: newCampain.finishAt,
-            isActive: true,
-            responsible: peoples.rows[0].leader,
-            createdBy: newCampain.createdBy
-        })
-
-
             for(let i=0; i<peoples.count; i++)
             {
                 
-                if(peoples.rows[i].leader !=null)
-                {
+                
                 let pool = await createPools({
                     citizenID: peoples.rows[i].citizenID,
-                    campain: newCampain.id
+                    campain: newCampain.id,
+                    active:true
                 })
-
                 pools.push(pool)
                 
-                }
             }
-        const resultado = [newCampain, peoples, pools, tarea]
-        return resultado
+        
+        return [peoples]
 
     } catch (err) {
         return err
     }
-
-
 }
+
+
+const activeCampainController = async (id, active) => {
+    const campainId = id;
+    const transaction = await sequelize.transaction();
+    try {
+        // Desactivar la campaña en la tabla Campain
+        await Campain.update(
+            { active: active, isActive:active },
+            {
+                where: {
+                    id: campainId
+                },
+                transaction
+            }
+        );
+
+        // Desactivar todos los Polls asociados a la campaña en la tabla Polls
+        await Polls.update(
+            { active: active },
+            {
+                where: {
+                    campain: campainId
+                },
+                transaction
+            }
+        );
+
+        // Confirmar la transacción
+        await transaction.commit();
+
+        return { success: true, message: 'Campaña y encuestas actualizadas exitosamente.' };
+    } catch (error) {
+        // Si ocurre un error, deshacer la transacción
+        await transaction.rollback();
+
+        return { success: false, message: 'Error al actualizar campaña y encuestas.' };
+    }
+};
 
 module.exports = {
     getAllCampains,
     createCampains,
+    activeCampainController
 }

@@ -20,6 +20,7 @@ const tiesTypes = require('./tiesTypes.models')
 const TiesTypes = require('./tiesTypes.models')
 const Precincts = require('./precinct.models')
 const College = require('./college.models')
+const Audit =require('./audit.models')
 
 const {Op} = require("sequelize")
 
@@ -82,8 +83,8 @@ const initModels = () => {
 
     //relacion encuesta y campaña cada encuesta puede tener una campaña
     Poll.hasOne(Campain,  {foreignKey:'id' , sourceKey: 'campain', as: 'Campain'})
-
-
+    Campain.hasMany(Poll, {foreignKey:'campain', sourceKey:'id', as: 'encuestas'})
+    
 /* ###### Inicio ligando tareas a usuarios ####*/
 
 Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
@@ -154,11 +155,13 @@ Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
     Precincts.hasMany(Maps,  {foreignKey: 'id',sourceKey: 'municipio', as: 'PrecinctsMunicipio'})
 
     //trayendo colegios junto a los recintos
-     Census.hasOne(College,  {foreignKey: 'id',sourceKey: 'college', as: 'colegio'})
-     College.hasMany(Census,  {foreignKey: 'college',sourceKey: 'id', as: 'ColegioCensus'})
-
+    Census.hasOne(College,  {foreignKey: 'id',sourceKey: 'college', as: 'colegio'})
+    College.hasMany(Census,  {foreignKey: 'college',sourceKey: 'id', as: 'ColegioCensus'})
+    College.belongsTo(Precincts, { foreignKey: 'precinct', as: 'precinctData' });
     //trayendo el recinto de cada colegio 
     College.hasOne(Precincts,  {foreignKey: 'id',sourceKey: 'precinct', as: 'recinto'})
+
+    Census.hasOne(Suffrage,  {foreignKey: 'citizenID',sourceKey: 'citizenID', as: 'sufragio'})
 }
 
 

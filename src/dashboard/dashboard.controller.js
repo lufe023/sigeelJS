@@ -1,6 +1,7 @@
 const Ballot = require('../models/ballot.models')
 const Benefit = require('../models/benefit.models')
 const Census = require('../models/census.models')
+const College = require('../models/college.models')
 const Condition = require('../models/condition.models')
 const Gps = require('../models/gps.models')
 const Job = require('../models/job.models')
@@ -8,14 +9,16 @@ const Maps = require('../models/maps.models')
 const Participation = require('../models/participation.models')
 const Parties = require('../models/parties.models')
 const Poll = require('../models/poll.models')
+const { Op } = require("sequelize");
+const Precincts = require('../models/precinct.models')
 
-const MyTotalCitizens = async (userId, campainId)=> {
-    const citizens =  await Census.findAndCountAll({
+const MyTotalCitizens = async (userId, campainId) => {
+    const citizens = await Census.findAndCountAll({
         where: {
-            leader:userId
-            },
-            attributes: ['id','citizenID', 'district', 'firstName', 'lastName', 'picture'],
-            include:[
+            leader: userId
+        },
+        attributes: ['id', 'citizenID', 'district', 'firstName', 'lastName', 'picture'],
+        include: [
                 {
                     model: Benefit,
                     as: 'Beneficios'
@@ -36,11 +39,22 @@ const MyTotalCitizens = async (userId, campainId)=> {
                     model:Condition,
                     as: 'condition'
                 },
+                {model: College,
+                    as: 'colegio',
+                    include: [
+                        {
+                        model: Precincts,
+                        as: 'precinctData', // Usar el nombre del alias en la relación
+                        }
+                    ]
+                },
                 {
                     model: Poll,
                     as: "Encuestas",
-                    where:
-                    campainId? {campain:campainId, active: true } : {active: true},
+                    where: {
+                        active: true
+                    },
+                    required: false,
                     include:[
                         {
                             model: Parties,
@@ -93,12 +107,21 @@ const MyTotalCitizens = async (userId, campainId)=> {
             ]
 })
 
-let activities = await citizens.rows.map(obj => obj.Actividades).filter(x=> x > []).length
 
-let beneficios = await citizens.rows.map(obj => obj.Beneficios).filter(x=> x > []).length
+let activities = await citizens.rows.map(obj => obj.Actividades).filter( x => x > []).length
+let beneficios = await citizens.rows.map(obj => obj.Beneficios).filter( x => x > []).length
 
 let encuestas = await citizens.rows.map(obj => obj.Encuestas)
 
+/* declaramos todas los arrays a enviar*/
+    const preferedPartyArray = []
+    const preferedPresidentArray = []
+    const preferedSenatorArray = []
+    const preferedDiputyArray = []
+    const preferedMayorArray = []
+    const preferedCouncillorArray = []
+    const preferedDistrictDirectorArray = []
+    const preferedDistrictCouncillorArray = []
 
 
 /*
@@ -108,10 +131,11 @@ let encuestas = await citizens.rows.map(obj => obj.Encuestas)
     !? en caso de que un elector pertenecer al municipio mas no al distrito se debe invertir el comentario anterior puesto que todos pertenecen al municipio.
 */
 
-let completas = 0
+let completas = 0;
+let incompletas = 0;
 
-for (let i=0; i < encuestas.length; i++)
-    {
+if (encuestas[0].length > 0) {
+    for (let i = 0; i < encuestas.length; i++) {
         if(encuestas[i][0].preferedParty && encuestas[i][0].electorType && encuestas[i][0].president && encuestas[i][0].senator && encuestas[i][0].diputy)
         {
         
@@ -125,14 +149,17 @@ for (let i=0; i < encuestas.length; i++)
         }
         }
     }
-
-//saber cuantas encuestas hay incompletas restandole las completadas a longitud total de las encuestas existentes
-let incompletas = encuestas.length - completas
+   
+    incompletas = encuestas.length - completas;
+} else {
+ // Si no hay encuestas, todas se consideran incompletas
+ completas = 0;
+ incompletas = 0;
+}
 
 
 //!? #inicio sacando los votos de los partidos preferidos
-    const preferedPartyArray = []
-
+if (encuestas[0].length > 0) {
     let preferedParty =  encuestas.map(x => x[0]).map(x =>x.preferedPartyDetails[0])
     let lookingParty
     
@@ -146,12 +173,12 @@ let incompletas = encuestas.length - completas
             }
         }
     }
+}
 //Fin sacando los votos de los partidos preferidos
 
 
 //!? #inicio Sacando los votos de los presidentes preferidos
-const preferedPresidentArray = []
-
+if (encuestas[0].length > 0) {
 let preferedPresident =  encuestas.map(x => x[0]).map(x=>x.preferedPresidentDetails[0])
 let lookingPresident
 
@@ -175,12 +202,12 @@ for (let i=0; i < preferedPresident.length; i++){
         }
     }
 }
+}
 //Fin sacando los votos de los presidentes preferidos
 
 
 //!? #inicio Sacando los votos de los Senadores preferidos
-const preferedSenatorArray = []
-
+if (encuestas[0].length > 0) {
 let preferedSenator =  encuestas.map(x => x[0]).map(x=>x.preferedSenatorDetails[0])
 let lookingSenator
 
@@ -204,11 +231,11 @@ for (let i=0; i < preferedSenator.length; i++){
         }
     }
 }
+}
 //Fin sacando los votos de los Senadores preferidos
 
 //!? #inicio Sacando los votos de los Diputados preferidos
-const preferedDiputyArray = []
-
+if (encuestas[0].length > 0) {
 let preferedDiputy =  encuestas.map(x => x[0]).map(x=>x.preferedDiputyDetails[0])
 let lookingDiputy
 
@@ -233,10 +260,10 @@ for (let i=0; i < preferedDiputy.length; i++){
     }
 }
 //Fin sacando los votos de los Diputados preferidos
+}
 
 //!? #inicio Sacando los votos de los Alcalde preferidos
-const preferedMayorArray = []
-
+if (encuestas[0].length > 0) {
 let preferedMayor =  encuestas.map(x => x[0]).map(x=>x.preferedMayorDetails[0])
 let lookingMayor
 
@@ -255,12 +282,12 @@ for (let i=0; i < preferedMayor.length; i++){
         }
     }
 }
+}
 //Fin sacando los votos de los Alcalde preferidos
 
 
 //!? #inicio Sacando los votos de los Regidores preferidos
-const preferedCouncillorArray = []
-
+if (encuestas[0].length > 0) {
 let preferedCouncillor =  encuestas.map(x => x[0]).map(x=>x.preferedCouncillorDetails[0])
 let lookingCouncillor
 
@@ -279,11 +306,11 @@ for (let i=0; i < preferedCouncillor.length; i++){
         }
     }
 }
+}
 //Fin sacando los votos de los Regidores preferidos
 
 //!? #inicio Sacando los votos de los Director distritales preferidos
-const preferedDistrictDirectorArray = []
-
+if (encuestas[0].length > 0) {
 let preferedDistrictDirector =  encuestas.map(x => x[0]).map(x=>x.preferedDistrictDirectorDetails[0])
 let lookingDistrictDirector
 
@@ -302,11 +329,11 @@ for (let i=0; i < preferedDistrictDirector.length; i++){
         }
     }
 }
+}
 //Fin sacando los votos de los Director distritales preferidos
 
 //!? #inicio Sacando los votos de los Director distritales preferidos
-const preferedDistrictCouncillorArray = []
-
+if (encuestas[0].length > 0) {
 let preferedDistrictCouncillor =  encuestas.map(x => x[0]).map(x=>x.preferedDistrictCouncilorDetails[0])
 let lookingDistrictCouncillor
 
@@ -325,6 +352,7 @@ for (let i=0; i < preferedDistrictCouncillor.length; i++){
         }
     }
 }
+}
 //Fin sacando los votos de los Vo distritales preferidos
 
 
@@ -332,12 +360,12 @@ const result = {
     "ciudadanos": citizens,
     "Activities": activities,
     "Beneficios": beneficios,
-    "Encuestas":{
-        "total":encuestas.length,
-        "Completas":completas,
+    "Encuestas": {
+        "total": encuestas.length,
+        "Completas": completas,
         "Incompletas": incompletas,
-        "percent_complete": Math.round(completas/encuestas.length*100),
-        "percent_incomplete": Math.round(incompletas/encuestas.length*100)
+        "percent_complete": Math.round(completas / citizens.count * 100),
+        "percent_incomplete": Math.round(incompletas / citizens.count * 100)
     },
     "preferedParty": preferedPartyArray,
     "preferedPresident": preferedPresidentArray,
@@ -348,7 +376,6 @@ const result = {
     "preferedDistrictDirector": preferedDistrictDirectorArray,
     "preferedDistrictCouncillor": preferedDistrictCouncillorArray,
     
-
 }
 
 return result

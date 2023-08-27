@@ -2,15 +2,16 @@ const dashboardController = require("./dashboard.controller")
 
 
 const MyCitizensDataServices = (req, res) =>{
-const {userId} = req.params
-const {campainId} = req.params
+// const {userId} = req.params
+// const {campainId} = req.params
 
-if(!campainId){ 
-    const campainId = null
-}
+const {campainId} = req.query || 0
+const {user} = req.query
+
+// res.status(200).json({campainId, user})
 
 dashboardController
-.MyCitizensDataController(userId, campainId)
+.MyCitizensDataController(user, campainId)
 .then(dashboard=>{
     res.status(200).json({
         dashboard

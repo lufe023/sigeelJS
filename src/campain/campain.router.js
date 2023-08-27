@@ -12,4 +12,7 @@ router.route('/')
 router.route('/')
 .post(passport.authenticate('jwt', {session:false}), adminValidate, campainServices.createNewCampain)
 
+router.route('/')
+.patch(passport.authenticate('jwt', {session:false}), adminValidate, campainServices.activeCampainServices)
+
 module.exports = router 

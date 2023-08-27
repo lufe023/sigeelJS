@@ -2,8 +2,6 @@ const campainControllers = require('./campain.controller')
 
 //ver todas las campañas
 const getAllCampains = (req, res) => {
-
-
     campainControllers
     .getAllCampains()
     .then((data) => {
@@ -19,8 +17,6 @@ const createNewCampain = (req, res) => {
     const {
         name,
         details,
-        neighbourhood,
-        distrito_municipal,
         municipio,
         provincia,
         startAt,
@@ -34,11 +30,8 @@ const createNewCampain = (req, res) => {
         {
 
             campainControllers.createCampains({
-        
                     name,
                     details,
-                    neighbourhood,
-                    distrito_municipal,
                     municipio,
                     provincia,
                     createdBy,
@@ -46,26 +39,40 @@ const createNewCampain = (req, res) => {
                     finishAt,
                     isActive
                     })
-                .then((resultado) => 
-                {
-                    res.status(201).json({resultado})
-                })
+                .then((resultado) => {res.status(201).json({res: resultado})})
             
-            .catch((err) => {
-            res.status(400).json({
-                Error: err.err
-            });
-        });
+            .catch((err) => {res.status(400).json({Error: err.err});});
         
         } else {
         //? Error cuando no mandan todos los datos necesarios para crear un usuario
         res.status(400).json({
-            message: "All fields must be completed"
+        message: "All fields must be completed",
+        name,
+        details,
+        municipio,
+        provincia,
+        startAt,
+        finishAt,
+        isActive
         })
         }
 }
 
+const activeCampainServices = (req, res) => {
+
+//ver todas las campañas
+const id = req.query.id
+const active = req.query.active
+
+    campainControllers
+    .activeCampainController(id, active)
+    .then((data) => { res.status(200).json(data)})
+    .catch((err) => {res.status(400).json({ message: err.message })});
+}
+
+
 module.exports = {
     getAllCampains,
-    createNewCampain
+    createNewCampain,
+    activeCampainServices
 }

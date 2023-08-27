@@ -1,6 +1,8 @@
 const db = require("../utils/database");
 const College = require("./college.models");
 const Maps = require("./maps.models");
+const Audit = require('./audit.models');
+
 
 const { DataTypes } = require("sequelize");
 
@@ -114,6 +116,26 @@ outside:{
     type: DataTypes.UUID,
     allowNull: true,
   },
+});
+
+
+Census.beforeUpdate(async (census, options) => {
+  const changedFields = census.changed();
+
+  if (changedFields.length > 0) {
+    // Construye un objeto con los nombres y valores de los campos modificados
+    const changedValues = {};
+    changedFields.forEach(fieldName => {
+      changedValues[fieldName] = census[fieldName];
+    });
+
+    // Crea un registro en la tabla de auditoría
+    await Audit.create({
+      tableName: 'census',
+      recordId: census.citizenID, // Cambia esto según la propiedad que almacena el ID en Census
+      changedFields: changedValues,
+    });
+  }
 });
 
 module.exports = Census

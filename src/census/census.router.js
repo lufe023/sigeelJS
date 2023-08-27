@@ -32,5 +32,15 @@ router.post('/removepeople', passport.authenticate('jwt', {session: false}), cen
 router.get('/:id', passport.authenticate('jwt', {session: false}), censusServices.getOnePeople)
 
 
+//get people pending
+router.get('/pendiente/:citizenId', passport.authenticate('jwt', {session: false}), censusServices.getPendingUpdatesService)
+
+//actualizar datos del ciudadano 
+router.patch('/:citizenID', passport.authenticate('jwt', {session: false}), censusServices.updatePeopleService)
+
+//get people pending
+router.get('/colegio/:collegeId', passport.authenticate('jwt', {session: false}), censusServices.getAllCensusByCollegeService)
+
+
 module.exports = router
 
