@@ -39,7 +39,8 @@ const MyTotalCitizens = async (userId, campainId) => {
                     model:Condition,
                     as: 'condition'
                 },
-                {model: College,
+                {
+                    model: College,
                     as: 'colegio',
                     include: [
                         {
