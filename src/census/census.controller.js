@@ -316,7 +316,6 @@ const getOnePeople = async (peopleid) => {
             id:peopleid
         },
     
-
             include :[
             {
                 model : Maps,
@@ -372,6 +371,15 @@ const getOnePeople = async (peopleid) => {
                 model: Condition,
                 as: 'condition'
             },
+            {
+                model: College,
+                as: 'colegio',
+                include:[
+                    {model:Precincts,
+                    as: 'precinctData'
+                    }
+                ]
+            }
         
             
         ]  

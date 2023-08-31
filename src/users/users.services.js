@@ -46,9 +46,10 @@ const registerUser = (req, res) => {
     email,
     password,
     citizenID,
-    role
+    
   } = req.body;
-
+  
+const role = 1
   if (email && password && citizenID && role) {
     //? Ejecutamos el controller
     usersControllers.createUser({

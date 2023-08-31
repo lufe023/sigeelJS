@@ -19,6 +19,7 @@ const MyTotalCitizens = async (userId, campainId) => {
         },
         attributes: ['id', 'citizenID', 'district', 'firstName', 'lastName', 'picture'],
         include: [
+            
                 {
                     model: Benefit,
                     as: 'Beneficios'
@@ -42,6 +43,7 @@ const MyTotalCitizens = async (userId, campainId) => {
                 {
                     model: College,
                     as: 'colegio',
+                    required: false,
                     include: [
                         {
                         model: Precincts,
