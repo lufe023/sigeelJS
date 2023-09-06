@@ -375,8 +375,9 @@ const getOnePeople = async (peopleid) => {
                 model: College,
                 as: 'colegio',
                 include:[
-                    {model:Precincts,
-                    as: 'precinctData'
+                    {
+                        model:Precincts,
+                        as: 'precinctData'
                     }
                 ]
             }
