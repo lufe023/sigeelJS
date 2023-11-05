@@ -71,8 +71,43 @@ const active = req.query.active
 }
 
 
+//ver todas las campañas
+const getCampainsByPlaceService = (req, res) => {
+
+    const place = req.query.place
+    const col = req.query.col
+
+    campainControllers
+    .getCampainsByPlaceController(place, col)
+    .then((data) => {
+        res.status(200).json(data);
+    })
+    .catch((err) => {
+        res.status(400).json({ message: err.message });
+    });
+}
+
+
+//ver campañas por colegio
+const getCampainsByCollegeServices = (req, res) => {
+
+    const collegeId = req.query.collegeId
+
+
+    campainControllers
+    .getCampainsByCollegeController(collegeId)
+    .then((data) => {
+        res.status(200).json(data);
+    })
+    .catch((err) => {
+        res.status(400).json({ message: err.message });
+    });
+}
+
 module.exports = {
     getAllCampains,
     createNewCampain,
-    activeCampainServices
+    activeCampainServices,
+    getCampainsByPlaceService,
+    getCampainsByCollegeServices
 }

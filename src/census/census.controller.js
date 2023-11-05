@@ -447,7 +447,12 @@ const findPeople = async (findWord) => {
             {
                 model : Users,
                 attributes: ['id', 'email'],
-                as: 'leaders'
+                as: 'leaders',
+                include:[
+                    {model:Census,
+                    attributes:['id','firstName']
+                    }
+                ]
             },
             {
             model: College,
@@ -580,48 +585,58 @@ const updatePeopleController = async (data, citizenID) => {
     return lastUpdatedDates;
 };
 
-const getAllCensusByCollegeController = async (collegeId) => {
-    const data = await Census.findAndCountAll({
-        where: {
-            college: collegeId,
-        },
+const getAllCensusByCollegeController = async (collegeId, offset, limit, includeExterior) => {
+    const whereCondition = {
+        college: collegeId,
+    };
 
-            include :[
+    if (!includeExterior) {
+        whereCondition.outside = false; // Filtrar registros con outside: false
+    }
+
+    const data = await Census.findAndCountAll({
+        where: whereCondition,
+        order: [['position', 'ASC'], ['id', 'ASC']],
+        offset: offset,
+        limit: limit,
+        include: [
             {
                 model: Suffrages,
                 as: 'sufragio'
             },
-           {
-            model: Condition,
-            as: 'condition'
-           },
             {
-                model : Users,
+                model: Condition,
+                as: 'condition'
+            },
+            {
+                model: Users,
                 attributes: ['id', 'email'],
                 as: 'leaders',
-                include:[
-                    {model: Census,
-                    attributes: ['firstName'],
+                include: [
+                    {
+                        model: Census,
+                        attributes: ['firstName'],
                     }
                 ]
             },
-        
-        ]  
-})
+        ]
+    });
 
-const college = await College.findOne({
-    where:{
-        id: collegeId
-    },
-    include:[
-        {
-        model: Precincts,
-        as: 'precinctData'
-        }
-    ]
-})
-    return [data, college]
+    const college = await College.findOne({
+        where: {
+            id: collegeId
+        },
+        include: [
+            {
+                model: Precincts,
+                as: 'precinctData'
+            }
+        ]
+    });
+
+    return [data, college];
 }
+
 
 module.exports = {
     getAllCensus,

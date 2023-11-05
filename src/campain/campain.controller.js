@@ -1,3 +1,5 @@
+const { QueryTypes } = require('sequelize');
+
 const Campain = require('../models/campain.models')
 const Maps = require('../models/maps.models')
 const Polls = require('../models/poll.models')
@@ -5,6 +7,9 @@ const uuid = require('uuid')
 const CensusControllers =  require('../census/census.controller')
 const { Op, Sequelize } = require("sequelize");
 const sequelize = require('../utils/database');
+const Precincts = require('../models/precinct.models')
+const College = require('../models/college.models')
+const Census = require('../models/census.models')
 
 const getAllCampains = async () => {
     const campains = await Campain.findAll({
@@ -81,7 +86,6 @@ const createCampains = async (data) =>
     }
 }
 
-
 const activeCampainController = async (id, active) => {
     const campainId = id;
     const transaction = await sequelize.transaction();
@@ -120,8 +124,87 @@ const activeCampainController = async (id, active) => {
     }
 };
 
+const getCampainsByPlaceController = async (place, col) => {
+
+    //place es el ID del municipio, provincia o distrito municipal, se encutra mas detalles en el modelo maps, Col es la columna
+    const campains = await Campain.findAndCountAll({
+
+        
+        where:{
+            [col]:place
+        }
+    });
+
+    return campains;
+}
+
+// const getCampainsByCollegeController = async (collegeId) => {
+//     const campains = await Census.findAll({
+//       where: {
+//         college: collegeId
+//       },
+//       attributes: ['citizen_id',],
+//       include: [
+//         {
+//           model: Polls,
+//           as: 'Encuestas',
+//           attributes: ['id'],
+//           include: [
+//             {
+//               model: Campain,
+//               as: 'Campain',
+//             //   attributes: ['id', 'otrasColumnasQueQuieras']
+//             }
+//           ]
+//         }
+//       ],
+//       group: ['census.citizen_id', 'Encuestas.id', 'Encuestas.Campain.id'] // Agrupa por el id de la campaña
+//     });
+  
+//     // Ahora campains contendrá una lista de objetos Campain agrupados por el id de la campaña
+  
+//     return campains;
+//   };
+  
+const getCampainsByCollegeController = async (collegeId) => {
+    const campains = await Census.findAll({
+      where: {
+        college: collegeId,
+      },
+      attributes: [
+        'Encuestas.Campain.id',
+        'Encuestas.Campain.name', 
+        'Encuestas.Campain.details', 
+        'Encuestas.Campain.start_at',
+        'Encuestas.Campain.finish_at',
+        'Encuestas.Campain.isActive'], // Incluye la columna que necesitas
+      include: [
+        {
+          model: Polls,
+          as: 'Encuestas',
+          attributes: [], // No necesitas incluir atributos de Polls
+          include: [
+            {
+              model: Campain,
+              as: 'Campain',
+              attributes: [], // No necesitas incluir atributos de Campain
+            },
+          ],
+        },
+      ],
+      group: ['Encuestas.Campain.id'],
+      raw: true, // Agrega esta opción
+    });
+  
+    return campains;
+  };
+  
+  
+
 module.exports = {
     getAllCampains,
     createCampains,
-    activeCampainController
+    activeCampainController,
+    getCampainsByPlaceController,
+    getCampainsByCollegeController
 }

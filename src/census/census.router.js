@@ -24,6 +24,9 @@ router.post('/simplesearch', censusServices.simpleFindPeople)
 //agegar personas a mi padron personal
 router.post('/addpeople', passport.authenticate('jwt', {session: false}), censusServices.addPeople)
 
+//agegar personas a mi padron personal
+router.post('/addpeopletoother', passport.authenticate('jwt', {session: false}), adminValidate, censusServices.addPeopleToOtherUser)
+
 //eliminar una persona de tu padrón personal
 router.post('/removepeople', passport.authenticate('jwt', {session: false}), censusServices.removePeople)
 
@@ -39,7 +42,7 @@ router.get('/pendiente/:citizenId', passport.authenticate('jwt', {session: false
 router.patch('/:citizenID', passport.authenticate('jwt', {session: false}), censusServices.updatePeopleService)
 
 //get people pending
-router.get('/colegio/:collegeId', passport.authenticate('jwt', {session: false}), censusServices.getAllCensusByCollegeService)
+router.get('/colegio/:collegeId', censusServices.getAllCensusByCollegeService)
 
 
 module.exports = router

@@ -17,7 +17,7 @@ const getAllUsers = async (offset, limit) => {
     include: [
       {
         model: Census,
-        attributes: ["first_name", "last_name", "picture", "celphone"],
+        attributes: ["id","first_name", "last_name", "picture", "celphone"],
       },
       {
         model: Roles,

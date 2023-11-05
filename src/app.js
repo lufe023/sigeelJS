@@ -22,14 +22,15 @@ const ties = require('./ties/ties.router')
 const gpsRouter = require('./gps/gps.router')
 const jceRouter = require('./jce/jce.router')
 const campain = require('./campain/campain.router')
+const reports = require('./reports/reports.router')
 
 
 
 //? Initial Configurations
 const app = express()
 
-app.use(bodyParser.json({ limit: '100mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
+app.use(bodyParser.json({ limit: '500mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
 
 app.use(cors())
 app.use(express.json())
@@ -77,8 +78,7 @@ app.use('/api/v1/ties', ties)
 app.use('/api/v1/gps', gpsRouter)
 app.use('/api/v1/jce', jceRouter)
 app.use('/api/v1/campains', campain)
-
-
+app.use('/api/v1/reports', reports)
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)

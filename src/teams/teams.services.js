@@ -130,7 +130,14 @@ const teamById = (req, res) => {
     const teamId = req.params.teamId
     teamsController
     .getOneTeamController(teamId)
-    .then((data) => {res.status(200).json(data)})
+    .then((data) => 
+    {
+        if(data!=null){
+        res.status(200).json(data)
+    }else{
+        res.status(400).json({msg: null})
+    }
+    })
     .catch((err) => {res.status(400).json({ message: err })});
 }
 

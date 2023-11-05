@@ -9,6 +9,13 @@ require('../middlewares/auth.middleware')(passport)
 router.route('/')
 .get(passport.authenticate('jwt', {session: false}), campainServices.getAllCampains)
 
+router.route('/byplace')
+.get(passport.authenticate('jwt', {session: false}), campainServices.getCampainsByPlaceService)
+
+
+router.route('/college')
+.get(passport.authenticate('jwt', {session: false}), campainServices.getCampainsByCollegeServices)
+
 router.route('/')
 .post(passport.authenticate('jwt', {session:false}), adminValidate, campainServices.createNewCampain)
 

@@ -16,7 +16,6 @@ const adminValidate = (req, res, next) => {
             your: role
         })
     }
-    
 }
 
 const leaderValidate = (req, res, next) => {

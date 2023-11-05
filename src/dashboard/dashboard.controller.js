@@ -152,7 +152,7 @@ if (encuestas[0].length > 0) {
         }
         }
     }
-   
+
     incompletas = encuestas.length - completas;
 } else {
  // Si no hay encuestas, todas se consideran incompletas
@@ -385,7 +385,6 @@ return result
 }
 const partiesList = async () => {
     const parties = await Parties.findAndCountAll() 
-    
     return parties
 }
 
@@ -396,8 +395,6 @@ const total = await MyTotalCitizens(userId, campainId)
 const result = [total]
 return result
 }
-
-
 
 module.exports = {
     MyCitizensDataController,
