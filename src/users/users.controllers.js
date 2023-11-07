@@ -17,7 +17,7 @@ const getAllUsers = async (offset, limit) => {
     include: [
       {
         model: Census,
-        attributes: ["id","first_name", "last_name", "picture", "celphone"],
+        attributes: ["id","first_name", "last_name", "picture", "celphone",],
       },
       {
         model: Roles,
@@ -29,10 +29,9 @@ const getAllUsers = async (offset, limit) => {
 
 const getUserById = async (id) => {
   const data = await Users.findOne({
-    attributes: ["id", "email", "userRoleId", "status", "censuCitizenID"],
+    attributes: ["id", "email", "userRoleId", "active", "censuCitizenID", "passwordRequest"],
     where: {
       id: id,
-      active: true,
     },
     include: [
       //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron

@@ -78,16 +78,17 @@ const role = 1
 };
 
 const requestForgotPassword = (req, res)=> {
-
+const email = req.body.email
 usersControllers
-.requestForgotPassword(req.body.email)
+.requestForgotPassword(email)
 .then((data)=>{
 if(data[0]!=0){
   res.status(201).json({message: "Peticion enviada",
 })
 let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='https://sigeel.netlify.app/#/recoverypassword/${data[1]}'>Recuperar Contraseña</a>  `
-
-enviarMail('no-reply@no-reply@sigeel.netlify.app', req.body.email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
+if(email.includes('@')){
+enviarMail('no-reply@no-reply@sigeel.netlify.app', email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
+}
 }
 else{
   res.status(400).json({message: "Esta petición no pudo ser procesada",})
