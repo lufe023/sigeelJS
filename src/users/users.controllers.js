@@ -57,6 +57,20 @@ const createUser = async (data) => {
   return newUser;
 };
 
+const changeUserRoleController = async (id, newRole) => {
+const change = await Users.update(
+  {
+    userRoleId: newRole,
+  },
+  {
+    where: {
+      id,
+    },
+  })
+
+return change
+}
+
 const requestForgotPassword = async (email) => {
   const codigo = uuid.v4();
   const result = await Users.update(
@@ -113,12 +127,6 @@ const getUserByEmail = async (email) => {
       status: "active",
     },
     include: [
-      //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
-      // {
-      //     model : Census,
-      //     attributes: ['first_name', 'last_name', 'picture'],
-      //     as: 'usuario'
-      // },
       {
         model: Roles,
       },
@@ -155,21 +163,6 @@ const findUserController = async (findWord) => {
 ]
 });
 
-  // Obtener los resultados de la consulta
-//   const results = censusData.rows.map((census) => {
-//     // Acceder a los datos de Users a través de la relación
-//     const userId = census.User.id;
-//     const userEmail = census.User.email;
-//     const userFirstName = census.firstName;
-//     const userLastName = census.lastName;
-
-//     // Retornar los datos requeridos
-//     return {
-//       id: userId,
-//       email: userEmail,
-//     };
-//   });
-
   return censusData;
 };
 
@@ -182,5 +175,6 @@ module.exports = {
   getUserByEmail,
   changeForgotPassword,
   requestForgotPassword,
-  findUserController
+  findUserController,
+  changeUserRoleController
 };

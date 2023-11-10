@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const passport = require('passport')
-const {leaderValidate, adminValidate, itSupportValidate, superAdminValidate } = require('../middlewares/role.middleware')
+const {leaderValidate, adminValidate, itSupportValidate, superAdminValidate, isAdministrator } = require('../middlewares/role.middleware')
 const userServices = require('./users.services')
 
 require('../middlewares/auth.middleware')(passport)
@@ -24,6 +24,9 @@ router.route('/me')
         passport.authenticate('jwt', {session: false}),
         userServices.deleteMyUser
     )
+//? /api/v1/users/passwordRequest
+router.route('/changeUserRole')
+.patch(passport.authenticate('jwt', {session: false}), isAdministrator , userServices.changeUserRoleService)
 
 //? /api/v1/users/passwordRequest
 router.route('/passwordRequest')
@@ -36,7 +39,8 @@ router.route('/passwordRequest/:idRequest')
 router.route('/:id')
     .get(
         passport.authenticate('jwt', {session: false}),
-        adminValidate,
+        //adminValidate,
+        isAdministrator,
         userServices.getUserById)
 
     .patch(

@@ -77,6 +77,7 @@ const role = 1
   }
 };
 
+
 const requestForgotPassword = (req, res)=> {
 const email = req.body.email
 usersControllers
@@ -97,6 +98,36 @@ else{
 .catch((err) => {
   res.status(400).json({ message: err.message });
 });
+}
+
+//cambiar el rol de un usuario
+const changeUserRoleService = (req, res) => {
+
+  const {id, newRoleId} = req.body
+
+  usersControllers
+  .getUserById(req.user.id)
+  .then((data) => {
+
+    if(data.userRoleId>newRoleId){
+      usersControllers
+      .changeUserRoleController(id, newRoleId)
+      .then((data) => { 
+        if(data==1)
+        {res.status(200).json(data)}else{
+          {res.status(400).json({ message: "no se actualizó el rol" })}
+        }
+      
+      })
+      .catch((err) => {res.status(400).json({ message: err })})
+    }else{
+      res.status(400).json({ message: 'Usted no está autorizado para estos permisos' })
+    }
+  })
+  .catch((err) => {
+    res.status(400).json({ message: err });
+  });
+
 }
 
 
@@ -253,5 +284,6 @@ module.exports = {
   deleteMyUser,
   changeForgotPassword,
   requestForgotPassword,
-  simpleFindUser
+  simpleFindUser,
+  changeUserRoleService
 };
