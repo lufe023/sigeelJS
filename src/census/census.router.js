@@ -30,6 +30,8 @@ router.post('/addpeopletoother', passport.authenticate('jwt', {session: false}),
 //eliminar una persona de tu padrón personal
 router.post('/removepeople', passport.authenticate('jwt', {session: false}), censusServices.removePeople)
 
+//eliminar una persona de tu padrón personal
+router.patch('/transfercensus', passport.authenticate('jwt', {session: false}), censusServices.transferCensusService)
 
 //get One People
 router.get('/:id', passport.authenticate('jwt', {session: false}), censusServices.getOnePeople)

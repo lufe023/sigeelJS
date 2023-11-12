@@ -518,6 +518,19 @@ const removePeople = async (peopleId, leaderId) =>{
     return result
 }
 
+//pasar el padroncillo de un usuario a otro
+const transferCensusController = async (leaderIdA, leaderIdB) => {
+    const result = await Census.update({
+        leader: leaderIdB,
+    },
+{
+        where: {
+            leader:leaderIdA
+        }
+    })
+    return result
+}
+
 const updatePeopleController = async (data, citizenID) => {
     try {
       const census = await Census.findOne({
@@ -651,5 +664,6 @@ module.exports = {
     updatePeopleController,
     getLastUpdatedDates,
     getPendingUpdatesController,
-    getAllCensusByCollegeController
+    getAllCensusByCollegeController,
+    transferCensusController
 }

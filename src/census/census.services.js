@@ -1,5 +1,6 @@
 const censusControllers = require('./census.controller');
 const { host } = require('../config')
+const {getUserById} = require('../users/users.controllers')
 
 const getAllCensus = (req, res) => {
     censusControllers
@@ -249,6 +250,27 @@ const getPeoplesByPlacesServices = (req, res) => {
 
 }
 
+//servicio para transferir un padron a otro usuario
+const transferCensusService = (req, res) => {
+
+  const {leaderIdA, leaderIdB} = req.body
+  if(leaderIdA, leaderIdB){
+getUserById(leaderIdA)
+.then((result) => {
+  if(result.active){
+censusControllers.transferCensusController(leaderIdA, leaderIdB)
+.then((result) => {res.status(200).json(result)})
+.catch((err) => {res.status(400).json(err)});
+  }else{
+  res.status(400).json({message: "El usuario donador debe estar desactivado para poder donar el padroncillo"})
+  }
+})
+  }else{
+    res.status(400).json({message: "Se deben elegir dos usuarios para que ocurra la trasferencia"})
+  }
+
+}
+
 module.exports = {
     getAllCensus,
     findPeople,
@@ -261,5 +283,6 @@ module.exports = {
     updatePeopleService,
     getPendingUpdatesService,
     getAllCensusByCollegeService,
-    addPeopleToOtherUser
+    addPeopleToOtherUser,
+    transferCensusService
 }
