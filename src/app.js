@@ -23,7 +23,7 @@ const gpsRouter = require('./gps/gps.router')
 const jceRouter = require('./jce/jce.router')
 const campain = require('./campain/campain.router')
 const reports = require('./reports/reports.router')
-
+const suffrage = require('./suffrage/suffrage.router')
 
 
 //? Initial Configurations
@@ -79,6 +79,7 @@ app.use('/api/v1/gps', gpsRouter)
 app.use('/api/v1/jce', jceRouter)
 app.use('/api/v1/campains', campain)
 app.use('/api/v1/reports', reports)
+app.use('/api/v1/suffrages', suffrage)
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)

@@ -612,6 +612,7 @@ const getAllCensusByCollegeController = async (collegeId, offset, limit, include
         order: [['position', 'ASC'], ['id', 'ASC']],
         offset: offset,
         limit: limit,
+        attributes:["id","firstName","lastName","nickname","citizenID","picture", "position", "outside", "celphone","telephone", "otherPhone","adress"],
         include: [
             {
                 model: Suffrages,
@@ -649,6 +650,7 @@ const getAllCensusByCollegeController = async (collegeId, offset, limit, include
 
     return [data, college];
 }
+
 
 
 module.exports = {

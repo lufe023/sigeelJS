@@ -28,10 +28,6 @@ router.route('/me')
 router.route('/changeUserRole')
 .patch(passport.authenticate('jwt', {session: false}), isAdministrator , userServices.changeUserRoleService)
 
-//? /api/v1/users/changeUserRole
-router.route('/changeUserRole')
-.patch(passport.authenticate('jwt', {session: false}), isAdministrator , userServices.changeUserRoleService)
-
 
 //? /api/v1/users/passwordRequest
 router.route('/passwordRequest')

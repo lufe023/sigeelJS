@@ -5,7 +5,16 @@
         "titleBar.activeBackground": "#42b883",
         "titleBar.activeForeground": "#15202b",
         "titleBar.inactiveBackground": "#42b88399",
-        "titleBar.inactiveForeground": "#15202b99"
+        "titleBar.inactiveForeground": "#15202b99",
+        "activityBar.activeBackground": "#65c89b",
+        "activityBar.background": "#65c89b",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#945bc4",
+        "activityBarBadge.foreground": "#e7e7e7"
     },
-    "peacock.color": "#42b883"
+    "peacock.color": "#42b883",
+    "prettier.bracketSameLine": true,
+    "prettier.bracketSpacing": true,
+    "prettier.enableDebugLogs": true
 }

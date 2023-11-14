@@ -3,6 +3,7 @@ const Census = require("./census.models");
 
 
 const { DataTypes } = require("sequelize");
+const Users = require("./users.models");
 
 const Suffrages = db.define("suffrages", {
   id: {
@@ -25,7 +26,14 @@ const Suffrages = db.define("suffrages", {
     allowNull: false,
     defaultValue:false
   },
-
+registerBy:{
+  type: DataTypes.UUID,
+  allowNull:false,
+  references:{
+    key: 'id',
+    model: Users
+  },
+}
 });
 
 module.exports = Suffrages
