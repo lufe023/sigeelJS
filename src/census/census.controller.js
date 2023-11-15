@@ -37,7 +37,7 @@ const getPeoplesByPlaces = async (province, municipality) => {
 const getAllCensus = async () => {
     const data = await Census.findAndCountAll({
     
-
+            
             include :[
             {
                 model : Maps,
@@ -117,31 +117,27 @@ const getMyPeople = async (leaderId) => {
                 attributes: ['id', 'name', 'parent'],
                 as: 'districts'
             },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'neighbourhoods'
-            },
+
             {
                 model : Users,
                 attributes: ['id', 'email'],
                 as: 'leaders'
             },
-            {
-                model : Benefit,
-                //attributes: ['id', 'email'],
-                as: 'Beneficios'
-            },
-            {
-                model : Job,
-                //attributes: ['id', 'email'],
-                as: 'Empleos'
-            },
-            {
-                model : Participation,
-                //attributes: ['id', 'email'],
-                as: 'Actividades'
-            },
+            // {
+            //     model : Benefit,
+            //     //attributes: ['id', 'email'],
+            //     as: 'Beneficios'
+            // },
+            // {
+            //     model : Job,
+            //     //attributes: ['id', 'email'],
+            //     as: 'Empleos'
+            // },
+            // {
+            //     model : Participation,
+            //     //attributes: ['id', 'email'],
+            //     as: 'Actividades'
+            // },
             {
                 model : Gps,
                 //attributes: ['id', 'email'],

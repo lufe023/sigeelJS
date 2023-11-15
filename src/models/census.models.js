@@ -5,6 +5,7 @@ const Audit = require('./audit.models');
 
 
 const { DataTypes } = require("sequelize");
+const Users = require("./users.models");
 
 const Census = db.define("census", {
   id: {
@@ -25,12 +26,13 @@ const Census = db.define("census", {
   nickname: {
     type: DataTypes.TEXT,
   },
-  citizenID:{
+  citizenID: {
     type: DataTypes.STRING,
-    unique:true,
+    unique: true,
     allowNull: false,
     field: 'citizen_id',
     primaryKey: true,
+    // Añadir índice en la columna citizenID
   },
 
   age: {
@@ -48,7 +50,7 @@ const Census = db.define("census", {
   province: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references:{
+    references: {
       key: 'id',
       model: Maps
     }
@@ -56,7 +58,7 @@ const Census = db.define("census", {
   municipality: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references:{
+    references: {
       key: 'id',
       model: Maps
     }
@@ -112,10 +114,21 @@ outside:{
   allowNull:true
 },
   //referencia a usuarios llave foranea de users
-  leader:{
+  leader: {
     type: DataTypes.UUID,
     allowNull: true,
+    // Añadir índice en la columna leader
   },
+  
+}, {
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['province', 'municipality']
+    },
+    // ... (otros índices)
+  ]
 });
 
 
