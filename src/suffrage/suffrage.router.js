@@ -7,4 +7,7 @@ const {leaderValidate, adminValidate, itSupportValidate, superAdminValidate } = 
 //get people who voted by college
 router.get('/whovote', passport.authenticate('jwt', {session: false}), suffrageServices.getPeopleWhoVotedServices)
 
+//get people who voted by college
+router.post('/registervote', passport.authenticate('jwt', {session: false}), suffrageServices.createOrUpdateSuffrageServices)
+
 module.exports = router
