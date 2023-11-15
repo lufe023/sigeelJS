@@ -20,6 +20,40 @@ const adminValidate = (req, res, next) => {
     }
 }
 
+const isDelegate = async (req, res, next) => {
+    const user = req.user.id;
+
+    //List of users who have permission to this area
+    const permissionList = [
+        {id: 2, roleName: 'Administrador'},
+        {id: 3, roleName: 'Delegado'},
+        {id: 5, roleName: 'super admin'}
+    ];
+
+    try {
+        const consulta = await getUserById(user);
+        const userRoleId = consulta.user_role.id;
+
+        const tienePermiso = permissionList.some(item => item.id === userRoleId);
+
+        if (tienePermiso) {
+            next();
+        } else {
+            res.status(401).json({
+                message: 'Acceso denegado, necesitas ser Delegado para realizar esta acción!',
+                reason: 'No tienes los permisos necesarios',
+                youRoleIs: consulta.user_role
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(401).json({
+            message: 'Access Denied!',
+            reason: 'Error occurred while checking permissions',
+        });
+    }
+};
+
 const isAdministrator = async (req, res, next) => {
     const user = req.user.id;
 
@@ -108,4 +142,4 @@ const superAdminValidate = (req, res, next) => {
 
 
 module.exports = {
-    leaderValidate, adminValidate, itSupportValidate, superAdminValidate, isAdministrator}
+    leaderValidate, adminValidate, itSupportValidate, superAdminValidate, isAdministrator,isDelegate}
