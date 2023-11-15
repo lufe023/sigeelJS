@@ -125,7 +125,7 @@ outside:{
   indexes: [
     // Añadir índices compuestos si es necesario
     {
-      fields: ['province', 'municipality']
+      fields: ['province', 'municipality','leader','college','citizen_id']
     },
     // ... (otros índices)
   ]
