@@ -51,7 +51,7 @@ const createUser = async (data) => {
     id: uuid.v4(),
     email: data.email,
     password: hashPassword(data.password),
-    censuCitizenID: data.citizenID,
+    censuCitizenID: data.citizenID.trim().replaceAll("-", ""),
     userRoleId: data.role,
   });
   return newUser;
