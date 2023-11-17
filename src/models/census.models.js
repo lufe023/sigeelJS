@@ -142,12 +142,27 @@ Census.beforeUpdate(async (census, options) => {
       changedValues[fieldName] = census[fieldName];
     });
 
-    // Crea un registro en la tabla de auditoría
-    await Audit.create({
-      tableName: 'census',
-      recordId: census.citizenID, // Cambia esto según la propiedad que almacena el ID en Census
-      changedFields: changedValues,
+    // Busca un registro existente en la tabla de auditoría
+    const existingAudit = await Audit.findOne({
+      where: {
+        tableName: 'census',
+        recordId: census.citizenID,
+      },
     });
+
+    if (existingAudit) {
+      // Si existe, actualiza los campos modificados
+      await existingAudit.update({
+        changedFields: changedValues,
+      });
+    } else {
+      // Si no existe, crea un nuevo registro en la tabla de auditoría
+      await Audit.create({
+        tableName: 'census',
+        recordId: census.citizenID,
+        changedFields: changedValues,
+      });
+    }
   }
 });
 

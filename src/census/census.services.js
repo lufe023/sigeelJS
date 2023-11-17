@@ -187,7 +187,6 @@ const updatePeopleService = (req, res)=>{
   censusControllers
   .updatePeopleController(data,citizenID)
   .then((result) => {res.status(200).json({ message: `Actualización exitosa`, data: result });
-    
   })
 
   .catch((err) => {res.status(400).json(err)});
