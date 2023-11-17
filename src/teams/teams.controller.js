@@ -97,7 +97,8 @@ const createNewTeam = async (data, createdBy) => {
         name: data.name,
         createdBy,
         logo: data.logo,
-        description: data.description
+        description: data.description,
+        whatsapp: data.whatsapp
     })
 
     return newTeam

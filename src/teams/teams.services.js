@@ -29,7 +29,7 @@ const getMyTeamsService = (req, res) => {
 
 const createNewTeamServices = (req, res) => {
     const createdBy = req.user.id
-    const {name, description} = req.body
+    const {name, description, whatsapp} = req.body
     const logo = req.file?.filename
     const members = []
     if(req.body.members){
@@ -43,7 +43,7 @@ const createNewTeamServices = (req, res) => {
     let teams
     if(name){
     teamsController
-    .createNewTeam({name, logo, description}, createdBy)
+    .createNewTeam({name, logo, description, whatsapp}, createdBy)
     .then(data => {
         teams = data
     if(teams){
