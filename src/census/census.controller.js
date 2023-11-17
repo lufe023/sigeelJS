@@ -103,6 +103,10 @@ const getMyPeople = async (leaderId) => {
         },
             include :[
             {
+                model: Suffrages,
+                as:'sufragio'
+            },
+            {
                 model : Maps,
                 attributes: ['id', 'name', 'parent'],
                 as: 'provinces'
@@ -204,6 +208,10 @@ const getPeopleByUser = async (leaderId) => {
             leader:leaderId
         },
             include :[
+                {
+                    model: Suffrages,
+                    as:'sufragio'
+                },
             {
                 model : Maps,
                 attributes: ['id', 'name', 'parent'],

@@ -11,6 +11,7 @@ const Parties = require('../models/parties.models')
 const Poll = require('../models/poll.models')
 const { Op } = require("sequelize");
 const Precincts = require('../models/precinct.models')
+const Suffrages = require('../models/suffrage.models')
 
 const MyTotalCitizens = async (userId, campainId) => {
     const citizens = await Census.findAndCountAll({
@@ -19,7 +20,10 @@ const MyTotalCitizens = async (userId, campainId) => {
         },
         attributes: ['id', 'citizenID', 'district', 'firstName', 'lastName', 'picture'],
         include: [
-            
+                {
+                    model: Suffrages,
+                    as:'sufragio'
+                },
                 {
                     model: Benefit,
                     as: 'Beneficios'
