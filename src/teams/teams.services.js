@@ -1,5 +1,5 @@
 const teamsController = require("./teams.controller")
-
+const imagenController = require('../images/images.controller')
 //llamar a todos los partidos
 const getAllTeams = (req, res) => {
     const role = req.user.role
@@ -94,7 +94,7 @@ const addTeamMemberService = (req, res)=> {
 const deleteTeamService = (req, res) => {
     const who = req.user.id
     const id = req.params.id
-    const isAdmin = req.user.role>1?true:false
+    const isAdmin = req.user.role>3?true:false
     teamsController
     .getOneTeamController(id)
     .then(
@@ -141,6 +141,54 @@ const teamById = (req, res) => {
     .catch((err) => {res.status(400).json({ message: err })});
 }
 
+// update a team
+// update a team
+const updateTeamServices = async (req, res) => {
+    const { teamId, name, teamLeader, description, whatsapp } = req.body;
+    const logo = req.file?.filename;
+    const createdBy = teamLeader;
+
+    const who = req.user.id;
+    const isAdmin = req.user.role > 3;
+
+    try {
+        if (!teamId) {
+            throw new Error("Se necesita de forma obligatoria un teamId");
+        }
+
+        const team = await teamsController.getOneTeamController(teamId);
+
+        if (!team || (team.createdBy !== who && !isAdmin)) {
+            throw new Error("Usted no es propietario del equipo o no tiene permisos de administrador");
+        }
+
+        const updatedData = {
+            logo,
+            name,
+            description,
+            whatsapp,
+            createdBy
+        };
+
+        const [updateResult] = await teamsController.updateTeamController(updatedData, teamId);
+
+        // Verifica si la actualización fue exitosa y si hay un nuevo logo
+        if (logo) {
+            // Llamada al controlador para borrar la imagen antigua
+            //console.log("Antes de llamar a deleteImageController");
+            await imagenController.deleteImageController("teams", team.logo);
+            //console.log("Después de llamar a deleteImageController");
+            // Puedes verificar deleteImageResult para asegurarte de que la imagen se haya eliminado correctamente
+        }
+
+        res.status(200).json({ data: updateResult });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+
+
 
 
 module.exports = {
@@ -151,5 +199,6 @@ module.exports = {
     addTeamMemberService,
     teamById,
     deleteTeamMemberService,
-    deleteTeamService
+    deleteTeamService,
+    updateTeamServices
 }
