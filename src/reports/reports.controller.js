@@ -147,6 +147,7 @@ const getPreferedPresidentReportByPlaceController = async (campainId) =>{
   return report
 }
 
+
 module.exports = {
     getCampainReport,
     getPartyReport,
