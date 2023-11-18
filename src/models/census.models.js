@@ -132,38 +132,20 @@ outside:{
 });
 
 
-Census.beforeUpdate(async (census, options) => {
+Census.afterUpdate(async (census, options) => {
   const changedFields = census.changed();
 
   if (changedFields.length > 0) {
-    // Construye un objeto con los nombres y valores de los campos modificados
     const changedValues = {};
     changedFields.forEach(fieldName => {
       changedValues[fieldName] = census[fieldName];
     });
 
-    // Busca un registro existente en la tabla de auditoría
-    const existingAudit = await Audit.findOne({
-      where: {
-        tableName: 'census',
-        recordId: census.citizenID,
-      },
+    await Audit.create({
+      tableName: 'census',
+      recordId: census.citizenID,
+      changedFields: changedValues,
     });
-
-    if (existingAudit) {
-      // Si existe, actualiza los campos modificados
-      await existingAudit.update({
-        changedFields: changedValues,
-      });
-    } else {
-      // Si no existe, crea un nuevo registro en la tabla de auditoría
-      await Audit.create({
-        tableName: 'census',
-        recordId: census.citizenID,
-        changedFields: changedValues,
-      });
-    }
   }
 });
-
 module.exports = Census
