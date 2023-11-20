@@ -1,5 +1,7 @@
 const teamsController = require("./teams.controller")
 const imagenController = require('../images/images.controller')
+const {isAdministratorBoolean} = require('../middlewares/role.middleware')
+
 //llamar a todos los partidos
 const getAllTeams = (req, res) => {
     const role = req.user.role
@@ -8,6 +10,7 @@ teamsController
 .then((data) => {res.status(200).json(data)})
 .catch((err) => {res.status(400).json({ message: err })});
 }
+
 
 //obtener los equipos a los que un usuario pertenece enviando el id del usuario
 const getTeamsByUserService = (req, res) => {
@@ -63,7 +66,7 @@ const createNewTeamServices = (req, res) => {
 const addTeamMemberService = (req, res)=> {
     const who = req.user.id
     const teamId = req.params.id
-    const isAdmin = req.user.role>1?true:false
+    const isAdmin = req.user.role>=3
     const {members} = req.body
 
     teamsController
@@ -94,7 +97,7 @@ const addTeamMemberService = (req, res)=> {
 const deleteTeamService = (req, res) => {
     const who = req.user.id
     const id = req.params.id
-    const isAdmin = req.user.role>3?true:false
+    const isAdmin = req.user.role>=3
     teamsController
     .getOneTeamController(id)
     .then(
@@ -142,51 +145,85 @@ const teamById = (req, res) => {
 }
 
 // update a team
-// update a team
 const updateTeamServices = async (req, res) => {
     const { teamId, name, teamLeader, description, whatsapp } = req.body;
     const logo = req.file?.filename;
     const createdBy = teamLeader;
 
     const who = req.user.id;
-    const isAdmin = req.user.role > 3;
+    const isAdmin = await isAdministratorBoolean(req.user.id)
 
+    //nota para la deuda tecnica en esta funcion se usa el middleware isAministrator de forma correcta
+    // se debe cambiar en las demas funciones porque consulta directamente en la DB y no toma valores del token
     try {
         if (!teamId) {
             throw new Error("Se necesita de forma obligatoria un teamId");
         }
 
         const team = await teamsController.getOneTeamController(teamId);
+        if (team.createdBy == who || isAdmin) {
 
-        if (!team || (team.createdBy !== who && !isAdmin)) {
-            throw new Error("Usted no es propietario del equipo o no tiene permisos de administrador");
-        }
-
-        const updatedData = {
-            logo,
-            name,
-            description,
-            whatsapp,
-            createdBy
-        };
-
-        const [updateResult] = await teamsController.updateTeamController(updatedData, teamId);
-
-        // Verifica si la actualización fue exitosa y si hay un nuevo logo
-        if (logo) {
-            // Llamada al controlador para borrar la imagen antigua
-            //console.log("Antes de llamar a deleteImageController");
-            await imagenController.deleteImageController("teams", team.logo);
-            //console.log("Después de llamar a deleteImageController");
-            // Puedes verificar deleteImageResult para asegurarte de que la imagen se haya eliminado correctamente
-        }
-
-        res.status(200).json({ data: updateResult });
+            const updatedData = {
+                logo,
+                name,
+                description,
+                whatsapp,
+                createdBy
+            };
+    
+            const [updateResult] = await teamsController.updateTeamController(updatedData, teamId);
+    
+            // Verifica si la actualización fue exitosa y si hay un nuevo logo
+            if (logo) {
+                // Llamada al controlador para borrar la imagen antigua
+                await imagenController.deleteImageController("teams", team.logo);
+            }
+    
+            res.status(200).json({ data: updateResult });
+        }else{
+            throw new Error("Usted no es team Leader del equipo o no tiene permisos de administrador");
+        
+    }
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
 };
 
+//agregar o quitar otros teamLeaders al equipo
+const setTeamLeaderServices = async (req, res) => {
+    const {memberId, teamId, value } = req.body;
+    const requester = req.user.id; // Supongo que "who" debería ser "createdBy"
+    const isAdmin = await isAdministratorBoolean(req.user.id)
+
+try {
+        if (!teamId) {
+            throw new Error("Se necesita de forma obligatoria un teamId");
+        }
+
+        const team = await teamsController.getOneTeamController(teamId);
+        const isTeamLeader = team.members.some(member => member.teamLeader && member.memberId === requester);
+
+        if (isAdmin || isTeamLeader) {
+            
+        const updateResult = await teamsController.setTeamLeaderController(memberId, teamId, value);
+
+            // Puedes agregar la lógica para manejar el logo aquí, si es necesario
+
+            res.status(200).json({ data: updateResult });
+        } else {
+            throw new Error("Usted no es el líder del equipo, no tiene permisos de administrador ni es el creador del equipo");
+        }
+    } catch (err) {
+        console.error('Error en setTeamLeaderServices:', err);
+        res.status(400).json({ message: err.message });
+    }
+};
+
+
+    // teamsController
+    // .deleteTeamMemberController(teamId, memberId)
+    // .then((data) => {res.status(200).json(data)})
+    // .catch((err) => {res.status(400).json({ message: err })});
 
 
 
@@ -200,5 +237,6 @@ module.exports = {
     teamById,
     deleteTeamMemberService,
     deleteTeamService,
-    updateTeamServices
+    updateTeamServices,
+    setTeamLeaderServices
 }

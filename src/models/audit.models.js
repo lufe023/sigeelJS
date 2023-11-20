@@ -25,7 +25,16 @@ const Audit = db.define('audit', {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
-    },
+    }
+  } ,{
+    // ... (otras opciones de modelo)
+    indexes: [
+      // Añadir índices compuestos si es necesario
+      {
+        fields: ['tableName', 'recordId','changedFields']
+      },
+      // ... (otros índices)
+    ]
   });
 
   

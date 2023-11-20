@@ -44,7 +44,10 @@ router.delete('/:id', passport.authenticate('jwt', {session: false}), teams.dele
 //eliminar un miembro de un team
 router.delete('/', passport.authenticate('jwt', {session: false}), teams.deleteTeamMemberService)
 
+//actualizat un equipo
 router.patch('/updateteam', passport.authenticate('jwt', {session: false}), upload.single('logo'), teams.updateTeamServices)
 
+//actualizar los lideres de un equipo
+router.patch('/setteamleader', passport.authenticate('jwt', {session: false}), teams.setTeamLeaderServices)
 
 module.exports = router

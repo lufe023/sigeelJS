@@ -114,6 +114,24 @@ const updateTeamController = async (data, teamId) => {
     return [result];
 }
 
+const setTeamLeaderController = async (memberId, teamId, value) => {
+    const result = await teamsMembers.update(
+        {
+            teamLeader: value
+        },
+        {
+            where: {
+                [Op.and]: {
+                    teamId,
+                    memberId
+                }
+            }
+        }
+    );
+
+    return [result];
+}
+
 
 //agregar 1 o varios registros a la vez un equipo //teamId, members, teamLeder:uuid leader or null or false
 const addMembersTeam = async (teamId, members, teamLeader) => {
@@ -232,5 +250,6 @@ module.exports = {
     addMembersTeam,
     deleteTeamMemberController,
     deleteTeamController,
-    updateTeamController
+    updateTeamController,
+    setTeamLeaderController
 }

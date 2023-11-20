@@ -54,6 +54,36 @@ const isDelegate = async (req, res, next) => {
     }
 };
 
+const isAdministratorBoolean = async (userId) => {
+    const user = userId;
+
+    //List of users who have permission to this area
+    const permissionList = [
+        {level: 2, roleName: 'Administrador'},
+        {level: 3, roleName: 'Delegado'},
+        {level: 5, roleName: 'super admin'}
+    ];
+
+    try {
+        const consulta = await getUserById(user);
+        const userRoleId = consulta.user_role.level;
+
+        const tienePermiso = permissionList.some(item => item.level === userRoleId);
+
+        if (tienePermiso) {
+            return true 
+        } else {
+           return false
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(401).json({
+            message: 'Access Denied!',
+            reason: 'Error occurred while checking permissions',
+        });
+    }
+};
+
 const isAdministrator = async (req, res, next) => {
     const user = req.user.id;
 
@@ -142,4 +172,11 @@ const superAdminValidate = (req, res, next) => {
 
 
 module.exports = {
-    leaderValidate, adminValidate, itSupportValidate, superAdminValidate, isAdministrator,isDelegate}
+    leaderValidate, 
+    adminValidate, 
+    itSupportValidate, 
+    superAdminValidate, 
+    isAdministrator,
+    isDelegate,
+    isAdministratorBoolean
+}
