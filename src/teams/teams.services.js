@@ -211,7 +211,7 @@ try {
 
             res.status(200).json({ data: updateResult });
         } else {
-            throw new Error("Usted no es el líder del equipo, no tiene permisos de administrador ni es el creador del equipo");
+            res.status(400).json({ message:"Usted no es el líder del equipo, no tiene permisos de administrador"});
         }
     } catch (err) {
         console.error('Error en setTeamLeaderServices:', err);

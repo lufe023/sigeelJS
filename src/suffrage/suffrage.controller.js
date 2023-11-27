@@ -53,42 +53,6 @@ const getPeopleWhoVotedController = async (collegeId, offset, limit) => {
   return data;
 };
 
-//primera opcion
-// const getPeopleWhoVotedController = async (collegeId, offset, limit) => {
-//     const whereCondition = {
-//         college: collegeId,
-//     };
-
-//     const data = await Census.findAndCountAll({
-//         where: whereCondition,
-//         order: [['position', 'ASC'], ['id', 'ASC']],
-//         offset: offset,
-//         limit: limit,
-//         include: [
-//             {
-//                 model: Suffrages,
-//                 as: 'sufragio',
-//                 where: {
-//                     [Op.or]: [{ suffrage: false }, { suffrage: null }],
-//                 },
-//             },
-//             {
-//                 model: Users,
-//                 attributes: ['id', 'email'],
-//                 as: 'leaders',
-//                 include: [
-//                     {
-//                         model: Census,
-//                         attributes: ['firstName'],
-//                     }
-//                 ]
-//             },
-//         ]
-//     });
-
-//     return data;
-// }
-
 const createOrUpdateSuffrageController = async (citizenID, suffrageValue, registerBy) => {
     try {
     // Buscar el registro existente con el mismo citizenID

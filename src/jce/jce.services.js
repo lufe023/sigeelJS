@@ -4,7 +4,7 @@ const jceController = require('./jce.controller')
 
 const createPrecintServices = (req, res) => {
     const {
-        id,
+        precintNumber,
         recintoNombre,
         direccionRecinto,
         latitud,
@@ -16,10 +16,10 @@ const createPrecintServices = (req, res) => {
         distrito,
         circunscripcion} = req.body
 
-        if(id && recintoNombre && provincia && municipio){
+        if(precintNumber && recintoNombre && provincia && municipio){
             jceController
             .createPrecintController({
-                id,
+                precintNumber,
                 recintoNombre,
                 direccionRecinto,
                 latitud,
@@ -48,16 +48,16 @@ const getAllPrecintService = (req, res) => {
 //? Star College area ################################################# Star College area ###################################################
 const createCollegeServices = (req, res) => {
     const {
-        id,
+        collegeNumber,
         precinct,
         electLocal,
         electExterior,
         meta} = req.body
 
-        if(id && precinct){
+        if(collegeNumber && precinct){
             jceController
             .createCollegeController({
-                id,
+                collegeNumber,
                 precinct,
                 electLocal,
                 electExterior,

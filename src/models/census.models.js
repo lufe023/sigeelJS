@@ -99,7 +99,7 @@ const Census = db.define("census", {
   },
 
   college: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
     allowNull: true,
     references:{
       model: College,
@@ -125,7 +125,7 @@ outside:{
   indexes: [
     // Añadir índices compuestos si es necesario
     {
-      fields: ['province', 'municipality','leader','college','citizen_id']
+      fields: ['province', 'municipality','leader','citizen_id']
     },
     // ... (otros índices)
   ]

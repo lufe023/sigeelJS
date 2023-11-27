@@ -34,6 +34,17 @@ registerBy:{
     model: Users
   },
 }
-});
+},
+{
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['citizen_id', 'registerBy','suffrage']
+    },
+    // ... (otros índices)
+  ]
+}
+);
 
 module.exports = Suffrages

@@ -30,6 +30,15 @@ const teamsMembers = db.define("teamMembers", {
     type: DataTypes.BOOLEAN,
     defaultValue:false
   }
+},{
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id', 'teamId','memberId','teamLeader']
+    },
+    // ... (otros índices)
+  ]
 });
 
 module.exports = teamsMembers

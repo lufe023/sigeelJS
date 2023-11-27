@@ -6,14 +6,18 @@ const Precincts = require("./precinct.models");
 
 const College = db.define("college", {
   id:{
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
     allowNull: false,
     unique:true,
     primaryKey: true,
   },
-  precinct: {
+  collegeNumber:{
     type: DataTypes.INTEGER,
     allowNull: false,
+  },
+  precinct: {
+    type: DataTypes.UUID,
+    allowNull: true,
     references:{
       key: 'id',
       model: Precincts

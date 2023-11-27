@@ -344,7 +344,12 @@ const getOnePeople = async (peopleid) => {
             {
                 model : Users,
                 attributes: ['id', 'email'],
-                as: 'leaders'
+                as: 'leaders',
+                include:[
+                    {
+                        model:Census,
+                    }
+                ]
             },
             {
                 model : Benefit,

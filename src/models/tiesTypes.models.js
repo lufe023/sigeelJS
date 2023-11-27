@@ -17,6 +17,16 @@ const TiesTypes = db.define("tiesTypes", {
   }
 },{
 createdAt:false,
+},
+{
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id', 'tiesDescription']
+    },
+    // ... (otros índices)
+  ]
 });
 
 module.exports = TiesTypes

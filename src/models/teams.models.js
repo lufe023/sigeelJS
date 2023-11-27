@@ -31,6 +31,16 @@ const Teams = db.define("teams", {
   whatsapp: {
     type: DataTypes.TEXT
   },
+},
+{
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id', 'name','createdBy']
+    },
+    // ... (otros índices)
+  ]
 });
 
 module.exports = Teams

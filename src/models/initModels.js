@@ -21,7 +21,7 @@ const TiesTypes = require('./tiesTypes.models')
 const Precincts = require('./precinct.models')
 const College = require('./college.models')
 const Audit =require('./audit.models')
-
+const Banners = require('./banner.model')
 const {Op} = require("sequelize")
 
 const initModels = () => {

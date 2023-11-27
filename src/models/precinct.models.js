@@ -4,12 +4,16 @@ const Maps = require("./maps.models");
 const { DataTypes } = require("sequelize");
 
 const Precincts = db.define("precincts", {
-  id:{
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    unique:true,
+  id:{    
+    type: DataTypes.UUID,
     primaryKey: true,
+    allowNull: true,
   },
+  precintNumber:{    
+    type: DataTypes.INTEGER,
+    allowNull:false
+  },
+
   recintoNombre: {
     type: DataTypes.STRING,
     allowNull: false,

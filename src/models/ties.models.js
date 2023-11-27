@@ -50,6 +50,16 @@ const Ties = db.define("ties", {
   }
 },{
 createdAt:false,
+},
+{
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id', 'a_citizen_id','b_citizen_id', 'ties']
+    },
+    // ... (otros índices)
+  ]
 });
 
 module.exports = Ties

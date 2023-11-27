@@ -63,6 +63,16 @@ active: {
   type: DataTypes.BOOLEAN,
   defaultValue:false,
 }
+},
+{
+  // ... (otras opciones de modelo)
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id', 'email','userRoleId', 'citizen_identification']
+    },
+    // ... (otros índices)
+  ]
 });
 
 module.exports = Users

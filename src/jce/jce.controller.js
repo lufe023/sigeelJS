@@ -9,7 +9,8 @@ const { DataTypes, Op } = require("sequelize");
 //crear un nuevo recinto
 const createPrecintController = async (data) => {
     const newPrecint = await Precincts.create({
-        id: data.id,
+        id: uuid.v4(),
+        precintNumber:data.precintNumber,
         recintoNombre: data.recintoNombre,
         direccionRecinto: data.direccionRecinto,
         latitud: data.latitud,
@@ -45,7 +46,8 @@ const getAllPrecintController = async () => {
 //crear un nuevo Colegio
 const createCollegeController = async (data) => {
     const newCollege = await College.create({
-        id: data.id,
+        id: uuid.v4(),
+        collegeNumber:data.collegeNumber,
         precinct: data.precinct,
         electLocal: data.electLocal,
         electExterior: data.electExterior,
@@ -118,8 +120,15 @@ const getDataConsistencyController = async () => {
         {
           model: College,
           as: 'colegios',
-          attributes: ['id', 'electLocal', 'electExterior'],
         },
+        {
+          model: Maps,
+          as: 'PrecinctsProvincia'
+        },
+        {
+          model: Maps,
+          as: 'PrecinctsMunicipio'
+        }
       ],
     });
 
@@ -127,10 +136,13 @@ const getDataConsistencyController = async () => {
       precinctsData.map(async (precinct) => {
         const {
           id,
+          precintNumber,
           recintoNombre,
           electLocal,
           electExterior,
           colegios,
+          PrecinctsProvincia,
+          PrecinctsMunicipio
         } = precinct;
 
         const collegeIds = colegios.map((college) => college.id);
@@ -161,9 +173,12 @@ const getDataConsistencyController = async () => {
 
         return {
           id,
+          precintNumber,
           recintoNombre,
           electLocal,
           electExterior,
+          PrecinctsProvincia,
+          PrecinctsMunicipio,
           localCitizens: await Census.count({
             where: {
               college: collegeIds,
