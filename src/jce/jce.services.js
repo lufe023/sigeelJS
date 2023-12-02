@@ -80,14 +80,15 @@ const getAllCollegeService = (req, res) => {
 //? start registrando Ciudadanos ################################################# registrando Ciudadanos ###################################################
 
 const grupalCitizensServices = (req, res) => {
+    const { citizens } = req.body;
+    const uniqueFilenames = req.files.map(file => file.filename);
 
-    const {citizens} = req.body
-   
+    // Llamar al controlador con el array actualizado
     jceController
-    .grupalCitizensController(citizens)
-    .then((data) => {res.status(200).json(data)})
-    .catch((err) => {res.status(400).json({ message: err,})})
-}
+        .grupalCitizensController(citizens, uniqueFilenames)
+        .then((data) => res.status(200).json(data))
+        .catch((err) => res.status(400).json({ message: err }));
+};
 
 const getDataConsistencyService = (req, res) => {
     jceController

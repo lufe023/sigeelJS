@@ -73,45 +73,31 @@ const getAllCollegeController = async () => {
 
 //? start registrando Ciudadanos ################################################# registrando Ciudadanos ###################################################
 
-const grupalCitizensController = async (citizens) => {
+const grupalCitizensController = async (citizens, uniqueFilenames) => {
+  await citizens.forEach((element, index) => {
+      const citizen = JSON.parse(element);
+      const uniqueFilename = uniqueFilenames[index];
 
-    await citizens.forEach((element, index) => {
-        citizen = JSON.parse(element)
+      Census.create({
+          id: uuid.v4(),
+          firstName: citizen.firstName,
+          lastName: citizen.lastName,
+          citizenID: citizen.citizenID,
+          province: citizen.province,
+          municipality: citizen.municipality,
+          district: citizen.district,
+          position: citizen.position,
+          address: citizen.address,
+          outside: citizen.outside,
+          telephone: citizen.telephone,
+          celphone: citizen.celphone,
+          college: citizen.college,
+          picture: uniqueFilename,
+      });
+  });
 
-        Census.create({    
-                id: uuid.v4(),
-                firstName: citizen.firstName,
-                lastName: citizen.lastName,
-                citizenID: citizen.citizenID,
-                province: citizen.province,
-                municipality: citizen.municipality,
-                district: citizen.district,
-                position: citizen.position,
-                adress: citizen.adress,
-                outside: citizen.outside,
-                telephone: citizen.telephone,
-                celphone: citizen.celphone,
-                college: citizen.college,
-                picture:citizen.picture
-            }) 
-    });
-
-//     //funcional
-// const x = JSON.parse(citizens[0])
-// console.log(x)
-// const group = await Census.create({    
-//     id: uuid.v4(),
-//     firstName: x.firstName,
-//     lastName: x.lastName,
-//     citizenID: x.citizenID,
-//     province: x.province,
-//     municipality: x.municipality
-// }) 
-
-return 'ready'
-    // const group = await Census.bulkCreate(citizens)
-    // return group
-}
+  return 'ready';
+};
 
 const getDataConsistencyController = async () => {
   try {
