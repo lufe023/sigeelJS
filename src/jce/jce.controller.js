@@ -28,10 +28,13 @@ const createPrecintController = async (data) => {
 //llamar a todos los recintos
 const getAllPrecintController = async () => {
     const precints = await Precincts.findAndCountAll({
+      order: [
+        ['precintNumber', 'ASC'],
+      ],
         include:[
             {
                 model:College,
-                as: 'colegios'
+                as: 'colegios',
             }
         ]
 })
@@ -59,6 +62,7 @@ const createCollegeController = async (data) => {
 //llamar a todos los Colegios
 const getAllCollegeController = async () => {
     const precints = await College.findAndCountAll({
+
         include:[
             {
                 model:Precincts,
@@ -102,6 +106,9 @@ const grupalCitizensController = async (citizens, uniqueFilenames) => {
 const getDataConsistencyController = async () => {
   try {
     const precinctsData = await Precincts.findAll({
+      order: [
+        ['precintNumber', 'ASC'],
+      ],
       include: [
         {
           model: College,
@@ -131,6 +138,7 @@ const getDataConsistencyController = async () => {
           PrecinctsMunicipio
         } = precinct;
 
+        
         const collegeIds = colegios.map((college) => college.id);
 
         const collegeCitizensPromises = colegios.map(async (college) => {

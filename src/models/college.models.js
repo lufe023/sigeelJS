@@ -12,7 +12,7 @@ const College = db.define("college", {
     primaryKey: true,
   },
   collegeNumber:{
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   precinct: {

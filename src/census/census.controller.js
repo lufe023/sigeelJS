@@ -410,6 +410,7 @@ return {
 }
 
 const findPeople = async (findWord) => {
+    let looking = findWord.trim().replaceAll("-", "")
     const data = await Census.findAndCountAll({
         limit: 5,
         where:
@@ -418,16 +419,16 @@ const findPeople = async (findWord) => {
             {
             firstName: 
             {
-                [Op.iLike]: `%${findWord}%`
+                [Op.iLike]: `%${looking}%`
             },
             lastName: {
-                [Op.iLike]: `%${findWord}%`
+                [Op.iLike]: `%${looking}%`
             },
             citizenID: {
-                [Op.iLike]: `%${findWord}%`
+                [Op.iLike]: `%${looking}%`
             },
             nickname: {
-                [Op.iLike]: `%${findWord}%`
+                [Op.iLike]: `%${looking}%`
             },
             }
         },
