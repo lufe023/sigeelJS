@@ -127,21 +127,7 @@ const getMyPeople = async (leaderId) => {
                 attributes: ['id', 'email'],
                 as: 'leaders'
             },
-            // {
-            //     model : Benefit,
-            //     //attributes: ['id', 'email'],
-            //     as: 'Beneficios'
-            // },
-            // {
-            //     model : Job,
-            //     //attributes: ['id', 'email'],
-            //     as: 'Empleos'
-            // },
-            // {
-            //     model : Participation,
-            //     //attributes: ['id', 'email'],
-            //     as: 'Actividades'
-            // },
+
             {
                 model : Gps,
                 //attributes: ['id', 'email'],

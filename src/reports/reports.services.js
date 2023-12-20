@@ -53,9 +53,18 @@ const getPreferedPresidentReportByPlaceService = (req, res) => {
     };
 
 
+    //reporte para obtener los partidos por campaña
+const bocaUrnaService = (req, res) => {
+
+        reportController.bocaUrna()
+        .then((data) => {res.status(200).json(data);})
+        .catch((err) => {res.status(400).json({ err })});
+    };
+
 module.exports = {
     getCampainReport,
     getPartyReport,
     getPartyCollegeReportService,
-    getPreferedPresidentReportByPlaceService
+    getPreferedPresidentReportByPlaceService,
+    bocaUrnaService
 }

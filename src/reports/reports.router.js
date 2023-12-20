@@ -19,4 +19,9 @@ router.get('/collegeReport', passport.authenticate('jwt', {session: false}), rep
 //traer un reporte a partir del id de una campaña para el presidente preferido
 router.get('/president', passport.authenticate('jwt', {session: false}), reportsServices.getPreferedPresidentReportByPlaceService)
 
+
+//boca de urna
+router.get('/urna', passport.authenticate('jwt', {session: false}), reportsServices.bocaUrnaService)
+
+
 module.exports = router

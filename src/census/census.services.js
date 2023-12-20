@@ -209,8 +209,6 @@ const getPendingUpdatesService  = (req,res) => {
 
 const getAllCensusByCollegeService  = (req,res) => {
 
- 
-
   const collegeId = req.params.collegeId
 
     // variable para incluir o no personas del exterior
