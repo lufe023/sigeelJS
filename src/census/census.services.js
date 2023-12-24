@@ -37,6 +37,18 @@ const getPeopleByUser = (req, res) => {
   });
 };
 
+const getSimpleCensus = (req, res) => {
+  const leaderId = req.body.leaderId
+  censusControllers
+  .getSimpleCensusController(leaderId)
+  .then((data) => {
+    res.status(200).json(data);
+  })
+  .catch((err) => {
+    res.status(400).json({ message: err });
+  });
+};
+
 const getOnePeople = (req, res) => {
   const peopleId = req.params.id
   censusControllers
@@ -280,5 +292,6 @@ module.exports = {
     getPendingUpdatesService,
     getAllCensusByCollegeService,
     addPeopleToOtherUser,
-    transferCensusService
+    transferCensusService,
+    getSimpleCensus
 }

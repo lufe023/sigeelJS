@@ -109,6 +109,14 @@ districtDirector:{
     type: DataTypes.BOOLEAN,
     default: true
   }
+},{
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id','citizen_id','campain','prefered_party','elector_type', 'active']
+    },
+    // ... (otros índices)
+  ]
 });
 
 module.exports = Poll

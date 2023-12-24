@@ -215,7 +215,7 @@ try {
         }
     } catch (err) {
         console.error('Error en setTeamLeaderServices:', err);
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: err });
     }
 };
 

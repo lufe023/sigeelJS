@@ -148,10 +148,8 @@ const getPreferedPresidentReportByPlaceController = async (campainId) =>{
   return report
 }
 
-const bocaUrna = async () => {
-  const college = 'd4ce2844-ba42-4735-b048-f8f904f28f04';
-  const campain = '8cc5d4c3-78fd-49c2-a13c-bf0822267db1';
-
+const bocaUrna = async (college,campain) => {
+  
   try {
     // Obtener los citizenID de los registros de Census que tienen suffrage verdadero en Suffrages
     const censusRecords = await Census.findAll({
@@ -234,21 +232,8 @@ const bocaUrna = async () => {
     const resultadosFinales = Object.values(resultadosAgrupados);
 
 
-     resultadosFinales.sort((a, b) => a.hour - b.hour);
+    resultadosFinales.sort((a, b) => a.hour - b.hour);
 
-    // const newData = resultadosFinales.map(result => {
-    //   const candidato = candidatos.find(c => c.id === result.president);
-    //   return {
-    //     label: candidato.nombre,
-    //     data: Array.from({ length: horas.length }).fill(0).map((_, index) =>
-    //       result.hour === index ? result.total : 0
-    //     ),
-    //     borderColor: candidato.color,
-    //     fill: false,
-    //     tension: 0.4,
-    //     backgroundColor: candidato.color,
-    //   };
-    // });
     return resultadosFinales
   } catch (error) {
     // Manejar errores aquí
@@ -256,81 +241,6 @@ const bocaUrna = async () => {
     throw error;
   }
 };
-
-
-
-const bocaUrna1 = async () => {
-  const college = 'd4ce2844-ba42-4735-b048-f8f904f28f04';
-  const campain = '8cc5d4c3-78fd-49c2-a13c-bf0822267db1';
-
-
-  
-  try {
-    // Obtener los citizenID de los registros de Census que tienen suffrage verdadero en Suffrages
-    const censusRecords = await Census.findAll({
-      where: {
-        college: college,
-      },
-      raw: true,
-      attributes: ['citizenID']
-    });
-
-    // Obtener los citizenID como un array
-    const citizenIDs = censusRecords.map(record => record.citizenID);
-
-    // Obtener los registros de Poll que tienen citizenID, campain en el array y constante, respectivamente
-    const pollRecords = await Poll.findAll({
-      where: {
-        citizenID: citizenIDs,
-        campain: campain,
-        president: {
-          [Sequelize.Op.ne]: null,
-        },
-      },
-      raw: true,
-      attributes: ['citizenID', 'president'],
-      include:[
-        {
-          model: Ballots,
-          as: 'preferedPresidentDetails',
-          attributes: ['name','party', 'picture'],
-          include:[
-            {
-              model:Parties,
-              as: 'partyDetails',
-              attributes:['partyAcronyms', 'color']
-            }
-          ]
-        }
-      ]
-    });
-
-    // Obtener los registros de Suffrages que tienen citizenID en el array y suffrage verdadero
-    const suffragesRecords = await Suffrages.findAll({
-      where: {
-        citizenID: citizenIDs,
-        suffrage: true,
-      },
-      raw: true,
-      attributes: ['citizenID', 'suffrage', 'updatedAt'] // Puedes agregar más columnas según tus necesidades
-    });
-
-    // Retornar los resultados
-    return {
-      totalCandidatos:pollRecords.length,
-      pollRecords,
-      votaron: suffragesRecords.length,
-      suffragesRecords,
-    };
-  } catch (error) {
-    // Manejar errores aquí
-    console.error(error);
-    throw error;
-  }
-};
-
-
-
 
 
 module.exports = {

@@ -23,6 +23,7 @@ const College = require('./college.models')
 const Audit =require('./audit.models')
 const Banners = require('./banner.model')
 const {Op} = require("sequelize")
+const teamsMembers = require('./teamsMembers.models')
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
@@ -35,15 +36,22 @@ const initModels = () => {
     Census.hasOne(Maps, {foreignKey: 'id',sourceKey: 'neighbourhood', as: 'neighbourhoods'})
     
     
+      
+
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {foreignKey: 'id',sourceKey: 'leader', as: 'leaders'})
 
      //relacionando la tabla Condition para obtener la informacion de la condicion especial de cada ciudadano
     Census.hasOne(Condition, {foreignKey: 'citizenID',sourceKey: 'citizenID', as: 'condition'})
+    
 
     Census.hasOne(Users, {foreignKey: 'censuCitizenID',sourceKey: 'citizenID', as: 'colaborador'})
-    
+
+    Users
+
     Users.belongsTo(Census)
+
+
     
     //relacionar los candidatos con los partidos
     Ballots.hasOne(Parties, {foreignKey: 'id',sourceKey: 'party', as: 'partyDetails'} )

@@ -1,7 +1,7 @@
 const Teams = require("../models/teams.models")
 const uuid = require('uuid')
 const Users = require('../models/users.models')
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const Census = require("../models/census.models");
 const Roles = require("../models/roles.models");
 const teamsMembers = require("../models/teamsMembers.models");
@@ -38,6 +38,7 @@ const allTeams = await Teams.findAll({
 
 return allTeams
 } 
+
 
 const getOneTeamController = async(id) => {
 

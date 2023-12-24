@@ -40,6 +40,14 @@ const Gps = db.define("gps", {
       model: Users
     }
   }
+},{
+  indexes: [
+    // Añadir índices compuestos si es necesario
+    {
+      fields: ['id','citizen_id','latitud','longitud']
+    },
+    // ... (otros índices)
+  ]
 });
 
 

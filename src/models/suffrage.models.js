@@ -40,7 +40,7 @@ registerBy:{
   indexes: [
     // Añadir índices compuestos si es necesario
     {
-      fields: ['citizen_id', 'registerBy','suffrage']
+      fields: ['id','citizen_id', 'registerBy','suffrage']
     },
     // ... (otros índices)
   ]

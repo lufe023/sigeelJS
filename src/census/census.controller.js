@@ -298,6 +298,73 @@ return {
 
 }
 
+const getSimpleCensusController = async (leaderId) => {
+
+    const data = await Census.findAndCountAll({
+    
+        where:{
+            leader:leaderId
+        },
+            include :[
+                {
+                    model: Suffrages,
+                    as:'sufragio'
+                },
+            {
+                model : Gps,
+                //attributes: ['id', 'email'],
+                as: 'geolocation'
+            },
+            {
+                model : Poll,
+                //attributes: ['id', 'citizenID', 'campain'],
+                as: 'Encuestas',
+                include:[
+                    {model:Campain,
+                    as: 'Campain'}
+                ]
+            },
+            {
+                model:Condition,
+                as: 'condition'
+            },
+            {model: College,
+            as: 'colegio',
+            include: [
+                {
+                model: Precincts,
+                as: 'precinctData', // Usar el nombre del alias en la relación
+                }
+            ]
+        },
+ 
+    ]  
+})
+
+const peopleWithUpdates = [];
+
+for (const citizen of data.rows) {
+    const citizenId = citizen.citizenID;
+
+    const lastUpdatedDates = await getLastUpdatedDates(citizenId);
+    const pendingUpdates = await getPendingUpdatesController(citizenId);
+
+    const citizenWithUpdates = {
+        ...citizen.toJSON(),
+        lastUpdatedDates,
+        pendingUpdates
+    };
+
+    peopleWithUpdates.push(citizenWithUpdates);
+}
+
+
+const user = await getUser.getUserById(leaderId)
+        
+
+return data
+
+}
 //getting one People from db
 const getOnePeople = async (peopleid) => {
     const data = await Census.findOne({
@@ -395,30 +462,30 @@ return {
 
 }
 
+
 const findPeople = async (findWord) => {
     let looking = findWord.trim().replaceAll("-", "")
+
+     const [firstName, ...lastNameParts] = looking.split(" ");
+    const lastName = lastNameParts.join(" ");
+
     const data = await Census.findAndCountAll({
         limit: 5,
-        where:
-        {
-        [Op.or]:
-            {
-            firstName: 
-            {
-                [Op.iLike]: `%${looking}%`
-            },
-            lastName: {
-                [Op.iLike]: `%${looking}%`
-            },
-            citizenID: {
-                [Op.iLike]: `%${looking}%`
-            },
-            nickname: {
-                [Op.iLike]: `%${looking}%`
-            },
-            }
+        where: {
+            [Op.or]: [
+                {
+                    [Op.and]: [
+                        { firstName: { [Op.iLike]: `%${firstName}%` } },
+                        { lastName: { [Op.iLike]: `%${lastName}%` } }
+                    ]
+                },
+                { citizenID: { [Op.iLike]: `%${looking}%` } },
+                { nickname: { [Op.iLike]: `%${looking}%` } },
+                { firstName: { [Op.iLike]: `%${looking}%` } },
+                { lastName: { [Op.iLike]: `%${looking}%` } }
+            ]
         },
-        
+
             include :[
             {
                 model : Maps,
@@ -663,5 +730,6 @@ module.exports = {
     getLastUpdatedDates,
     getPendingUpdatesController,
     getAllCensusByCollegeController,
-    transferCensusController
+    transferCensusController,
+    getSimpleCensusController
 }

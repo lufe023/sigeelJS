@@ -5,7 +5,7 @@ const Audit = require('./audit.models');
 
 
 const { DataTypes } = require("sequelize");
-const Users = require("./users.models");
+const Usuario = require("./users.models");
 
 const Census = db.define("census", {
   id: {
@@ -117,7 +117,6 @@ outside:{
   leader: {
     type: DataTypes.UUID,
     allowNull: true,
-    // Añadir índice en la columna leader
   },
   
 }, {
@@ -125,7 +124,7 @@ outside:{
   indexes: [
     // Añadir índices compuestos si es necesario
     {
-      fields: ['province', 'municipality','leader','citizen_id']
+      fields: ['id','province', 'municipality','leader','citizen_id', 'college']
     },
     // ... (otros índices)
   ]
