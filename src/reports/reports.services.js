@@ -64,10 +64,20 @@ const bocaUrnaService = (req, res) => {
         .catch((err) => {res.status(400).json({ err })});
     };
 
+const coberturaService = (req, res) => {
+
+    const precinct = req.query.precinct
+
+    reportController.coberturaController(precinct)
+    .then((data) => {res.status(200).json(data);})
+    .catch((err) => {res.status(400).json({ err })});
+}
+
 module.exports = {
     getCampainReport,
     getPartyReport,
     getPartyCollegeReportService,
     getPreferedPresidentReportByPlaceService,
-    bocaUrnaService
+    bocaUrnaService,
+    coberturaService
 }

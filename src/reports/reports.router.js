@@ -23,5 +23,6 @@ router.get('/president', passport.authenticate('jwt', {session: false}), reports
 //boca de urna
 router.get('/urna', passport.authenticate('jwt', {session: false}), reportsServices.bocaUrnaService)
 
+router.get('/cobertura', passport.authenticate('jwt', {session: false}), reportsServices.coberturaService)
 
 module.exports = router

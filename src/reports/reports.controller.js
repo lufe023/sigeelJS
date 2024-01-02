@@ -6,6 +6,8 @@ const Parties = require('../models/parties.models')
 const { Op, Sequelize  } = require('sequelize');
 const Census = require('../models/census.models')
 const Suffrages = require('../models/suffrage.models')
+const College = require('../models/college.models')
+const Precincts = require('../models/precinct.models')
 
 const getCampainReport = async (campainId)=> {
     const report = await Campain.findAll({
@@ -242,11 +244,48 @@ const bocaUrna = async (college,campain) => {
   }
 };
 
+const coberturaController = async (precinct)=> {
+  
+    try {
+      // Obtener los citizenID de los registros de Census que tienen suffrage verdadero en Suffrages
+      const colleges = await College.findAndCountAll({
+        where: {
+          precinct: precinct,
+        },
+        raw: false,
+        include:[
+          {
+            model: Census,
+            attributes: ['firstName','lastName', 'citizenID', 'picture', 'position', 'outside'],
+            as: 'ColegioCensus',
+            where: {
+              leader:null,
+              [Op.not]:{outside: true}
+            },
+          }
+        ]
+      });
+
+      const recinto = await Precincts.findOne({
+        where:{
+          id: precinct
+        }
+      })
+
+      return [recinto, colleges]
+    } catch (error) {
+      // Manejar errores aquí
+      console.error(error);
+      throw error;
+    }
+  };
+
 
 module.exports = {
     getCampainReport,
     getPartyReport,
     getPartyCollegeReportController,
     getPreferedPresidentReportByPlaceController,
-    bocaUrna
+    bocaUrna,
+    coberturaController
 }
