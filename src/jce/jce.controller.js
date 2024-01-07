@@ -29,12 +29,18 @@ const createPrecintController = async (data) => {
 const getAllPrecintController = async () => {
     const precints = await Precincts.findAndCountAll({
       order: [
+        [{ model: Maps, as: 'PrecinctsMunicipio' }, 'id', 'ASC'],
         ['precintNumber', 'ASC'],
       ],
+      
         include:[
             {
                 model:College,
                 as: 'colegios',
+            },
+            {
+              model: Maps,
+              as: 'PrecinctsMunicipio'
             }
         ]
 })
@@ -107,8 +113,10 @@ const getDataConsistencyController = async () => {
   try {
     const precinctsData = await Precincts.findAll({
       order: [
+        [{ model: Maps, as: 'PrecinctsMunicipio' }, 'id', 'ASC'],
         ['precintNumber', 'ASC'],
       ],
+      
       include: [
         {
           model: College,
@@ -120,7 +128,7 @@ const getDataConsistencyController = async () => {
         },
         {
           model: Maps,
-          as: 'PrecinctsMunicipio'
+          as: 'PrecinctsMunicipio',
         }
       ],
     });
