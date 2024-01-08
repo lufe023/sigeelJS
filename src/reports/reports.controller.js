@@ -256,7 +256,7 @@ const coberturaController = async (precinct)=> {
         include:[
           {
             model: Census,
-            attributes: ['firstName','lastName', 'citizenID', 'picture', 'position', 'outside'],
+            attributes: ['id','firstName','lastName', 'citizenID', 'picture'],
             as: 'ColegioCensus',
             where: {
               leader:null,
