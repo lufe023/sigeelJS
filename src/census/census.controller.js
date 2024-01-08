@@ -464,6 +464,8 @@ return {
 
 
 const findPeople = async (findWord) => {
+
+    try {
     let looking = findWord.trim().replaceAll("-", "")
 
     const [firstName, ...lastNameParts] = looking.split(" ");
@@ -530,8 +532,13 @@ const findPeople = async (findWord) => {
             
         ]  
 })
-
+console.log("Query executed successfully. Result:", data);
     return data
+}
+catch (error) {
+    console.error("Error executing query:", error);
+    throw error; // Propaga el error para que se capture en el controlador
+  }
 }
 
 const simpleFindPeople = async (findWord) => {
