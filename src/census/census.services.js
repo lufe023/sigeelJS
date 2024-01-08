@@ -87,7 +87,7 @@ const findPeople = (req, res) => {
 }
 
 const simpleFindPeople = (req, res) => {
-  
+
   const findWord = req.body.findWord
   
   if(findWord){
