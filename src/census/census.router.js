@@ -49,6 +49,4 @@ router.patch('/:citizenID', passport.authenticate('jwt', {session: false}), cens
 //get people pending
 router.get('/colegio/:collegeId', censusServices.getAllCensusByCollegeService)
 
-
 module.exports = router
-
