@@ -539,7 +539,8 @@ return {
 const findPeople = async (findWord) => {
 
     try {
-    let looking = findWord.trim().replaceAll("-", "")
+        
+        let looking = findWord.trim().replace(/-/g, "");
 
     const [firstName, ...lastNameParts] = looking.split(" ");
     const lastName = lastNameParts.join(" ");
