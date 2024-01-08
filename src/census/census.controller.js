@@ -465,101 +465,29 @@ return {
 
 
 
-const findPeople = async (findWord) => {
-        let looking = findWord.trim().replaceAll("-", "")
-        const data = await Census.findAndCountAll({
-            limit: 5,
-            where:
-            {
-            [Op.or]:
-                {
-                firstName: 
-                {
-                    [Op.iLike]: `%${looking}%`
-                },
-                lastName: {
-                    [Op.iLike]: `%${looking}%`
-                },
-                citizenID: {
-                    [Op.iLike]: `%${looking}%`
-                },
-                nickname: {
-                    [Op.iLike]: `%${looking}%`
-                },
-                }
-            },
-            
-            include :[
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'provinces'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'municipalities'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'districts'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'neighbourhoods'
-            },
-            {
-                model : Users,
-                attributes: ['id', 'email'],
-                as: 'leaders',
-                include:[
-                    {model:Census,
-                    attributes:['id','firstName']
-                    }
-                ]
-            },
-            {
-            model: College,
-            as: 'colegio',
-            include: [
-                {
-                model: Precincts,
-                as: 'precinctData', // Usar el nombre del alias en la relación
-                }
-            ]
-            }
-            
-        ]  
-})
-    return data
-}
-
 // const findPeople = async (findWord) => {
-
-//     try {
-//     let looking = findWord.trim().replaceAll("-", "")
-
-//     const [firstName, ...lastNameParts] = looking.split(" ");
-//     const lastName = lastNameParts.join(" ");
-
-//     const data = await Census.findAndCountAll({
-//         limit: 5,
-//         where: {
-//             [Op.or]: [
+//         let looking = findWord.trim().replaceAll("-", "")
+//         const data = await Census.findAndCountAll({
+//             limit: 5,
+//             where:
+//             {
+//             [Op.or]:
 //                 {
-//                     [Op.and]: [
-//                         { firstName: { [Op.iLike]: `%${firstName}%` } },
-//                         { lastName: { [Op.iLike]: `%${lastName}%` } }
-//                     ]
+//                 firstName: 
+//                 {
+//                     [Op.iLike]: `%${looking}%`
 //                 },
-//                 { citizenID: { [Op.iLike]: `%${looking}%` } },
-//                 { nickname: { [Op.iLike]: `%${looking}%` } },
-//                 { firstName: { [Op.iLike]: `%${looking}%` } },
-//                 { lastName: { [Op.iLike]: `%${looking}%` } }
-//             ]
-//         },
+//                 lastName: {
+//                     [Op.iLike]: `%${looking}%`
+//                 },
+//                 citizenID: {
+//                     [Op.iLike]: `%${looking}%`
+//                 },
+//                 nickname: {
+//                     [Op.iLike]: `%${looking}%`
+//                 },
+//                 }
+//             },
 
 //             include :[
 //             {
@@ -605,14 +533,86 @@ const findPeople = async (findWord) => {
             
 //         ]  
 // })
-// console.log("Query executed successfully. Result:", data);
 //     return data
 // }
-// catch (error) {
-//     console.error("Error executing query:", error);
-//     throw error; // Propaga el error para que se capture en el controlador
-//   }
-// }
+
+const findPeople = async (findWord) => {
+
+    try {
+    let looking = findWord.trim().replaceAll("-", "")
+
+    const [firstName, ...lastNameParts] = looking.split(" ");
+    const lastName = lastNameParts.join(" ");
+
+    const data = await Census.findAndCountAll({
+        limit: 5,
+        where: {
+            [Op.or]: [
+                {
+                    [Op.and]: [
+                        { firstName: { [Op.iLike]: `%${firstName}%` } },
+                        { lastName: { [Op.iLike]: `%${lastName}%` } }
+                    ]
+                },
+                { citizenID: { [Op.iLike]: `%${looking}%` } },
+                { nickname: { [Op.iLike]: `%${looking}%` } },
+                { firstName: { [Op.iLike]: `%${looking}%` } },
+                { lastName: { [Op.iLike]: `%${looking}%` } }
+            ]
+        },
+
+            include :[
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'provinces'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'municipalities'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'districts'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'neighbourhoods'
+            },
+            {
+                model : Users,
+                attributes: ['id', 'email'],
+                as: 'leaders',
+                include:[
+                    {model:Census,
+                    attributes:['id','firstName']
+                    }
+                ]
+            },
+            {
+            model: College,
+            as: 'colegio',
+            include: [
+                {
+                model: Precincts,
+                as: 'precinctData', // Usar el nombre del alias en la relación
+                }
+            ]
+            }
+            
+        ]  
+})
+
+    return data
+}
+catch (error) {
+    console.error("Error executing query:", error);
+    throw error; // Propaga el error para que se capture en el controlador
+  }
+}
 
 const simpleFindPeople = async (findWord) => {
     const data = await Census.findAndCountAll({

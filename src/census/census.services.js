@@ -66,8 +66,7 @@ const findPeople = (req, res) => {
       const findWord = req.body.findWord
       
       if(findWord){
-      censusControllers
-      .findPeople(findWord)
+      censusControllers.findPeople(findWord)
       .then((data) => {
         res.status(200).json({
           data,
