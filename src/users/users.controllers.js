@@ -49,7 +49,7 @@ const getUserById = async (id) => {
 const createUser = async (data) => {
   const newUser = await Users.create({
     id: uuid.v4(),
-    email: data.email,
+    email: data.email.toLowerCase(),
     password: hashPassword(data.password),
     censuCitizenID: data.citizenID.trim().replace(/-/g, ""),
     userRoleId: data.role,

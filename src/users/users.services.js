@@ -62,7 +62,7 @@ const role = 1
         res.status(201).json(data);
       })
       .catch((err) => {
-        res.status(400).json(err.message);
+        res.status(400).json(err);
       });
   } else {
     //? Error cuando no mandan todos los datos necesarios para crear un usuario
