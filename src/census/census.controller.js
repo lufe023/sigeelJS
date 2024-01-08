@@ -466,7 +466,7 @@ return {
 const findPeople = async (findWord) => {
     let looking = findWord.trim().replaceAll("-", "")
 
-     const [firstName, ...lastNameParts] = looking.split(" ");
+    const [firstName, ...lastNameParts] = looking.split(" ");
     const lastName = lastNameParts.join(" ");
 
     const data = await Census.findAndCountAll({
