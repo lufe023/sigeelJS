@@ -461,84 +461,84 @@ return {
 
 
 }
-
-
 const findPeople = async (findWord) => {
 
-    try {
-    let looking = findWord.trim().replaceAll("-", "")
-
-    const [firstName, ...lastNameParts] = looking.split(" ");
-    const lastName = lastNameParts.join(" ");
-
-    const data = await Census.findAndCountAll({
-        limit: 5,
-        where: {
-            [Op.or]: [
-                {
-                    [Op.and]: [
-                        { firstName: { [Op.iLike]: `%${firstName}%` } },
-                        { lastName: { [Op.iLike]: `%${lastName}%` } }
-                    ]
+return {
+    "data": {
+        "count": 1,
+        "rows": [
+            {
+                "id": "d7b13977-4602-41ab-97b4-6328e217e9b2",
+                "firstName": "Luis Fernando",
+                "lastName": "Gomez Mateo",
+                "nickname": "Emerson ",
+                "citizenID": "11300037618",
+                "age": 32,
+                "gender": "Masculino",
+                "picture": "11300037618.jpg",
+                "province": 2,
+                "municipality": 44,
+                "district": null,
+                "neighbourhood": null,
+                "adress": "AMOR Y PAZ, # 05",
+                "celphone": "8494718594",
+                "telephone": "",
+                "otherPhone": null,
+                "college": "d4ce2844-ba42-4735-b048-f8f904f28f04",
+                "position": 0,
+                "outside": false,
+                "leader": "4bab4fcb-d688-414d-b31e-c989e8df7cfc",
+                "createdAt": "2023-04-09T14:44:05.736Z",
+                "updatedAt": "2023-11-21T02:40:06.041Z",
+                "provinces": {
+                    "id": 2,
+                    "name": "Baoruco",
+                    "parent": 0
                 },
-                { citizenID: { [Op.iLike]: `%${looking}%` } },
-                { nickname: { [Op.iLike]: `%${looking}%` } },
-                { firstName: { [Op.iLike]: `%${looking}%` } },
-                { lastName: { [Op.iLike]: `%${looking}%` } }
-            ]
-        },
-
-            include :[
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'provinces'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'municipalities'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'districts'
-            },
-            {
-                model : Maps,
-                attributes: ['id', 'name', 'parent'],
-                as: 'neighbourhoods'
-            },
-            {
-                model : Users,
-                attributes: ['id', 'email'],
-                as: 'leaders',
-                include:[
-                    {model:Census,
-                    attributes:['id','firstName']
+                "municipalities": {
+                    "id": 44,
+                    "name": "Galván",
+                    "parent": 2
+                },
+                "districts": null,
+                "neighbourhoods": null,
+                "leaders": {
+                    "id": "4bab4fcb-d688-414d-b31e-c989e8df7cfc",
+                    "email": "lufe023@gmail.com",
+                    "censu": {
+                        "id": "d7b13977-4602-41ab-97b4-6328e217e9b2",
+                        "firstName": "Luis Fernando"
                     }
-                ]
-            },
-            {
-            model: College,
-            as: 'colegio',
-            include: [
-                {
-                model: Precincts,
-                as: 'precinctData', // Usar el nombre del alias en la relación
+                },
+                "colegio": {
+                    "id": "d4ce2844-ba42-4735-b048-f8f904f28f04",
+                    "collegeNumber": "1",
+                    "precinct": "a8269888-2ad8-4ac4-b840-dab07ad83aee",
+                    "electLocal": 386,
+                    "electExterior": 26,
+                    "meta": 0,
+                    "createdAt": "2023-11-26T21:59:07.594Z",
+                    "updatedAt": "2023-11-26T21:59:07.594Z",
+                    "precinctData": {
+                        "id": "a8269888-2ad8-4ac4-b840-dab07ad83aee",
+                        "precintNumber": 11,
+                        "recintoNombre": "ESCUELA ESPEJO",
+                        "direccionRecinto": "CALLE PADRE BILLINI",
+                        "latitud": null,
+                        "longitud": null,
+                        "electLocal": 1824,
+                        "electExterior": 133,
+                        "provincia": 2,
+                        "municipio": 44,
+                        "distrito": null,
+                        "circunscripcion": "1"
+                    }
                 }
-            ]
             }
-            
-        ]  
-})
-console.log("Query executed successfully. Result:", data);
-    return data
+        ]
+    },
+    "busqueda": "Luis Gomez Mateo"
 }
-catch (error) {
-    console.error("Error executing query:", error);
-    throw error; // Propaga el error para que se capture en el controlador
-  }
 }
 
 const simpleFindPeople = async (findWord) => {
