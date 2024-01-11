@@ -62,11 +62,13 @@ router.post(
   );
 
   //crear un ciudadano
-router.post(
-  '/newcitizen',
-  passport.authenticate('jwt', { session: false }),
-  itSupportValidate,
-  upload.any('photos', 10),
-  jceServices.newCitizenServices
-);
+  router.post('/newcitizen', passport.authenticate('jwt', { session: false }), itSupportValidate, async (req, res) => {
+    try {
+      await upload.any('photos', 10)(req, res);
+      // Resto del código aquí
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error uploading files' });
+    }
+  });
 module.exports = router 
