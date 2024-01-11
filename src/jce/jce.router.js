@@ -11,7 +11,7 @@ require('../middlewares/auth.middleware')(passport);
 // Configuración de Multer para manejar las fotos
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const absolutePath = path.join(process.env.RENDER_WORKING_DIR, 'uploads/images/citizens')
+    const absolutePath = path.join('./disk/uploads/images/citizens')
 
     cb(null, absolutePath);
   },
