@@ -109,6 +109,31 @@ const grupalCitizensController = async (citizens, uniqueFilenames) => {
   return 'ready';
 };
 
+const newCitizenController = async (citizen, filename) => {
+
+  citizen = JSON.parse(citizen)
+  const newCitizen = await Census.create({
+      id: uuid.v4(),
+      firstName: citizen.firstName,
+      lastName: citizen.lastName,
+      citizenID: citizen.citizenID,
+      province: citizen.province,
+      municipality: citizen.municipality,
+      district: citizen.district,
+      position: citizen.position,
+      address: citizen.address,
+      outside: citizen.outside,
+      telephone: citizen.telephone,
+      celphone: citizen.celphone,
+      college: citizen.college,
+      picture: filename,
+  });
+  return newCitizen;
+};
+
+
+
+
 const getDataConsistencyController = async () => {
   try {
     const precinctsData = await Precincts.findAll({
@@ -213,5 +238,6 @@ module.exports = {
     createCollegeController,
     getAllCollegeController,
     grupalCitizensController,
-    getDataConsistencyController
+    getDataConsistencyController,
+    newCitizenController
 }

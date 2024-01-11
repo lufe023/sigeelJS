@@ -61,4 +61,12 @@ router.post(
     jceServices.grupalCitizensServices
   );
 
+  //crear un ciudadano
+router.post(
+  '/newcitizen',
+  passport.authenticate('jwt', { session: false }),
+  itSupportValidate,
+  upload.any('photos', 10),
+  jceServices.newCitizenServices
+);
 module.exports = router 
