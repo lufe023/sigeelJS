@@ -2,7 +2,7 @@
 const uuid = require("uuid");
 const Census = require("../models/census.models");
 const Roles = require("../models/roles.models");
-const {Op} = require("sequelize")
+const { Sequelize, Op } = require('sequelize');
 const Users = require("../models/users.models");
 const { hashPassword } = require("../utils/crypto");
 
@@ -136,29 +136,40 @@ const getUserByEmail = async (email) => {
 };
 
 const findUserController = async (findWord) => {
+  let looking = findWord.trim().replace(/-/g, "");
+
+  const [firstName, ...lastNameParts] = looking.split(" ");
+  const lastName = lastNameParts.join(" ");
+
   const censusData = await Census.findAndCountAll({
-    limit: 4,
+    limit: 5,
     where: {
-      [Op.or]: {
-        firstName: {
-          [Op.iLike]: `%${findWord}%`,
-        },
-        lastName: {
-          [Op.iLike]: `%${findWord}%`,
-        },
-        citizenID: {
-          [Op.iLike]: `%${findWord}%`,
-        },
-        nickname: {
-          [Op.iLike]: `%${findWord}%`,
-        },
-      },
+        [Op.or]: [
+            {
+                [Op.and]: [
+                    { firstName: { [Op.iLike]: `%${firstName}%` } },
+                    { lastName: { [Op.iLike]: `%${lastName}%` } }
+                ]
+            },
+            { citizenID: { [Op.iLike]: `%${looking}%` } },
+            { nickname: { [Op.iLike]: `%${looking}%` } },
+            { firstName: { [Op.iLike]: `%${looking}%` } },
+            { lastName: { [Op.iLike]: `%${looking}%` } },
+            { celphone: { [Op.iLike]: `%${looking}%` } },
+            { telephone: { [Op.iLike]: `%${looking}%` } }
+            
+        ]
     },
     include:[
     {
         model : Users,
-        attributes: ['id', 'email'],
-        as: 'colaborador'
+        as: 'colaborador',
+        required: true,
+        include:[
+          {
+            model:Roles
+          }
+        ]
     },
 ]
 });
