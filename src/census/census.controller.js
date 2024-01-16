@@ -529,7 +529,11 @@ const findPeople = async (findWord) => {
                 }
             ]
             }
-            
+            ,
+            {
+                model: Suffrages,
+                as: 'sufragio'
+            }
         ]  
 })
 
