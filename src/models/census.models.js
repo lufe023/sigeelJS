@@ -38,6 +38,15 @@ const Census = db.define("census", {
   age: {
     type: DataTypes.INTEGER
   },
+  birthDay:{
+    type: DataTypes.DATE,
+    allowNull:true,
+  },
+  
+  placeBirth:{
+    type: DataTypes.STRING,
+    allowNull:true,
+  },
   gender:{
     type: DataTypes.TEXT,
   },
