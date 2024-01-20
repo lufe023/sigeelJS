@@ -9,7 +9,7 @@ const teams = require('./teams.services')
 
 const storage = multer.diskStorage({
     destination: (req, logo, cb) =>{
-        cb(null, './uploads/images/teams')
+        cb(null, './src/uploads/images/teams')
     },
     filename: (req, logo, cb) => {
         const ext = logo.originalname.split('.').pop()
