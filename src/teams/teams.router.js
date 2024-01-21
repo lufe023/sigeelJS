@@ -8,7 +8,7 @@ const fs = require('fs-extra');
 //tratando las imagenes 
 
 // Directorio de destino para las imágenes
-const uploadDirectory = '../../uploads/images/teams';
+const uploadDirectory = '../uploads/images/teams';
 
 // Función para verificar si el directorio existe y crearlo si no
 const createUploadDirectory = () => {
