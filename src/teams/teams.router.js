@@ -3,21 +3,36 @@ const passport = require('passport')
 const {leaderValidate, adminValidate, itSupportValidate, superAdminValidate } = require('../middlewares/role.middleware')
 const multer = require('multer')
 const teams = require('./teams.services')
-
+const fs = require('fs-extra');
 
 //tratando las imagenes 
 
+// Directorio de destino para las imágenes
+const uploadDirectory = './src/uploads/images/teams';
+
+// Función para verificar si el directorio existe y crearlo si no
+const createUploadDirectory = () => {
+  if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory, { recursive: true }); // Crea el directorio de manera recursiva si no existe
+  }
+};
+
+// Llama a la función para crear el directorio
+createUploadDirectory();
+
+// Configuración de multer para almacenar archivos en el directorio
 const storage = multer.diskStorage({
-    destination: (req, logo, cb) =>{
-        cb(null, './uploads/images/teams')
+    destination: (req, logo, cb) => {
+      cb(null, uploadDirectory);
     },
     filename: (req, logo, cb) => {
-        const ext = logo.originalname.split('.').pop()
-        cb(null, `${Date.now()}.${ext}`)
-    }
-})
+      const ext = logo.originalname.split('.').pop();
+      cb(null, `${Date.now()}.${ext}`);
+    },
+  });
 
 const upload = multer({storage})
+
 
 require('../middlewares/auth.middleware')(passport)
 
