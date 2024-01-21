@@ -39,7 +39,7 @@ const getImage = async (req, res) => {
     const deleteImageController = async (folder, imageName) => {
         console.log(`Antes de borrar la imagen: ${folder}/${imageName}`);
         try {
-            const imagePath = path.resolve(__dirname, `../../uploads/images/${folder}/${imageName}`);
+            const imagePath = path.resolve(__dirname, `../../../uploads/images/${folder}/${imageName}`);
     
             if (await fs.existsSync(imagePath)) {
                 // Borra la imagen
