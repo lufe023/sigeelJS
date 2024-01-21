@@ -22,7 +22,7 @@ const getImage = async (req, res) => {
         }
         if(type=="teams"){
             //funcionando
-            pathImage = path.resolve( __dirname, `../uploads/images/teams/${image}`);
+            pathImage = path.resolve( __dirname, `../../uploads/images/teams/${image}`);
         }
 
         if (await fs.existsSync(pathImage)) {
