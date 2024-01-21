@@ -21,6 +21,7 @@ const getImage = async (req, res) => {
             pathImage = path.resolve( __dirname, `../../uploads/images/candidates/${image}`);
         }
         if(type=="teams"){
+            //funcionando
             pathImage = path.resolve( __dirname, `../uploads/images/teams/${image}`);
         }
 
