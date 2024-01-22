@@ -90,7 +90,37 @@ const grupalCitizensServices = (req, res) => {
         .catch((err) => res.status(400).json({ err }));
 };
 
+const grupalCitizensServicesB = (req, res) => {
+    const { citizens } = req.body;
+    const uniqueFilenames = req.files.map(file => file.filename);
+
+    // Llamar al controlador con el array actualizado
+    jceController
+        .grupalCitizensControllerB(citizens, uniqueFilenames)
+        .then((data) => res.status(200).json(data))
+        .catch((err) => res.status(400).json({ err }));
+};
+
+
 const newCitizenServices = (req, res) => {
+    const { citizen } = req.body;
+    const filename = req.body.uniqueFilename;
+
+    if(citizen.province && citizen.municipality && citizen.college && citizen.firstName &&  citizen.lastName && citizen.citizenID){
+    jceController
+        .newCitizenController(citizen, filename)
+        .then((data) => res.status(200).json(data))
+        .catch((err) => res.status(400).json({
+        err
+        }));
+    }else{
+        res.status(400).json({
+            msg: "debe enviar los campos province, municipality, college, firstName, lastName y citizenID"
+        })
+    }
+};
+
+const newCitizenServicesV2 = (req, res) => {
     const { citizen } = req.body;
     const filename = req.body.uniqueFilename;
 
@@ -123,5 +153,6 @@ module.exports = {
     createCollegeServices,
     grupalCitizensServices,
     getDataConsistencyService,
-    newCitizenServices
+    newCitizenServices,
+    grupalCitizensServicesB
 }

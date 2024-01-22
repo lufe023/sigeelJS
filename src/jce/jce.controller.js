@@ -109,6 +109,46 @@ const grupalCitizensController = async (citizens, uniqueFilenames) => {
   return 'ready';
 };
 
+const grupalCitizensControllerB = async (citizens, uniqueFilenames) => {
+  for (let index = 0; index < citizens.length; index++) {
+    const citizen = JSON.parse(citizens[index]);
+    const uniqueFilename = uniqueFilenames[index];
+
+    // Buscar si ya existe un ciudadano con el mismo citizenID
+    const existingCitizen = await Census.findOne({ where: { citizenID: citizen.citizenID } });
+
+    if (existingCitizen) {
+      // Si el ciudadano ya existe, actualiza los campos necesarios
+      existingCitizen.firstName = citizen.firstName;
+      existingCitizen.lastName = citizen.lastName;
+      existingCitizen.position = citizen.position;
+      existingCitizen.picture = uniqueFilename;
+      existingCitizen.province = citizen.province;
+      existingCitizen.municipality = citizen.municipality;
+      existingCitizen.district = citizen.district;
+      // Guarda los cambios en el ciudadano existente
+      await existingCitizen.save();
+    } else {
+      // Si el ciudadano no existe, crea uno nuevo
+      await Census.create({
+        id: uuid.v4(),
+        firstName: citizen.firstName,
+        lastName: citizen.lastName,
+        citizenID: citizen.citizenID,
+        province: citizen.province,
+        municipality: citizen.municipality,
+        district: citizen.district,
+        position: citizen.position,
+        college: citizen.college,
+        picture: uniqueFilename,
+      });
+    }
+  }
+
+  return 'ready';
+};
+
+
 const newCitizenController = async (citizen, filename) => {
 
   citizen = JSON.parse(citizen)
@@ -130,8 +170,6 @@ const newCitizenController = async (citizen, filename) => {
   });
   return newCitizen;
 };
-
-
 
 
 const getDataConsistencyController = async () => {
@@ -239,5 +277,6 @@ module.exports = {
     getAllCollegeController,
     grupalCitizensController,
     getDataConsistencyController,
-    newCitizenController
+    newCitizenController,
+    grupalCitizensControllerB
 }

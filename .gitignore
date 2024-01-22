@@ -1,6 +1,4 @@
 node_modules/
 .env
 .env render
-src/uploads/
-/src/uploads/images/
-/src/uploads/images/teams
+uploads/images/teams/*
