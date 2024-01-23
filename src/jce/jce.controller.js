@@ -41,6 +41,10 @@ const getAllPrecintController = async () => {
             {
               model: Maps,
               as: 'PrecinctsMunicipio'
+            },
+            {
+              model: Maps,
+              as: 'PrecinctsDistrito'
             }
         ]
 })

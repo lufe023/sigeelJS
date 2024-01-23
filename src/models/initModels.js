@@ -161,7 +161,7 @@ Users.hasMany(Todo, {foreignKey:'responsible', sourceKey:'id', as: 'tasks'})
 
     Precincts.hasMany(Maps,  {foreignKey: 'id',sourceKey: 'provincia', as: 'PrecinctsProvincia'})
     Precincts.hasMany(Maps,  {foreignKey: 'id',sourceKey: 'municipio', as: 'PrecinctsMunicipio'})
-
+    Precincts.hasMany(Maps,  {foreignKey: 'id',sourceKey: 'distrito', as: 'PrecinctsDistrito'})
     //trayendo colegios junto a los recintos
     Census.hasOne(College,  {foreignKey: 'id',sourceKey: 'college', as: 'colegio'})
     College.hasMany(Census,  {foreignKey: 'college',sourceKey: 'id', as: 'ColegioCensus'})
