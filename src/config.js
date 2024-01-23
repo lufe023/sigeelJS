@@ -6,6 +6,7 @@ const config = {
     nodeEnv: process.env.NODE_ENV, //? Desarrollo, Testing, Produccion
     jwtSecret: process.env.JWT_SECRET,
     host: process.env.HOST,
+    frontendHost: process.env.FRONTENDHOST,
     db: {
         host: process.env.DB_HOST ,
         username: process.env.DB_USERNAME,

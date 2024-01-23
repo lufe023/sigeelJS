@@ -130,6 +130,8 @@ const grupalCitizensControllerB = async (citizens, uniqueFilenames) => {
       existingCitizen.province = citizen.province;
       existingCitizen.municipality = citizen.municipality;
       existingCitizen.district = citizen.district;
+      existingCitizen.college = citizen.college;
+      
       // Guarda los cambios en el ciudadano existente
       await existingCitizen.save();
     } else {

@@ -1,6 +1,6 @@
 const { enviarMail } = require("../utils/mails/sendEmail");
 const usersControllers = require("./users.controllers");
-const { host } = require('../config')
+const { host, frontendHost } = require('../config')
 
 const getAllUsers = (req, res) => {
 
@@ -86,9 +86,9 @@ usersControllers
 if(data[0]!=0){
   res.status(201).json({message: "Peticion enviada",
 })
-let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='https://sigeel.netlify.app/#/recoverypassword/${data[1]}'>Recuperar Contraseña</a>  `
+let bodyEmail = `Se ha hecho una peticion para recuperar la contraseña del Sistema de Gestion del Elector Mi Elector haga Click En el siguiente enlace para recuperar su contraseña <a href='${frontendHost}/#/recoverypassword/${data[1]}'>Recuperar Contraseña</a>  `
 if(email.includes('@')){
-enviarMail('no-reply@no-reply@sigeel.netlify.app', email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
+enviarMail('no-reply@mielector.com', email,'Recuperacion de Contraseña' , "la recuperacion se envio", bodyEmail)
 }
 }
 else{
