@@ -122,7 +122,7 @@ const grupalCitizensControllerB = async (citizens, uniqueFilenames) => {
     const existingCitizen = await Census.findOne({ where: { citizenID: citizen.citizenID } });
 
     if (existingCitizen) {
-      // Si el ciudadano ya existe, actualiza los campos necesarios
+      //Si el ciudadano ya existe, actualiza los campos necesarios
       existingCitizen.firstName = citizen.firstName;
       existingCitizen.lastName = citizen.lastName;
       existingCitizen.position = citizen.position;
