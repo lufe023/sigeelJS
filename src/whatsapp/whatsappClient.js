@@ -1,5 +1,6 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+const qrcode = require('qrcode');
+const {deleteImageController} = require('../images/images.controller')
 const CensusController = require('../census/census.controller')
 const path = require('path')
 const fs = require('fs-extra')
@@ -34,18 +35,35 @@ function formatearImagen(data) {
            // Agrega más campos según necesites
 }
 
+const generateQRImage = async (text, filePath) => {
+    try {
+        await qrcode.toFile(filePath, text);
+        return true;
+    } catch (error) {
+        console.error('Error al generar el archivo de código QR:', error);
+        return false;
+    }
+};
 
 const client = new Client({
     authStrategy: new LocalAuth() // Usando LocalAuth para la autenticación
 });
 
 client.on('qr', qr => {
-    qrcode.generate(qr, { small: true }); // Esta línea genera el código QR en la terminal.
-    console.log('Se requiere un nuevo escaneo del código QR');
+    const qrFilePath = path.join(__dirname, '../../uploads/images/system/qr/qr.png');
+    generateQRImage(qr, qrFilePath).then((success) => {
+        if (success) {
+            console.log('Código QR guardado en:', qrFilePath);
+        } else {
+            console.log('Error al guardar el código QR');
+        }
+    });
 });
 
 client.on('ready', () => {
     console.log('Client is ready!');
+    deleteImageController('system/qr','qr.png')
+
 });
 
 // Listener de mensajes

@@ -2,3 +2,5 @@ node_modules/
 .env
 .env render
 uploads/images/teams/*
+.wwebjs_auth/*
+.wwebjs_cache/*
