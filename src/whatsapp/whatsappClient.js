@@ -50,7 +50,7 @@ const client = new Client({
 });
 
 client.on('qr', qr => {
-    const qrFilePath = path.join(__dirname, '../../uploads/images/system/qr/qr.png');
+    const qrFilePath = path.join(__dirname, './qr/qr.png');
     generateQRImage(qr, qrFilePath).then((success) => {
         if (success) {
             console.log('Código QR guardado en:', qrFilePath);

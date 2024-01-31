@@ -26,7 +26,7 @@ const getImage = async (req, res) => {
         }
         if(type=="qr"){
             //funcionando
-            pathImage = path.resolve( __dirname, `../../uploads/images/system/qr/qr.png`);
+            pathImage = path.resolve( __dirname, `../whatsapp/qr/qr.png`);
         }
 
         if (await fs.existsSync(pathImage)) {
