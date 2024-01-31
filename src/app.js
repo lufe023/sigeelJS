@@ -5,7 +5,6 @@ const db = require('./utils/database');
 const initModels = require('./models/initModels');
 const bodyParser = require('body-parser');
 
-
 //* Routes
 const userRouter = require('./users/users.router')
 const authRouter = require('./auth/auth.router')
@@ -24,7 +23,7 @@ const jceRouter = require('./jce/jce.router')
 const campain = require('./campain/campain.router')
 const reports = require('./reports/reports.router')
 const suffrage = require('./suffrage/suffrage.router')
-
+const whatsapp = require('./whatsapp/whatsapp.router')
 
 //? Initial Configurations
 const app = express()
@@ -34,7 +33,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
 
 app.use(cors())
 app.use(express.json())
-
 
 db.authenticate()
     .then(() => {
@@ -53,6 +51,8 @@ db.sync()
     })
 
 initModels()
+
+
 
 
 app.get('/',(req, res) => {
@@ -80,6 +80,8 @@ app.use('/api/v1/jce', jceRouter)
 app.use('/api/v1/campains', campain)
 app.use('/api/v1/reports', reports)
 app.use('/api/v1/suffrages', suffrage)
+app.use('/api/v1/whatsapp', whatsapp)
+
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)
