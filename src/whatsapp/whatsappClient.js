@@ -1,6 +1,6 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode');
-const {deleteImageController} = require('../images/images.controller')
+const {deleteQrImage} = require('../images/images.controller')
 const CensusController = require('../census/census.controller')
 const path = require('path')
 const fs = require('fs-extra')
@@ -62,7 +62,7 @@ client.on('qr', qr => {
 
 client.on('ready', () => {
     console.log('Client is ready!');
-    deleteImageController('system/qr','qr.png')
+    deleteQrImage('../whatsapp/qr','qr.png')
 
 });
 
@@ -95,8 +95,9 @@ client.on('message', async message => {
                 chatStates[chatId].stage = 2; // Avanza al estado de consulta de cédula
             } else if (msgText === '2') {
                 // Aquí manejas la lógica para el Padroncillo
-                await message.reply("Aquí está tu Padroncillo. (Aquí iría la lógica para enviar el Padroncillo)");
+                await message.reply("Esta opción se encuentra en desarrollo y aún no esta disponible)");
                 chatStates[chatId].stage = 0; // Regresa al estado inicial
+
             }
             break;
 
