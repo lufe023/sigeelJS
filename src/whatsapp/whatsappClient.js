@@ -4,7 +4,30 @@ const {deleteQrImage} = require('../images/images.controller')
 const CensusController = require('../census/census.controller')
 const path = require('path')
 const fs = require('fs-extra')
+const usersControllers = require('../users/users.controllers')
+const padron = require('../pdfCreator/padronToPdf')
+const borrardeleteOldPdfs = require('../pdfCreator/cleanUpOldPdfs')
+const estado = [{
+    cedula: '',
+    fecha: ''
+}]
 
+
+const convertBirthDay = (fechaStr) =>{
+
+
+// Convertir a objeto de fecha
+const fechaObj = new Date(fechaStr);
+
+// Extraer día, mes y año
+const dia = fechaObj.getDate(); // Día del mes
+const mes = fechaObj.getMonth() + 1; // Mes (0-11, por eso sumamos 1)
+const año = fechaObj.getFullYear(); // Año
+
+// Asegurar formato DDMMYYYY
+const fechaFormateada = `${dia.toString().padStart(2, '0')}${mes.toString().padStart(2, '0')}${año}`;
+return fechaFormateada
+}
 function formatarRespuesta(data) {
     if (!data || !data.rows || data.rows.length === 0) {
         return 'No se encontraron datos.';
@@ -66,6 +89,14 @@ client.on('ready', () => {
 
 });
 
+//funcion para enviar pdf
+function sendPDF(filePath, number) {
+    client.on('ready', async () => {
+        const pdfMedia = MessageMedia.fromFilePath(filePath);
+        await client.sendMessage(number, pdfMedia, { caption: "Aquí está su padroncillo." });
+    });
+}
+
 // Listener de mensajes
 const chatStates = {};
 
@@ -95,9 +126,8 @@ client.on('message', async message => {
                 chatStates[chatId].stage = 2; // Avanza al estado de consulta de cédula
             } else if (msgText === '2') {
                 // Aquí manejas la lógica para el Padroncillo
-                await message.reply("Esta opción se encuentra en desarrollo y aún no esta disponible)");
-                chatStates[chatId].stage = 0; // Regresa al estado inicial
-
+                await message.reply("Indíqueme el número de cédula, por favor.");
+                chatStates[chatId].stage = 3; // avanza a caso 3
             }
             break;
 
@@ -118,11 +148,72 @@ client.on('message', async message => {
             }
             chatStates[chatId].stage = 0; // Regresa al estado inicial
             break;
+            
+            case 3:
+                
+                let cedula = msgText.trim().replace(/-/g, "");
+                if (cedula.length===11) {
+                    estado.cedula = cedula
+                    await message.reply("Indíqueme la fecha de nacimiento en el formato día, mes y año ejemplo: 20-01-1978");
+                    chatStates[chatId].stage = 4; // Avanza al estado de consulta de cédula
+                } 
+                break;
 
-        // Agrega más casos según sea necesario
-    }
-});
+            case 4:
+                let fecha = msgText.trim().replace(/-/g, "");
+                fecha = fecha.replace(/\//g, "");
+            if (fecha.length===8) {
+                const padroncillo = await usersControllers.findUserController(estado.cedula)
+                const birthDay = await CensusController.citizenBirthDay(estado.cedula)
+                const nacimiento = convertBirthDay(birthDay)
+                if (nacimiento === fecha) {
+                    // Genera el PDF
+                    await padron.padroncilloPdf(padroncillo.rows[0].colaborador.id, message.from, estado.cedula)
+                    // .then()
+                    .then((pdfName) => {
+                    let pdfPath = path.resolve(__dirname, '../pdfCreator/', pdfName);
+                    //let pdfMedia = MessageMedia.fromFilePath(pdfPath);
+                    const fileContent = fs.readFileSync(pdfPath)
+                    let pdfMedia = new MessageMedia('application/pdf', fileContent.toString('base64'), pdfPath);
+                    const sendPDFToWhatsApp = async (client, recipientNumber, pdfFilePath) => {
+                        // Verifica si el archivo existe antes de intentar enviarlo
+                        if (fs.existsSync(pdfFilePath)) {
+                            // Obtiene solo el nombre del archivo, sin la ruta
+                            const filename = path.basename(pdfFilePath);
+                            
+                            // Crea una instancia de MessageMedia desde el archivo PDF
+                            const pdfMedia = MessageMedia.fromFilePath(pdfFilePath);
+                            
+                            // Envía el archivo PDF al número de destino con una leyenda
+                            await client.sendMessage(recipientNumber, pdfMedia, { caption: "Aquí está su padroncillo." })
+                            .then(() => 
+                            borrardeleteOldPdfs.cleanUpOldPdfs(estado.cedula)
+                            )
+                            console.log("PDF enviado con éxito.");
+                        } else {
+                            console.log("El archivo PDF no se encontró.");
+                        }
+                    };
+                    setTimeout(() => {
+
+                    sendPDFToWhatsApp(client, message.from, pdfPath);
+                        
+                    }, 3000); // 10000 milisegundos = 10 segundos
+                })
+                .catch((err) => { console.log(err); });
+                } else {
+                    await message.reply("Esta fecha de nacimiento no coincide con: " + padroncillo.rows[0].firstName + " " + padroncillo.rows[0].lastName);
+                }
+                
+                chatStates[chatId].stage = 0;
+                }
+            break;
+            
+            
+                
+            }  
+})
 
 client.initialize();
 
-module.exports = client;
+module.exports = client

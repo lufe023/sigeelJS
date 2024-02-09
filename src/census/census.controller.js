@@ -18,6 +18,8 @@ const AuditLog = require('../models/audit.models')
 const { Sequelize, Op } = require('sequelize');
 const Suffrages = require('../models/suffrage.models')
 
+const tiesController = require('../ties/ties.controllers')
+
 const getPeoplesByPlaces = async (province, municipality) => {
     
     const peoples = await Census.findAndCountAll({
@@ -288,12 +290,127 @@ for (const citizen of data.rows) {
 
 
 const user = await getUser.getUserById(leaderId)
-        
+
+const ties = await tiesController.getPeoplesTiesByCitizenIdController(user?.censu?.citizenID)
 
 return {
     count: data.count,
     rows: peopleWithUpdates,
-    user
+    user,
+    ties,
+};
+
+}
+
+const getPeopleByUserToPdf = async (leaderId) => {
+
+    const data = await Census.findAndCountAll({
+    
+        where:{
+            leader:leaderId
+        },
+            include :[
+                {
+                    model: Suffrages,
+                    as:'sufragio'
+                },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'provinces'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'municipalities'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'districts'
+            },
+            {
+                model : Maps,
+                attributes: ['id', 'name', 'parent'],
+                as: 'neighbourhoods'
+            },
+            {
+                model : Users,
+                attributes: ['id', 'email'],
+                as: 'leaders'
+            },
+            {
+                model : Benefit,
+                //attributes: ['id', 'email'],
+                as: 'Beneficios'
+            },
+            {
+                model : Job,
+                //attributes: ['id', 'email'],
+                as: 'Empleos'
+            },
+            {
+                model : Participation,
+                //attributes: ['id', 'email'],
+                as: 'Actividades'
+            },
+            {
+                model : Gps,
+                //attributes: ['id', 'email'],
+                as: 'geolocation'
+            },
+            {
+                model : Poll,
+                //attributes: ['id', 'citizenID', 'campain'],
+                as: 'Encuestas',
+                include:[
+                    {model:Campain,
+                    as: 'Campain'}
+                ]
+            },
+            {
+                model:Condition,
+                as: 'condition'
+            },
+            {model: College,
+            as: 'colegio',
+            include: [
+                {
+                model: Precincts,
+                as: 'precinctData', // Usar el nombre del alias en la relación
+                }
+            ]
+        },
+        ]  
+})
+
+const peopleWithUpdates = [];
+
+for (const citizen of data.rows) {
+    const citizenId = citizen.citizenID;
+
+    const lastUpdatedDates = await getLastUpdatedDates(citizenId);
+    const pendingUpdates = await getPendingUpdatesController(citizenId);
+
+    const citizenWithUpdates = {
+        ...citizen.toJSON(),
+        lastUpdatedDates,
+        pendingUpdates
+    };
+
+    peopleWithUpdates.push(citizenWithUpdates);
+}
+
+
+const user = await getUser.getUserById(leaderId)
+
+const ties = await tiesController.getPeoplesTiesByCitizenIdController(user?.censu?.citizenID)
+
+return {
+    count: data.count,
+    rows: peopleWithUpdates,
+    user,
+    ties
 };
 
 }
@@ -725,7 +842,32 @@ const getAllCensusByCollegeController = async (collegeId, offset, limit, include
     return [data, college];
 }
 
+const citizenBirthDay = async (citizenID) => {
 
+    let cedula = citizenID.trim().replace(/-/g, "");
+
+        try {
+
+            if(cedula.length===11){
+
+            const data = await Census.findOne({
+                where: {
+                    citizenID: cedula
+                },
+            attributes:['birthDay']
+        })
+        return data.birthDay || ''
+    }   
+    else{
+        return []
+    }
+        }
+
+catch (error) {
+    console.error("Error executing query:", error);
+    throw error; // Propaga el error para que se capture en el controlador
+  }
+}
 
 module.exports = {
     getAllCensus,
@@ -742,5 +884,7 @@ module.exports = {
     getPendingUpdatesController,
     getAllCensusByCollegeController,
     transferCensusController,
-    getSimpleCensusController
+    getSimpleCensusController,
+    getPeopleByUserToPdf,
+    citizenBirthDay
 }

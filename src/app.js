@@ -82,7 +82,6 @@ app.use('/api/v1/reports', reports)
 app.use('/api/v1/suffrages', suffrage)
 app.use('/api/v1/whatsapp', whatsapp)
 
-
 app.listen(port, () => {
     console.log(`Server started at port ${port}`)
 })
