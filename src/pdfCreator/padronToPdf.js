@@ -219,7 +219,7 @@ function drawHeader(doc, currentPage, totalPages, user, total) {
     const marginTop = 50; // Margen superior de 50 puntos
     let headerXStart = 20;
     let headerYStart = 10;
-    let logo = path.resolve( __dirname, `../../uploads/images/system/MIELECTOR.PNG`) 
+    let logo = path.resolve( __dirname, `../../uploads/images/system/MIELECTOR.png`) 
     
     doc.fontSize(10).text(fecha, pageWidth - marginRight - doc.widthOfString(fecha), marginTop, {
         align: 'right'
@@ -252,7 +252,7 @@ function drawHeader(doc, currentPage, totalPages, user, total) {
         const marginTop = 50; // Margen superior de 50 puntos
         let headerXStart = 20;
         let headerYStart = 10;
-        let logo = path.resolve( __dirname, `../../uploads/images/system/MIELECTOR.PNG`) 
+        let logo = path.resolve( __dirname, `../../uploads/images/system/MIELECTOR.png`) 
     
         doc.fontSize(16).text("Vínculos y Conexiones", headerXStart, headerYStart, {
             align: 'center'
