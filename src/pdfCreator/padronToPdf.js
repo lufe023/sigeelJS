@@ -62,19 +62,31 @@ const padroncilloPdf = async (id, number, citizenID) => {
         college: citizen.colegio.collegeNumber,
         precint: citizen.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' ')
     }));
-
-    const vinculos = ties[0].rows.map(vinculo => ({
+    const vinculos = ties[0].rows.map(vinculo => 
+        citizenID==vinculo.bCiticenID?
+        
+    ({
+        firstName: vinculo.aties.firstName,
+        lastName: vinculo.aties.lastName,
+        citizenID: vinculo.aties.citizenID,
+        photo: imageExists(vinculo.aties.picture),
+        address: vinculo.aties.address || 'Desconocida',
+        phone: vinculo.aties.celphone || 'Desconocido',
+        college: vinculo.aties.colegio.collegeNumber,
+        precint: vinculo.aties.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' ')
+    })
+    :
+    ({
         firstName: vinculo.bties.firstName,
         lastName: vinculo.bties.lastName,
         citizenID: vinculo.bties.citizenID,
         photo: imageExists(vinculo.bties.picture),
         address: vinculo.bties.address || 'Desconocida',
         phone: vinculo.bties.celphone || 'Desconocido',
-        college: vinculo.bties.collegeNumber,
+        college: vinculo.bties.colegio.collegeNumber,
         precint: vinculo.bties.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' ')
-    }));
-
-
+    })
+    );
 
 const columnWidth = 185;
 const columnSpacing = 5;

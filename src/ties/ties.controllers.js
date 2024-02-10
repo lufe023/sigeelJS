@@ -44,7 +44,19 @@ const getPeoplesTiesByCitizenIdController = async (citizenID)=> {
         include:[
             {
                 model: Census,
-                as: 'aties'
+                as: 'aties',
+                include: [
+                    {
+                        model: College,
+                        as: 'colegio',
+                        include: [
+                            {
+                            model: Precincts,
+                            as: 'precinctData', // Usar el nombre del alias en la relación
+                            }
+                        ]
+                    },
+                ]
             },
             {
                 model: Census,

@@ -185,6 +185,7 @@ for (const citizen of data.rows) {
 return {
     count: data.count,
     rows: peopleWithUpdates
+
 };
 };
 
