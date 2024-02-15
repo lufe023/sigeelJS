@@ -64,7 +64,6 @@ const padroncilloPdf = async (id, number, citizenID) => {
     }));
     const vinculos = ties[0].rows.map(vinculo => 
         citizenID==vinculo.bCiticenID?
-        
     ({
         firstName: vinculo.aties.firstName,
         lastName: vinculo.aties.lastName,

@@ -28,6 +28,7 @@ const año = fechaObj.getFullYear(); // Año
 const fechaFormateada = `${dia.toString().padStart(2, '0')}${mes.toString().padStart(2, '0')}${año}`;
 return fechaFormateada
 }
+
 function formatarRespuesta(data) {
     if (!data || !data.rows || data.rows.length === 0) {
         return 'No se encontraron datos.';
@@ -88,14 +89,6 @@ client.on('ready', () => {
     deleteQrImage('../whatsapp/qr','qr.png')
 
 });
-
-//funcion para enviar pdf
-function sendPDF(filePath, number) {
-    client.on('ready', async () => {
-        const pdfMedia = MessageMedia.fromFilePath(filePath);
-        await client.sendMessage(number, pdfMedia, { caption: "Aquí está su padroncillo." });
-    });
-}
 
 // Listener de mensajes
 const chatStates = {};
