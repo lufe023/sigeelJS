@@ -15,8 +15,6 @@ async function startAPI() {
         console.log('Client is Ready!')
     })
 
-    
-
     await client.initialize()
 
     return client

@@ -56,6 +56,7 @@ const padroncilloPdf = async (id, number, citizenID) => {
         firstName: citizen.firstName,
         lastName: citizen.lastName,
         citizenID: citizen.citizenID,
+        position: citizen.position || 'Desconocida',
         photo: imageExists(citizen.picture), // Usa la función sincrónica directamente
         address: citizen.address || 'Desconocida',
         phone: citizen.celphone || 'Desconocido',
@@ -68,28 +69,32 @@ const padroncilloPdf = async (id, number, citizenID) => {
         firstName: vinculo.aties.firstName,
         lastName: vinculo.aties.lastName,
         citizenID: vinculo.aties.citizenID,
+        position: vinculo.aties.position || 'Desconocida',
         photo: imageExists(vinculo.aties.picture),
         address: vinculo.aties.address || 'Desconocida',
         phone: vinculo.aties.celphone || 'Desconocido',
         college: vinculo.aties.colegio.collegeNumber,
-        precint: vinculo.aties.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' ')
+        precint: vinculo.aties.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' '),
+        lider: vinculo.aties.leaders?vinculo.aties.leaders.censu.firstName + " " + vinculo.aties.leaders.censu.lastName:"No tiene"
     })
     :
     ({
         firstName: vinculo.bties.firstName,
         lastName: vinculo.bties.lastName,
         citizenID: vinculo.bties.citizenID,
+        position: vinculo.bties.position || 'Desconocida',
         photo: imageExists(vinculo.bties.picture),
         address: vinculo.bties.address || 'Desconocida',
         phone: vinculo.bties.celphone || 'Desconocido',
         college: vinculo.bties.colegio.collegeNumber,
-        precint: vinculo.bties.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' ')
+        precint: vinculo.bties.colegio.precinctData.recintoNombre.split(' ').slice(0,4).join(' '),
+        lider: vinculo.bties.leaders?vinculo.bties.leaders.censu.firstName + " " + vinculo.bties.leaders.censu.lastName: "No tiene"
     })
     );
 
 const columnWidth = 185;
 const columnSpacing = 5;
-const boxHeight = 100;
+const boxHeight = 110;
 const startY = 150;
 const startX = 15;
 const citizensPerPage = 15;
@@ -122,6 +127,8 @@ function drawCitizenBox(citizen, x, y) {
     currentY = doc.y;
     doc.text(`Tel: ${citizen.phone}`, detailsXStart, currentY, { width: detailsWidth });
     currentY = doc.y;
+    doc.text(`Posición: ${citizen.position}`, detailsXStart, currentY, { width: detailsWidth });
+    currentY = doc.y;
     doc.text(`Mesa: ${citizen.college}`, detailsXStart, currentY, { width: detailsWidth });
     currentY = doc.y;
     doc.text(citizen.precint, detailsXStart, currentY, { width: detailsWidth });
@@ -153,9 +160,13 @@ function drawTieBox(citizen, x, y) {
     currentY = doc.y;
     doc.text(`Tel: ${citizen.phone}`, detailsXStart, currentY, { width: detailsWidth });
     currentY = doc.y;
+    doc.text(`Posición: ${citizen.position}`, detailsXStart, currentY, { width: detailsWidth });
+    currentY = doc.y;
     doc.text(`Mesa: ${citizen.college}`, detailsXStart, currentY, { width: detailsWidth });
     currentY = doc.y;
     doc.text(citizen.precint, detailsXStart, currentY, { width: detailsWidth });
+    currentY = doc.y;
+    doc.text(`Líder: ${citizen.lider}`, detailsXStart, currentY, { width: detailsWidth });
 }
 
 drawHeader(doc,currentPage, totalPages, user, citizens.length);

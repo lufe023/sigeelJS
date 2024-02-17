@@ -260,8 +260,13 @@ const coberturaController = async (precinct)=> {
             as: 'ColegioCensus',
             where: {
               leader:null,
-              [Op.not]:{outside: true}
+              [Op.not]:{outside: true},
             },
+            include:[
+              {model: Suffrages,
+              as: 'sufragio'
+            }
+            ]
           }
         ]
       });

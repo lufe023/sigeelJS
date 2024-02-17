@@ -6,7 +6,7 @@ const {Op} = require("sequelize");
 const TiesTypes = require('../models/tiesTypes.models');
 const College = require('../models/college.models');
 const Precincts = require('../models/precinct.models');
-
+const Users = require('../models/users.models');
 
 //crear una nueva relacion
 const newTiesController = async (aCiticenID, bCiticenID, tiesType)=> {
@@ -53,6 +53,17 @@ const getPeoplesTiesByCitizenIdController = async (citizenID)=> {
                             {
                             model: Precincts,
                             as: 'precinctData', // Usar el nombre del alias en la relación
+                            }
+                        ]
+                    },
+                    {
+                        model : Users,
+                        attributes: ['id', 'email'],
+                        as: 'leaders',
+                        include:[
+                            {
+                                attributes:['firstName', 'lastName'],
+                                model: Census
                             }
                         ]
                     },

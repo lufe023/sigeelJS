@@ -42,7 +42,8 @@ function formatarRespuesta(data) {
     return  `👤 Nombre: ${persona.firstName} ${persona.lastName}\n` +
             `😉 Apodo: ${persona.nickname || 'No especificado'}\n` +
             `📱 Celular: ${persona.celphone || 'No especificado'}\n` +
-            `🏛️  Colegio: ${colegio.collegeNumber || 'No especificado'}\n` +
+            `🗒️ Posición: ${persona.position || 'No especificado'}\n` +
+            `🏛️ Colegio: ${colegio.collegeNumber || 'No especificado'}\n` +
             `🏫 Recinto: ${colegio.precinctData.recintoNombre || 'No especificado'}\n` +
             `🏠 Dirección: ${persona.adress || 'No especificada'}\n`+
             `🗳️ *${voto}*\n`+
