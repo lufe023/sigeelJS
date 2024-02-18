@@ -64,6 +64,16 @@ const bocaUrnaService = (req, res) => {
         .catch((err) => {res.status(400).json({ err })});
     };
 
+    const bocaUrnaServiceAlcalde = (req, res) => {
+  
+        const college = req.query.college
+        const campain = req.query.campain
+      
+              reportController.bocaUrnaAlcalde(college,campain)
+              .then((data) => {res.status(200).json(data);})
+              .catch((err) => {res.status(400).json({ err })});
+          };
+
 const coberturaService = (req, res) => {
 
     const precinct = req.query.precinct
@@ -79,5 +89,6 @@ module.exports = {
     getPartyCollegeReportService,
     getPreferedPresidentReportByPlaceService,
     bocaUrnaService,
+    bocaUrnaServiceAlcalde,
     coberturaService
 }

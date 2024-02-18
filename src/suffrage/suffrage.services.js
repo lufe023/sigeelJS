@@ -37,7 +37,24 @@ const createOrUpdateSuffrageServices = (req, res) => {
         }
 }
 
+const createOrUpdateSuffrageGrupalService = (req, res) => {
+    const registerBy = req.user.id
+    const {positions, collegeId, suffrageValue} = req.body
+
+    if(positions, collegeId, suffrageValue, registerBy)
+        {
+        suffrageControlles
+        .createOrUpdateSuffrageGrupalController(positions, collegeId, suffrageValue, registerBy)//positions, collegeId, suffrageValue, registerBy
+        .then((result) => {res.status(200).json(result)})
+        .catch((err) => {res.status(400).json(err)});
+        }else{
+            res.status(400).json({message:"debe enviar todos los campos requeridos: citizenID, suffrageValue"})
+        }
+}
+
+
 module.exports = {
     getPeopleWhoVotedServices,
-    createOrUpdateSuffrageServices
+    createOrUpdateSuffrageServices,
+    createOrUpdateSuffrageGrupalService
 }

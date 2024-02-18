@@ -150,6 +150,99 @@ const getPreferedPresidentReportByPlaceController = async (campainId) =>{
   return report
 }
 
+const bocaUrnaAlcalde = async (college,campain) => {
+  
+  try {
+    // Obtener los citizenID de los registros de Census que tienen suffrage verdadero en Suffrages
+    const censusRecords = await Census.findAll({
+      where: {
+        college: college,
+      },
+      raw: true,
+      attributes: [],
+      
+      include: [
+        {
+          model:Suffrages,
+          as: 'sufragio',
+          where: {
+            suffrage: {
+              [Sequelize.Op.ne]: null,
+            },
+          },
+          attributes: ['citizenID', 'suffrage', 'updatedAt'] // Ajusta según tus necesidades
+        },
+        {
+          model: Poll,
+          as: 'Encuestas',
+          where: {
+            campain: campain, // Cambiar "id" por "campain" para la condición de la encuesta
+            mayor: {
+              [Sequelize.Op.ne]: null,
+            },
+          },
+          //attributes: ['president'], // Si no necesitas ninguna columna específica de la encuesta, puedes omitirla
+          include:[
+            {model:Ballots,
+              as: 'preferedMayorDetails',
+              include:[
+                {
+                  model: Parties,
+                  as: 'partyDetails'
+                }
+              ]
+          }
+          ]
+        }
+      ]
+    });
+
+
+    const datos = await censusRecords
+
+    // Creamos un objeto para almacenar los resultados agrupados
+    const resultadosAgrupados = {};
+    
+    // Iteramos sobre cada objeto en el array de datos
+    datos.forEach(objeto => {
+      const alcalde = objeto["Encuestas.mayor"];
+      const name = objeto["Encuestas.preferedMayorDetails.name"]
+      const partyAcronyms = objeto["Encuestas.preferedMayorDetails.partyDetails.partyAcronyms"]
+      const color = objeto["Encuestas.preferedMayorDetails.partyDetails.color"]
+      const hora = new Date(objeto["sufragio.updatedAt"]).getHours(); // Obtener la hora del timestamp
+    console.log("alcalde" + alcalde)
+      // Creamos una clave única para cada combinación de presidente y hora
+      const clave = `${alcalde}-${hora}`;
+    
+      // Si la clave no existe en el objeto de resultados agrupados, la inicializamos a 1, de lo contrario, incrementamos el valor
+      if (!resultadosAgrupados[clave]) {
+        resultadosAgrupados[clave] = {
+          president: alcalde,
+          name: name,
+          partyAcronyms:partyAcronyms,
+          color: color,
+          hour: hora,
+          total: 1,
+        };
+      } else {
+        resultadosAgrupados[clave].total++;
+      }
+    });
+    
+    // Convertimos el objeto de resultados agrupados a un array
+    const resultadosFinales = Object.values(resultadosAgrupados);
+
+
+    resultadosFinales.sort((a, b) => a.hour - b.hour);
+
+    return resultadosFinales
+  } catch (error) {
+    // Manejar errores aquí
+    console.error(error);
+    throw error;
+  }
+};
+
 const bocaUrna = async (college,campain) => {
   
   try {
@@ -285,6 +378,7 @@ const coberturaController = async (precinct)=> {
     }
   };
 
+  
 
 module.exports = {
     getCampainReport,
@@ -292,5 +386,6 @@ module.exports = {
     getPartyCollegeReportController,
     getPreferedPresidentReportByPlaceController,
     bocaUrna,
-    coberturaController
+    coberturaController,
+    bocaUrnaAlcalde
 }

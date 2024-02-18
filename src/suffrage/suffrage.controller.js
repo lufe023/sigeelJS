@@ -79,7 +79,49 @@ const createOrUpdateSuffrageController = async (citizenID, suffrageValue, regist
     }
 };
 
+const createOrUpdateSuffrageGrupalController = async (positions, collegeId, suffrageValue, registerBy) => {
+  try {
+    // Buscar los registros de censo que coincidan con las posiciones y el colegio proporcionados
+    const citizens = await Census.findAll({
+        where: {
+            position: positions, // Sequelize debería manejar esto como un "IN" automáticamente
+            college: collegeId // Asegúrate de que este filtro esté correctamente aplicado
+        }
+    });
+
+    // Para cada ciudadano encontrado, crear o actualizar su registro de sufragio
+    const suffrageUpdates = citizens.map(async (citizen) => {
+        const [suffrage, created] = await Suffrages.findOrCreate({
+            where: { citizenID: citizen.citizenID },
+            defaults: {
+                id: uuid.v4(),
+                suffrage: suffrageValue,
+                registerBy,
+            },
+        });
+
+        // Si el registro ya existía, actualizar suffrage y updatedAt
+        if (!created) {
+            await suffrage.update({
+                suffrage: suffrageValue,
+            });
+        }
+
+        return suffrage;
+    });
+
+    // Esperar a que todas las actualizaciones se completen
+    await Promise.all(suffrageUpdates);
+
+    return { success: true, message: "Suffrages updated successfully." };
+} catch (error) {
+    throw error;
+} 
+};
+
+
 module.exports = {
     getPeopleWhoVotedController,
-    createOrUpdateSuffrageController
+    createOrUpdateSuffrageController,
+    createOrUpdateSuffrageGrupalController
 };

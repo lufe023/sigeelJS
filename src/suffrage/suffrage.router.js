@@ -10,4 +10,7 @@ router.get('/whovote', passport.authenticate('jwt', {session: false}), suffrageS
 //get people who voted by college
 router.post('/registervote', passport.authenticate('jwt', {session: false}), isDelegate, suffrageServices.createOrUpdateSuffrageServices)
 
+//votacion grupal por posiciones y colegios
+router.post('/registergrupalvote', passport.authenticate('jwt', {session: false}), isDelegate, suffrageServices.createOrUpdateSuffrageGrupalService)
+
 module.exports = router
