@@ -1,14 +1,13 @@
-const { sendMessage } = require('./whatsapp.controller');
-const router = require('express').Router()
-const passport = require('passport')
+const { sendMessage } = require("./whatsapp.controller");
+const router = require("express").Router();
+const passport = require("passport");
 
-require('../middlewares/auth.middleware')(passport)
+require("../middlewares/auth.middleware")(passport);
 
 // Inicializa WhatsApp Client
-require('./whatsappClient');
+require("./whatsappClient");
 
 // Define la ruta para enviar mensajes
-router.route('/send-message')
-.post(sendMessage)
+router.route("/send-message").post(sendMessage);
 
-module.exports = router
+module.exports = router;

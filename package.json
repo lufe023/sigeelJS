@@ -37,7 +37,7 @@
     "sequelize": "^6.24.0",
     "sharp": "^0.32.0",
     "uuid": "^9.0.0",
-    "whatsapp-web.js": "^1.23.0",
+    "whatsapp-web.js": "^1.16.4-alpha.0",
     "ws": "^8.13.0"
   },
   "devDependencies": {
