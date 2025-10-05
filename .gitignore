@@ -5,3 +5,4 @@ uploads/images/teams/*
 .wwebjs_auth/*
 .wwebjs_cache/*
 /src/whatsapp/qr/qr.png
+/src/uploads/images/citizens/*
