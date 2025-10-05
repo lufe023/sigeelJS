@@ -560,28 +560,25 @@ const getOnePeople = async (peopleid) => {
 
 const findPeople = async (findWord) => {
     try {
-        let looking = findWord.trim().replace(/-/g, "");
+        const looking = findWord.trim().replace(/-/g, "");
+        const words = looking.split(/\s+/).filter(Boolean); // divide por espacios múltiples
 
-        const [firstName, ...lastNameParts] = looking.split(" ");
-        const lastName = lastNameParts.join(" ");
+        // Construimos condiciones flexibles: cada palabra puede aparecer en nombre o apellido
+        const wordConditions = words.map((word) => ({
+            [Op.or]: [
+                { firstName: { [Op.iLike]: `%${word}%` } },
+                { lastName: { [Op.iLike]: `%${word}%` } },
+                { lastNameB: { [Op.iLike]: `%${word}%` } },
+                { nickname: { [Op.iLike]: `%${word}%` } },
+                { citizenID: { [Op.iLike]: `%${word}%` } },
+            ],
+        }));
 
         const data = await Census.findAndCountAll({
             limit: 5,
             where: {
-                [Op.or]: [
-                    {
-                        [Op.and]: [
-                            { firstName: { [Op.iLike]: `%${firstName}%` } },
-                            { lastName: { [Op.iLike]: `%${lastName}%` } },
-                        ],
-                    },
-                    { citizenID: { [Op.iLike]: `%${looking}%` } },
-                    { nickname: { [Op.iLike]: `%${looking}%` } },
-                    { firstName: { [Op.iLike]: `%${looking}%` } },
-                    { lastName: { [Op.iLike]: `%${looking}%` } },
-                ],
+                [Op.and]: wordConditions, // todas las palabras deben aparecer en algún campo
             },
-
             include: [
                 {
                     model: Provincia,
@@ -598,16 +595,6 @@ const findPeople = async (findWord) => {
                     ],
                     as: "municipalities",
                 },
-                // {
-                //     model: Maps,
-                //     attributes: ["id", "name", "parent"],
-                //     as: "districts",
-                // },
-                // {
-                //     model: Maps,
-                //     attributes: ["id", "name", "parent"],
-                //     as: "neighbourhoods",
-                // },
                 {
                     model: Users,
                     attributes: ["id", "email"],
@@ -619,24 +606,16 @@ const findPeople = async (findWord) => {
                 {
                     model: College,
                     as: "colegio",
-                    include: [
-                        {
-                            model: Precincts,
-                            as: "precinctData", // Usar el nombre del alias en la relación
-                        },
-                    ],
+                    include: [{ model: Precincts, as: "precinctData" }],
                 },
-                {
-                    model: Suffrages,
-                    as: "sufragio",
-                },
+                { model: Suffrages, as: "sufragio" },
             ],
         });
 
         return data;
     } catch (error) {
         console.error("Error executing query:", error);
-        throw error; // Propaga el error para que se capture en el controlador
+        throw error;
     }
 };
 
