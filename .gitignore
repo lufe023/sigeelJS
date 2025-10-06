@@ -3,5 +3,6 @@ node_modules/
 .env render
 .wwebjs_auth/*
 .wwebjs_cache/*
-/src/whatsapp/qr/qr.png
-/src/uploads/images/citizens/*
+/whatsapp/qr/qr.png
+
+/uploads/images/citizens/*

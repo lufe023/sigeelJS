@@ -1,11 +1,9 @@
-const router = require('express').Router()
+const router = require("express").Router();
 
-const imagencontroller = require('./images.controller')
-
-
+const imagencontroller = require("./images.controller");
 
 // devuelvve una imagen por typo y nombre
-router.get('/', imagencontroller.getImage);
-    router.get('/:type/:image', imagencontroller.getImage);
-
-module.exports = router
+router.get("/", imagencontroller.getImage);
+router.get("/pic/mun/:municipio/:cedula", imagencontroller.getCitizenImage);
+router.get("/:type/:image", imagencontroller.getImage);
+module.exports = router;
