@@ -37,7 +37,8 @@
     "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0",
     "sequelize": "^6.24.0",
-    "sharp": "^0.32.0",
+    "sharp": "^0.32.6",
+    "tedious": "^18.6.1",
     "uuid": "^9.0.0",
     "whatsapp-web.js": "^1.16.4-alpha.0",
     "ws": "^8.13.0"

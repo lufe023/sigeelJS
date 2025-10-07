@@ -1,7 +1,8 @@
 node_modules/
 .env
 .env render
-uploads/images/teams/*
 .wwebjs_auth/*
 .wwebjs_cache/*
-/src/whatsapp/qr/qr.png
+/whatsapp/qr/qr.png
+
+/uploads/images/citizens/*
