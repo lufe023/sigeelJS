@@ -36,7 +36,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(cors());
 app.use(express.json());
 
-db.authenticate({ alter: true })
+db.authenticate({ alter: false })
     .then(() => {
         console.log("Database Authenticated");
     })

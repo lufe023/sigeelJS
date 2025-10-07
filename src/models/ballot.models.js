@@ -1,8 +1,10 @@
 const db = require("../utils/database");
 
 const { DataTypes } = require("sequelize");
-const Maps = require("./maps.models");
+const Ciudadseccion = require("./ciudadseccion.model");
 const Parties = require("./parties.models");
+const Provincia = require("./provincia.models");
+const Municipio = require("./municipio.models");
 
 const Ballot = db.define("ballot", {
     candidateId: {
@@ -32,28 +34,28 @@ const Ballot = db.define("ballot", {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    distritoMunicipal: {
+    ciudadSeccion: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        field: "distrito_municipal",
+        field: "ciudadSeccion",
         references: {
-            key: "id",
-            model: Maps,
+            model: Ciudadseccion,
+            key: "CiudadseccionId",
         },
     },
     municipio: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-            key: "id",
-            model: Maps,
+            key: "MunicipalityId",
+            model: Municipio,
         },
     },
     provincia: {
         type: DataTypes.INTEGER,
         references: {
-            key: "id",
-            model: Maps,
+            key: "ProvinciaId",
+            model: Provincia,
         },
     },
 });
