@@ -4,5 +4,5 @@ node_modules/
 .wwebjs_auth/*
 .wwebjs_cache/*
 /whatsapp/qr/qr.png
-
+/whatsapp/qr/*
 /uploads/images/citizens/*
