@@ -23,6 +23,8 @@ const getAllUsers = async (offset, limit) => {
                     "last_name",
                     "picture",
                     "celphone",
+                    "citizenID",
+                    "municipality",
                 ],
             },
             {
