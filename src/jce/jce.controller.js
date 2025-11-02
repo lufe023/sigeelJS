@@ -1,58 +1,51 @@
-const College = require("../models/college.models")
-const Precincts = require("../models/precinct.models")
-const Census = require('../models/census.models')
-const uuid = require('uuid');
-const Maps = require("../models/maps.models");
+const College = require("../models/college.models");
+const Precincts = require("../models/precinct.models");
+const Census = require("../models/census.models");
+const uuid = require("uuid");
+const Municipios = require("../models/municipio.models");
+
 const db = require("../utils/database");
 const { DataTypes, Op } = require("sequelize");
+const Provincia = require("../models/provincia.models");
+const SectorParaje = require("../models/sectorParaje.model");
 //? Star Precints area ################################################# Star Precints area ###################################################
 //crear un nuevo recinto
 const createPrecintController = async (data) => {
     const newPrecint = await Precincts.create({
         id: uuid.v4(),
-        precintNumber:data.precintNumber,
+        precintNumber: data.precintNumber,
         recintoNombre: data.recintoNombre,
         direccionRecinto: data.direccionRecinto,
         latitud: data.latitud,
-        longitud:data.longitud,
+        longitud: data.longitud,
         electLocal: data.electLocal,
         electExterior: data.electExterior,
         provincia: data.provincia,
         municipio: data.municipio,
         distrito: data.distrito,
-        circunscripcion: data.circunscripcion
-    })
-    return newPrecint
-}
+        circunscripcion: data.circunscripcion,
+    });
+    return newPrecint;
+};
 
 //llamar a todos los recintos
 const getAllPrecintController = async () => {
     const precints = await Precincts.findAndCountAll({
-      order: [
-        [{ model: Maps, as: 'PrecinctsMunicipio' }, 'id', 'ASC'],
-        ['precintNumber', 'ASC'],
-      ],
-      
-        include:[
+        include: [
             {
-                model:College,
-                as: 'colegios',
+                model: College,
+                as: "colegios",
             },
             {
-              model: Maps,
-              as: 'PrecinctsMunicipio'
+                model: SectorParaje,
+                as: "PrecinctsSectorParaje",
             },
-            {
-              model: Maps,
-              as: 'PrecinctsDistrito'
-            }
-        ]
-})
-    return precints
-}
+        ],
+    });
+    return precints;
+};
 
 //? End Precints area
-
 
 //? start College area ################################################# start College area ###################################################
 
@@ -60,83 +53,104 @@ const getAllPrecintController = async () => {
 const createCollegeController = async (data) => {
     const newCollege = await College.create({
         id: uuid.v4(),
-        collegeNumber:data.collegeNumber,
+        collegeNumber: data.collegeNumber,
         precinct: data.precinct,
         electLocal: data.electLocal,
         electExterior: data.electExterior,
-        meta: data.meta
-    })
-    return newCollege
-}
+        meta: data.meta,
+    });
+    return newCollege;
+};
 
 //llamar a todos los Colegios
 const getAllCollegeController = async () => {
     const precints = await College.findAndCountAll({
-
-        include:[
+        include: [
             {
-                model:Precincts,
-                as: 'recinto'
-            }
-        ]
-})
-    return precints
-}
+                model: Precincts,
+                as: "recinto",
+            },
+        ],
+    });
+    return precints;
+};
 
 //? end College area
 
 //? start registrando Ciudadanos ################################################# registrando Ciudadanos ###################################################
 
 const grupalCitizensController = async (citizens, uniqueFilenames) => {
-  await citizens.forEach((element, index) => {
-      const citizen = JSON.parse(element);
-      const uniqueFilename = uniqueFilenames[index];
+    await citizens.forEach((element, index) => {
+        const citizen = JSON.parse(element);
+        const uniqueFilename = uniqueFilenames[index];
 
-      Census.create({
-          id: uuid.v4(),
-          firstName: citizen.firstName,
-          lastName: citizen.lastName,
-          citizenID: citizen.citizenID,
-          province: citizen.province,
-          municipality: citizen.municipality,
-          district: citizen.district,
-          position: citizen.position,
-          address: citizen.address,
-          outside: citizen.outside,
-          telephone: citizen.telephone,
-          celphone: citizen.celphone,
-          college: citizen.college,
-          picture: uniqueFilename,
-      });
-  });
+        Census.create({
+            id: uuid.v4(),
+            firstName: citizen.firstName,
+            lastName: citizen.lastName,
+            citizenID: citizen.citizenID,
+            province: citizen.province,
+            municipality: citizen.municipality,
+            district: citizen.district,
+            position: citizen.position,
+            address: citizen.address,
+            outside: citizen.outside,
+            telephone: citizen.telephone,
+            celphone: citizen.celphone,
+            college: citizen.college,
+            picture: uniqueFilename,
+        });
+    });
 
-  return 'ready';
+    return "ready";
 };
 
 const grupalCitizensControllerB = async (citizens, uniqueFilenames) => {
-  for (let index = 0; index < citizens.length; index++) {
-    const citizen = JSON.parse(citizens[index]);
-    const uniqueFilename = uniqueFilenames[index];
+    for (let index = 0; index < citizens.length; index++) {
+        const citizen = JSON.parse(citizens[index]);
+        const uniqueFilename = uniqueFilenames[index];
 
-    // Buscar si ya existe un ciudadano con el mismo citizenID
-    const existingCitizen = await Census.findOne({ where: { citizenID: citizen.citizenID } });
+        // Buscar si ya existe un ciudadano con el mismo citizenID
+        const existingCitizen = await Census.findOne({
+            where: { citizenID: citizen.citizenID },
+        });
 
-    if (existingCitizen) {
-      //Si el ciudadano ya existe, actualiza los campos necesarios
-      existingCitizen.firstName = citizen.firstName;
-      existingCitizen.lastName = citizen.lastName;
-      existingCitizen.position = citizen.position;
-      existingCitizen.picture = uniqueFilename;
-      existingCitizen.province = citizen.province;
-      existingCitizen.municipality = citizen.municipality;
-      existingCitizen.district = citizen.district;
-      existingCitizen.college = citizen.college;
-      
-      // Guarda los cambios en el ciudadano existente
-      await existingCitizen.save();
-    } else {
-      // Si el ciudadano no existe, crea uno nuevo
-      await Census.create({
+        if (existingCitizen) {
+            //Si el ciudadano ya existe, actualiza los campos necesarios
+            existingCitizen.firstName = citizen.firstName;
+            existingCitizen.lastName = citizen.lastName;
+            existingCitizen.position = citizen.position;
+            existingCitizen.picture = uniqueFilename;
+            existingCitizen.province = citizen.province;
+            existingCitizen.municipality = citizen.municipality;
+            existingCitizen.district = citizen.district;
+            existingCitizen.college = citizen.college;
+
+            // Guarda los cambios en el ciudadano existente
+            await existingCitizen.save();
+        } else {
+            // Si el ciudadano no existe, crea uno nuevo
+            await Census.create({
+                id: uuid.v4(),
+                firstName: citizen.firstName,
+                lastName: citizen.lastName,
+                citizenID: citizen.citizenID,
+                province: citizen.province,
+                municipality: citizen.municipality,
+                district: citizen.district,
+                position: citizen.position,
+                college: citizen.college,
+                picture: uniqueFilename,
+            });
+        }
+    }
+
+    return "ready";
+};
+
+const newCitizenController = async (citizen, filename) => {
+    citizen = JSON.parse(citizen);
+    const newCitizen = await Census.create({
         id: uuid.v4(),
         firstName: citizen.firstName,
         lastName: citizen.lastName,
@@ -145,136 +159,114 @@ const grupalCitizensControllerB = async (citizens, uniqueFilenames) => {
         municipality: citizen.municipality,
         district: citizen.district,
         position: citizen.position,
+        address: citizen.address,
+        outside: citizen.outside,
+        telephone: citizen.telephone,
+        celphone: citizen.celphone,
         college: citizen.college,
-        picture: uniqueFilename,
-      });
-    }
-  }
-
-  return 'ready';
+        picture: filename,
+    });
+    return newCitizen;
 };
-
-
-const newCitizenController = async (citizen, filename) => {
-
-  citizen = JSON.parse(citizen)
-  const newCitizen = await Census.create({
-      id: uuid.v4(),
-      firstName: citizen.firstName,
-      lastName: citizen.lastName,
-      citizenID: citizen.citizenID,
-      province: citizen.province,
-      municipality: citizen.municipality,
-      district: citizen.district,
-      position: citizen.position,
-      address: citizen.address,
-      outside: citizen.outside,
-      telephone: citizen.telephone,
-      celphone: citizen.celphone,
-      college: citizen.college,
-      picture: filename,
-  });
-  return newCitizen;
-};
-
 
 const getDataConsistencyController = async () => {
-  try {
-    const precinctsData = await Precincts.findAll({
-      order: [
-        [{ model: Maps, as: 'PrecinctsMunicipio' }, 'id', 'ASC'],
-        ['precintNumber', 'ASC'],
-      ],
-      
-      include: [
-        {
-          model: College,
-          as: 'colegios',
-        },
-        {
-          model: Maps,
-          as: 'PrecinctsProvincia'
-        },
-        {
-          model: Maps,
-          as: 'PrecinctsMunicipio',
-        }
-      ],
-    });
+    try {
+        const precinctsData = await Precincts.findAll({
+            order: [
+                [{ model: Maps, as: "PrecinctsMunicipio" }, "id", "ASC"],
+                ["precintNumber", "ASC"],
+            ],
 
-    const result = await Promise.all(
-      precinctsData.map(async (precinct) => {
-        const {
-          id,
-          precintNumber,
-          recintoNombre,
-          electLocal,
-          electExterior,
-          colegios,
-          PrecinctsProvincia,
-          PrecinctsMunicipio
-        } = precinct;
-
-        
-        const collegeIds = colegios.map((college) => college.id);
-
-        const collegeCitizensPromises = colegios.map(async (college) => {
-          const collegeCitizensLocal = await Census.count({
-            where: {
-              college: college.id,
-              outside: { [Op.or]: [false, null] },
-            },
-          });
-
-          const collegeCitizensExterior = await Census.count({
-            where: {
-              college: college.id,
-              outside: true,
-            },
-          });
-
-          return {
-            ...college.dataValues,
-            collegeCitizensLocal,
-            collegeCitizensExterior,
-          };
+            include: [
+                {
+                    model: College,
+                    as: "colegios",
+                },
+                {
+                    model: Maps,
+                    as: "PrecinctsProvincia",
+                },
+                {
+                    model: Maps,
+                    as: "PrecinctsMunicipio",
+                },
+            ],
         });
 
-        const collegeCitizens = await Promise.all(collegeCitizensPromises);
+        const result = await Promise.all(
+            precinctsData.map(async (precinct) => {
+                const {
+                    id,
+                    precintNumber,
+                    recintoNombre,
+                    electLocal,
+                    electExterior,
+                    colegios,
+                    PrecinctsProvincia,
+                    PrecinctsMunicipio,
+                } = precinct;
 
-        return {
-          id,
-          precintNumber,
-          recintoNombre,
-          electLocal,
-          electExterior,
-          PrecinctsProvincia,
-          PrecinctsMunicipio,
-          localCitizens: await Census.count({
-            where: {
-              college: collegeIds,
-              outside: { [Op.or]: [false, null] },
-            },
-          }),
-          exteriorCitizens: await Census.count({
-            where: {
-              college: collegeIds,
-              outside: true,
-            },
-          }),
-          colegios: collegeCitizens,
-        };
-      })
-    );
+                const collegeIds = colegios.map((college) => college.id);
 
-    return result;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
+                const collegeCitizensPromises = colegios.map(
+                    async (college) => {
+                        const collegeCitizensLocal = await Census.count({
+                            where: {
+                                college: college.id,
+                                outside: { [Op.or]: [false, null] },
+                            },
+                        });
+
+                        const collegeCitizensExterior = await Census.count({
+                            where: {
+                                college: college.id,
+                                outside: true,
+                            },
+                        });
+
+                        return {
+                            ...college.dataValues,
+                            collegeCitizensLocal,
+                            collegeCitizensExterior,
+                        };
+                    }
+                );
+
+                const collegeCitizens = await Promise.all(
+                    collegeCitizensPromises
+                );
+
+                return {
+                    id,
+                    precintNumber,
+                    recintoNombre,
+                    electLocal,
+                    electExterior,
+                    PrecinctsProvincia,
+                    PrecinctsMunicipio,
+                    localCitizens: await Census.count({
+                        where: {
+                            college: collegeIds,
+                            outside: { [Op.or]: [false, null] },
+                        },
+                    }),
+                    exteriorCitizens: await Census.count({
+                        where: {
+                            college: collegeIds,
+                            outside: true,
+                        },
+                    }),
+                    colegios: collegeCitizens,
+                };
+            })
+        );
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+    }
 };
-
-
 
 module.exports = {
     createPrecintController,
@@ -284,5 +276,5 @@ module.exports = {
     grupalCitizensController,
     getDataConsistencyController,
     newCitizenController,
-    grupalCitizensControllerB
-}
+    grupalCitizensControllerB,
+};

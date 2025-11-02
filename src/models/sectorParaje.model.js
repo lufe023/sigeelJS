@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const db = require("../utils/database");
-
+const Ciudadseccion = require("./ciudadseccion.model");
 const SectorParaje = db.define(
     "sectorparaje",
     {
@@ -12,11 +12,12 @@ const SectorParaje = db.define(
             autoIncrement: false, // Crucial para la migración de IDs existentes
         },
         IDCiudadSeccion: {
-            type: DataTypes.INTEGER, // Mapeo de smallint
+            type: DataTypes.INTEGER,
             allowNull: true,
+            field: "IDCiudadSeccion",
             references: {
-                model: "ciudadseccion", // o District, según tu estructura
-                key: "CiudadseccionId", // O el nombre real de la PK en Municipio/Maps
+                model: Ciudadseccion,
+                key: "CiudadseccionId",
             },
         },
         CodigoSector: {
@@ -36,10 +37,7 @@ const SectorParaje = db.define(
         },
     },
     {
-        // Deshabilita las columnas automáticas createdAt y updatedAt
         timestamps: false,
-        // Si quieres que el nombre de la tabla sea exactamente 'Ciudad' o 'Barrio', puedes usar:
-        // freezeTableName: true,
     }
 );
 

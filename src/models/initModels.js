@@ -6,7 +6,7 @@ const Benefit = require("./benefit.models");
 const Participation = require("./participation.models");
 const Job = require("./job.models");
 const Census = require("./census.models");
-const Ciudadseccion = require("./ciudadSeccion.model");
+const Ciudadseccion = require("./ciudadseccion.model");
 const Municipios = require("./municipio.models");
 const Provincia = require("./provincia.models");
 const SectorParaje = require("./sectorParaje.model");
@@ -44,6 +44,15 @@ const initModels = () => {
         as: "municipalities",
     });
 
+    SectorParaje.belongsTo(Ciudadseccion, {
+        foreignKey: "IDCiudadSeccion",
+        as: "ciudadseccion",
+    });
+    Census.hasOne(SectorParaje, {
+        foreignKey: "SectorParajeId",
+        sourceKey: "IDSectorParaje",
+        as: "sector",
+    });
     //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {
         foreignKey: "id",
@@ -248,12 +257,12 @@ const initModels = () => {
     });
 
     //union de la tabla que guarda la boleta con el mapa
-
     Ballots.hasMany(Ciudadseccion, {
         foreignKey: "CiudadseccionId",
         sourceKey: "ciudadSeccion",
         as: "DistritoMunicipal",
     });
+
     Ballots.hasMany(Municipios, {
         foreignKey: "MunicipalityId",
         sourceKey: "municipio",
@@ -295,29 +304,17 @@ const initModels = () => {
         sourceKey: "citicenID",
         as: "citizen",
     });
-
+    Precincts.hasOne(SectorParaje, {
+        foreignKey: "SectorParajeId",
+        sourceKey: "IDSectorParaje",
+        as: "PrecinctsSectorParaje",
+    });
     // 1. Un Recinto (Precincts) tiene muchos Colegios (College)
     Precincts.hasMany(College, {
         foreignKey: "PrecinctId", // La FK en College
         sourceKey: "PrecinctId", // La PK en Precincts (debe coincidir con la definición de Precincts)
         as: "colegios",
     });
-
-    Precincts.hasMany(Provincia, {
-        foreignKey: "ProvinciaId",
-        sourceKey: "provincia",
-        as: "PrecinctsProvincia",
-    });
-    Precincts.hasMany(Municipios, {
-        foreignKey: "MunicipalityId",
-        sourceKey: "municipio",
-        as: "PrecinctsMunicipio",
-    });
-    // Precincts.hasMany(Maps, {
-    //     foreignKey: "id",
-    //     sourceKey: "distrito",
-    //     as: "PrecinctsDistrito",
-    // });
 
     Census.belongsTo(College, {
         foreignKey: "CollegeId",
@@ -335,6 +332,7 @@ const initModels = () => {
         foreignKey: "PrecinctId",
         as: "precinctData",
     });
+
     // // 3. Relación HasOne para buscar el recinto desde el colegio (si la necesitas)
     // College.hasOne(Precincts, {
     //     foreignKey: "PrecinctId", // PK de Precincts

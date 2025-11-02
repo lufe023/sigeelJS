@@ -2,6 +2,7 @@ const db = require("../utils/database");
 const Maps = require("./maps.models");
 
 const { DataTypes } = require("sequelize");
+const SectorParaje = require("./sectorParaje.model");
 
 const Precincts = db.define(
     "precincts",
@@ -26,6 +27,10 @@ const Precincts = db.define(
         },
         IDSectorParaje: {
             type: DataTypes.INTEGER,
+            references: {
+                model: SectorParaje,
+                key: "SectorParajeId",
+            },
         },
         IDCircunscripcion: {
             type: DataTypes.INTEGER,
@@ -72,26 +77,7 @@ const Precincts = db.define(
         electExterior: {
             type: DataTypes.INTEGER,
         },
-        provincia: {
-            type: DataTypes.INTEGER,
-            references: {
-                key: "id",
-                model: Maps,
-            },
-        },
-        municipio: {
-            type: DataTypes.INTEGER,
-            references: {
-                key: "id",
-                model: Maps,
-            },
-        },
 
-        distrito: {
-            type: DataTypes.INTEGER,
-
-            allowNull: true,
-        },
         circunscripcion: {
             type: DataTypes.STRING,
         },

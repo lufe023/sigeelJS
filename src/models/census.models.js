@@ -2,7 +2,7 @@ const db = require("../utils/database");
 const College = require("./college.models");
 const Provincia = require("./provincia.models");
 const Municipality = require("./municipio.models");
-const Ciudadseccion = require("./ciudadSeccion.model");
+
 const Audit = require("./audit.models");
 const Sectorparaje = require("./sectorParaje.model");
 const { DataTypes } = require("sequelize");
@@ -30,7 +30,7 @@ const Census = db.define(
         },
         lastNameB: {
             type: DataTypes.TEXT,
-            allowNull: false,
+            allowNull: true,
             field: "last_nameB",
         },
         nickname: {

@@ -36,7 +36,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(cors());
 app.use(express.json());
 
-db.authenticate({ alter: false })
+db.authenticate()
     .then(() => {
         console.log("Database Authenticated");
     })
@@ -44,7 +44,7 @@ db.authenticate({ alter: false })
         console.log(err);
     });
 
-db.sync()
+db.sync({ alter: false })
     .then(() => {
         console.log("Database Synced");
     })
@@ -87,5 +87,5 @@ app.use("/api/v1/whatsapp", whatsapp);
 const key = fs.readFileSync("localhost-key.pem");
 const cert = fs.readFileSync("localhost.pem");
 https.createServer({ key, cert }, app).listen(port, "0.0.0.0", () => {
-    console.log(`🚀 Server running at https://192.168.100.5:${port}`);
+    console.log(`Server running at https://192.168.100.5:${port}`);
 });

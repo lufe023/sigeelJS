@@ -20,6 +20,8 @@ const Suffrages = require("../models/suffrage.models");
 const Provincia = require("../models/provincia.models");
 const Municipio = require("../models/municipio.models");
 const tiesController = require("../ties/ties.controllers");
+const SectorParaje = require("../models/sectorParaje.model");
+const Ciudadseccion = require("../models/ciudadseccion.model");
 
 const getPeoplesByPlaces = async (province, municipality) => {
     const peoples = await Census.findAndCountAll({
@@ -561,9 +563,8 @@ const getOnePeople = async (peopleid) => {
 const findPeople = async (findWord) => {
     try {
         const looking = findWord.trim().replace(/-/g, "");
-        const words = looking.split(/\s+/).filter(Boolean); // divide por espacios múltiples
+        const words = looking.split(/\s+/).filter(Boolean);
 
-        // Construimos condiciones flexibles: cada palabra puede aparecer en nombre o apellido
         const wordConditions = words.map((word) => ({
             [Op.or]: [
                 { firstName: { [Op.iLike]: `%${word}%` } },
@@ -576,9 +577,7 @@ const findPeople = async (findWord) => {
 
         const data = await Census.findAndCountAll({
             limit: 5,
-            where: {
-                [Op.and]: wordConditions, // todas las palabras deben aparecer en algún campo
-            },
+            where: { [Op.and]: wordConditions },
             include: [
                 {
                     model: Provincia,
@@ -594,6 +593,16 @@ const findPeople = async (findWord) => {
                         "ProvinciaId",
                     ],
                     as: "municipalities",
+                },
+                {
+                    model: SectorParaje,
+                    as: "sector",
+                    include: [
+                        {
+                            model: Ciudadseccion,
+                            as: "ciudadseccion",
+                        },
+                    ],
                 },
                 {
                     model: Users,
@@ -612,7 +621,39 @@ const findPeople = async (findWord) => {
             ],
         });
 
-        return data;
+        // Procesamos para agregar "district" solo si aplica
+        const processed = data.rows.map((c) => {
+            const cJson = c.toJSON();
+
+            const sector = cJson.sector;
+            let district = null;
+
+            if (sector && sector.ciudadseccion) {
+                const {
+                    idmunicipio,
+                    iddistritomunicipal,
+                    descripcion,
+                    codigociudad,
+                } = sector.ciudadseccion;
+
+                // Solo agregamos district si es distinto del municipio
+                if (idmunicipio !== iddistritomunicipal) {
+                    district = {
+                        iddistritomunicipal,
+                        idmunicipio,
+                        descripcion,
+                        codigociudad,
+                    };
+                }
+            }
+
+            // agregamos district al mismo nivel
+            cJson.district = district;
+
+            return cJson;
+        });
+
+        return { count: data.count, rows: processed };
     } catch (error) {
         console.error("Error executing query:", error);
         throw error;
