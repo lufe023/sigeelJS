@@ -29,8 +29,20 @@ const createPrecintController = async (data) => {
 };
 
 //llamar a todos los recintos
-const getAllPrecintController = async () => {
-    const precints = await Precincts.findAndCountAll({
+const getAllPrecintController = async (allowedIds = []) => {
+    if (!allowedIds || allowedIds.length === 0) {
+        return { count: 0, rows: [] };
+    }
+
+    // Forzamos que los IDs sean números por si acaso vienen como strings
+    const cleanIds = allowedIds.map((id) => Number(id));
+
+    return await Precincts.findAndCountAll({
+        where: {
+            IDSectorParaje: {
+                [Op.in]: cleanIds,
+            },
+        },
         include: [
             {
                 model: College,
@@ -41,8 +53,8 @@ const getAllPrecintController = async () => {
                 as: "PrecinctsSectorParaje",
             },
         ],
+        distinct: true,
     });
-    return precints;
 };
 
 //? End Precints area
@@ -229,11 +241,11 @@ const getDataConsistencyController = async () => {
                             collegeCitizensLocal,
                             collegeCitizensExterior,
                         };
-                    }
+                    },
                 );
 
                 const collegeCitizens = await Promise.all(
-                    collegeCitizensPromises
+                    collegeCitizensPromises,
                 );
 
                 return {
@@ -258,7 +270,7 @@ const getDataConsistencyController = async () => {
                     }),
                     colegios: collegeCitizens,
                 };
-            })
+            }),
         );
 
         return result;

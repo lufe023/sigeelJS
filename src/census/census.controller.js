@@ -286,7 +286,7 @@ const getPeopleByUser = async (leaderId) => {
     const user = await getUser.getUserById(leaderId);
 
     const ties = await tiesController.getPeoplesTiesByCitizenIdController(
-        user?.censu?.citizenID
+        user?.censu?.citizenID,
     );
 
     return {
@@ -395,7 +395,7 @@ const getPeopleByUserToPdf = async (leaderId) => {
     const user = await getUser.getUserById(leaderId);
 
     const ties = await tiesController.getPeoplesTiesByCitizenIdController(
-        user?.censu?.citizenID
+        user?.censu?.citizenID,
     );
 
     return {
@@ -684,7 +684,7 @@ const addPeople = async (peopleId, leaderId) => {
             where: {
                 id: peopleId,
             },
-        }
+        },
     );
     return result;
 };
@@ -701,7 +701,7 @@ const removePeople = async (peopleId, leaderId) => {
                     leader: leaderId,
                 },
             },
-        }
+        },
     );
 
     return result;
@@ -717,7 +717,7 @@ const transferCensusController = async (leaderIdA, leaderIdB) => {
             where: {
                 leader: leaderIdA,
             },
-        }
+        },
     );
     return result;
 };
@@ -799,16 +799,18 @@ const getAllCensusByCollegeController = async (
     collegeId,
     offset,
     limit,
-    includeExterior
+    includeExterior,
 ) => {
     const whereCondition = {
-        college: collegeId,
+        CollegeId: collegeId,
     };
 
-    if (!includeExterior) {
-        whereCondition.outside = false; // Filtrar registros con outside: false
+    if (includeExterior === "false" || includeExterior === false) {
+        whereCondition.outside = {
+            [Op.or]: [false, null],
+        };
     }
-
+    console.log("whereCondition", whereCondition);
     const data = await Census.findAndCountAll({
         where: whereCondition,
         order: [
@@ -856,7 +858,7 @@ const getAllCensusByCollegeController = async (
 
     const college = await College.findOne({
         where: {
-            id: collegeId,
+            CollegeId: collegeId,
         },
         include: [
             {

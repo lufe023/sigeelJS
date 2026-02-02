@@ -47,14 +47,16 @@ const createPrecintServices = (req, res) => {
 };
 
 const getAllPrecintService = (req, res) => {
+    const allowedIds = req.allowedSectorIds;
+
     jceController
-        .getAllPrecintController()
+        .getAllPrecintController(allowedIds)
         .then((data) => {
             res.status(200).json(data);
         })
         .catch((err) => {
             console.error(err);
-            res.status(400).json({ message: err });
+            res.status(400).json({ message: "Error al obtener los recintos" });
         });
 };
 
@@ -138,7 +140,7 @@ const newCitizenServices = (req, res) => {
             .catch((err) =>
                 res.status(400).json({
                     err,
-                })
+                }),
             );
     } else {
         res.status(400).json({
@@ -165,7 +167,7 @@ const newCitizenServicesV2 = (req, res) => {
             .catch((err) =>
                 res.status(400).json({
                     err,
-                })
+                }),
             );
     } else {
         res.status(400).json({

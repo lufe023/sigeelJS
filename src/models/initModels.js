@@ -25,8 +25,8 @@ const Precincts = require("./precinct.models");
 const College = require("./college.models");
 const Audit = require("./audit.models");
 const Banners = require("./banner.model");
+const UsuarioMunicipio = require("./usuarioMunicipio.model");
 const { Op } = require("sequelize");
-const teamsMembers = require("./teamsMembers.models");
 
 const initModels = () => {
     //? hasMany || hasOne llave foranea dentro de parentesis
@@ -344,6 +344,41 @@ const initModels = () => {
         foreignKey: "citizenID",
         sourceKey: "citizenID",
         as: "sufragio",
+    });
+
+    // 🔹 Usuarios y Municipios (muchos a muchos)
+    Users.belongsToMany(Municipios, {
+        through: UsuarioMunicipio,
+        foreignKey: "idusuario", // FK dentro de UsuarioMunicipio que apunta a Users
+        otherKey: "idmunicipio", // FK dentro de UsuarioMunicipio que apunta a Municipios
+        as: "municipios", // alias para incluir en consultas
+    });
+
+    Municipios.belongsToMany(Users, {
+        through: UsuarioMunicipio,
+        foreignKey: "idmunicipio",
+        otherKey: "idusuario",
+        as: "usuarios",
+    });
+
+    // 🔹 Relaciones directas opcionales para consultas más específicas
+    UsuarioMunicipio.belongsTo(Users, {
+        foreignKey: "idusuario",
+        as: "usuario",
+    });
+    UsuarioMunicipio.belongsTo(Municipios, {
+        foreignKey: "idmunicipio",
+        as: "municipio",
+    });
+
+    Users.hasMany(UsuarioMunicipio, {
+        foreignKey: "idusuario",
+        as: "usuario_municipios",
+    });
+
+    Municipios.hasMany(UsuarioMunicipio, {
+        foreignKey: "idmunicipio",
+        as: "usuario_municipios",
     });
 };
 
