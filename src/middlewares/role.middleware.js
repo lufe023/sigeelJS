@@ -208,7 +208,7 @@ const extractUserSectorPermissions = async (req, res, next) => {
 
         const permissions = await UsuarioSectorParaje.findAll({
             where: { idusuario: userId, estatus: true },
-            attributes: ["idsectorparaje"],
+            attributes: ["idsectorparaje"], // Asegúrate que coincida con el modelo
             raw: true,
         });
 

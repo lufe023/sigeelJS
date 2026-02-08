@@ -34,10 +34,19 @@ const UsuarioSectorParaje = db.define(
         },
     },
     {
+        tableName: "usuario_sector_parajes", // <--- FUERZA el nombre exacto de la DB
         timestamps: false,
+        underscored: true, // Ayuda si usas snake_case en la DB
         indexes: [
-            { unique: true, fields: ["idusuario", "idsectorparaje"] },
-            { fields: ["idusuario"] },
+            {
+                name: "idx_usuario_sector_active", // Nombre personalizado
+                fields: ["idusuario", "estatus"],
+                where: { estatus: true }, // Índice parcial (Postgres lo ama)
+            },
+            {
+                unique: true,
+                fields: ["idusuario", "idsectorparaje"],
+            },
         ],
     },
 );

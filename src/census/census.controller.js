@@ -560,10 +560,14 @@ const getOnePeople = async (peopleid) => {
     };
 };
 
-const findPeople = async (findWord) => {
+const findPeople = async (findWord, allowedIds = []) => {
     try {
         const looking = findWord.trim().replace(/-/g, "");
         const words = looking.split(/\s+/).filter(Boolean);
+
+        if (!allowedIds || allowedIds.length === 0) {
+            return { count: 0, rows: [] };
+        }
 
         const wordConditions = words.map((word) => ({
             [Op.or]: [
@@ -577,7 +581,12 @@ const findPeople = async (findWord) => {
 
         const data = await Census.findAndCountAll({
             limit: 5,
-            where: { [Op.and]: wordConditions },
+            where: {
+                [Op.and]: [
+                    ...wordConditions,
+                    { IDSectorParaje: { [Op.in]: allowedIds } }, // <--- FILTRO DE SEGURIDAD
+                ],
+            },
             include: [
                 {
                     model: Provincia,
@@ -832,6 +841,7 @@ const getAllCensusByCollegeController = async (
             "telephone",
             "otherPhone",
             "adress",
+            "municipality",
         ],
         include: [
             {

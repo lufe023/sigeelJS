@@ -19,20 +19,17 @@ const TeamsMembers = require("./teamsMembers.models");
 const Condition = require("./condition.models");
 const Suffrage = require("./suffrage.models");
 const Ties = require("./ties.models");
-const tiesTypes = require("./tiesTypes.models");
 const TiesTypes = require("./tiesTypes.models");
 const Precincts = require("./precinct.models");
 const College = require("./college.models");
 const Audit = require("./audit.models");
 const Banners = require("./banner.model");
 const UsuarioMunicipio = require("./usuarioMunicipio.model");
+const UsuarioSectorParaje = require("./usuarioSectorParaje.models");
 const { Op } = require("sequelize");
 
 const initModels = () => {
-    //? hasMany || hasOne llave foranea dentro de parentesis
-    //? belongsTo || belongsToMany llave foranea en primer paramentro
-    //user.hasOne(models.role, {foreignKey: 'id',sourceKey: 'roleId'})
-
+    // --- CENSUS ---
     Census.hasOne(Provincia, {
         foreignKey: "ProvinciaId",
         sourceKey: "province",
@@ -43,114 +40,73 @@ const initModels = () => {
         sourceKey: "municipality",
         as: "municipalities",
     });
-
-    SectorParaje.belongsTo(Ciudadseccion, {
-        foreignKey: "IDCiudadSeccion",
-        as: "ciudadseccion",
-    });
     Census.hasOne(SectorParaje, {
         foreignKey: "SectorParajeId",
         sourceKey: "IDSectorParaje",
         as: "sector",
     });
-    //relacionando la tabla usuario para obtener la informacion del lider que tiene a cargo la persona
     Census.hasOne(Users, {
         foreignKey: "id",
         sourceKey: "leader",
         as: "leaders",
     });
-
-    //relacionando la tabla Condition para obtener la informacion de la condicion especial de cada ciudadano
     Census.hasOne(Condition, {
         foreignKey: "citizenID",
         sourceKey: "citizenID",
         as: "condition",
     });
-
     Census.hasOne(Users, {
         foreignKey: "censuCitizenID",
         sourceKey: "citizenID",
         as: "colaborador",
     });
-
-    Users;
-
-    Users.belongsTo(Census);
-
-    //relacionar los candidatos con los partidos
-    Ballots.hasOne(Parties, {
-        foreignKey: "id",
-        sourceKey: "party",
-        as: "partyDetails",
-    });
-
-    Users.belongsTo(Roles);
-    //Users.hasOne(Roles, {foreignKey: 'id',sourceKey: 'role', as: 'nivel'})
-
-    //relacionando la tabla beneficios para obtener la informacion de beneficios que ha obtenido la persona
-    Census.hasMany(Benefit, {
-        foreignKey: "citicenID",
-        sourceKey: "citizenID",
-        as: "Beneficios",
-    });
-
-    //relacionando la tabla jobs para obtener la informacion de empleo que ha obtenido la persona, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
-    Census.hasMany(Job, {
-        foreignKey: "citicenID",
-        sourceKey: "citizenID",
-        as: "Empleos",
-    });
-
-    //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
-    Census.hasMany(Participation, {
-        foreignKey: "citicenID",
-        sourceKey: "citizenID",
-        as: "Actividades",
-    });
-
-    //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
     Census.hasOne(Gps, {
         foreignKey: "citicenID",
         sourceKey: "citizenID",
         as: "geolocation",
     });
-
-    //relacionando la tabla participations para obtener la informacion de en que actividades la persona ha estado activa, tambien esto nos da un poco de luz de la fidelidad partidaria de cada personas.
+    Census.hasOne(Suffrage, {
+        foreignKey: "citizenID",
+        sourceKey: "citizenID",
+        as: "sufragio",
+    });
+    Census.hasMany(Benefit, {
+        foreignKey: "citicenID",
+        sourceKey: "citizenID",
+        as: "Beneficios",
+    });
+    Census.hasMany(Job, {
+        foreignKey: "citicenID",
+        sourceKey: "citizenID",
+        as: "Empleos",
+    });
+    Census.hasMany(Participation, {
+        foreignKey: "citicenID",
+        sourceKey: "citizenID",
+        as: "Actividades",
+    });
     Census.hasMany(Poll, {
         foreignKey: "citizenID",
         sourceKey: "citizenID",
         as: "Encuestas",
     });
+    Census.belongsTo(College, { foreignKey: "CollegeId", as: "colegio" });
 
-    //llamando un ciudadano por su encuesta
+    // --- USERS & ROLES ---
+    Users.belongsTo(Census);
+    Users.belongsTo(Roles);
+    Users.hasMany(Todo, {
+        foreignKey: "responsible",
+        sourceKey: "id",
+        as: "tasks",
+    });
+
+    // --- POLLS & CAMPAIGNS ---
     Poll.hasOne(Census, {
         foreignKey: "citizenID",
         sourceKey: "citizenID",
         as: "citizen",
     });
-
-    //relacionando la tabla ties (los vinculos)
-    //Census.hasMany(Ties, {foreignKey: 'aCiticenID', sourceKey: 'citizenID', as: 'ties'})
-
-    //relacionando la tabla TIes con ties Types
-    Ties.hasOne(Census, {
-        foreignKey: "citizenID",
-        sourceKey: "aCiticenID",
-        as: "aties",
-    });
-    Ties.hasOne(Census, {
-        foreignKey: "citizenID",
-        sourceKey: "bCiticenID",
-        as: "bties",
-    });
-
-    Ties.hasOne(TiesTypes, {
-        foreignKey: "id",
-        sourceKey: "ties",
-        as: "tieType",
-    });
-
-    //relacion encuesta y campaña cada encuesta puede tener una campaña
     Poll.hasOne(Campain, {
         foreignKey: "id",
         sourceKey: "campain",
@@ -162,107 +118,59 @@ const initModels = () => {
         as: "encuestas",
     });
 
-    /* ###### Inicio ligando tareas a usuarios ####*/
-
-    Users.hasMany(Todo, {
-        foreignKey: "responsible",
-        sourceKey: "id",
-        as: "tasks",
-    });
-    //Todo.hasOne(Users, {foreignKey: 'id', sourceKey: 'responsible', as: 'tasks'})
-    /* ########################## // Fin ligando tareas a usuarios */
-    //Users.hasMany(Todo)
-
-    /* ############################# //Inicio conectando lista de Candidatos con las encuestas */
-    //conectando lista de partidos con las encuestas
+    // Poll Candidate Details
     Poll.hasMany(Parties, {
         foreignKey: "id",
         sourceKey: "preferedParty",
         as: "preferedPartyDetails",
     });
-
-    //conectando lista de Presidentes con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "president",
         as: "preferedPresidentDetails",
     });
-
-    //conectando lista de Senadores con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "senator",
         as: "preferedSenatorDetails",
     });
-
-    //conectando lista de Diputados con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "diputy",
         as: "preferedDiputyDetails",
     });
-
-    //conectando lista de Alcaldes con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "mayor",
         as: "preferedMayorDetails",
     });
-
-    //conectando lista de Regidor con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "councillor",
         as: "preferedCouncillorDetails",
     });
-
-    //conectando lista de Director de Distrito con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "districtDirector",
         as: "preferedDistrictDirectorDetails",
     });
-
-    //conectando lista de Vocal  de Distrito con las encuestas
     Poll.hasMany(Ballots, {
         foreignKey: "candidateId",
         sourceKey: "districtCouncilor",
         as: "preferedDistrictCouncilorDetails",
     });
-    /* ########################## // Fin conectando lista de Candidatos con las encuestas */
 
-    //Ballots.hasOne(Parties, {foreignKey:'id' , sourceKey: 'party', as: 'party_details'})
-
-    //asociando el modelo campains con el modelo maps
-    Campain.hasOne(Provincia, {
-        foreignKey: "ProvinciaId",
-        sourceKey: "provincia",
-        as: "provinces",
-    });
-    Campain.hasOne(Municipios, {
-        foreignKey: "MunicipalityId",
-        sourceKey: "municipio",
-        as: "municipalities",
-    });
-
-    Todo.hasOne(Users, {
+    // --- BALLOTS & PARTIES ---
+    Ballots.hasOne(Parties, {
         foreignKey: "id",
-        sourceKey: "responsible",
-        as: "Responsible",
+        sourceKey: "party",
+        as: "partyDetails",
     });
-    Todo.hasOne(Users, {
-        foreignKey: "id",
-        sourceKey: "createdBy",
-        as: "Creador",
-    });
-
-    //union de la tabla que guarda la boleta con el mapa
     Ballots.hasMany(Ciudadseccion, {
         foreignKey: "CiudadseccionId",
         sourceKey: "ciudadSeccion",
         as: "DistritoMunicipal",
     });
-
     Ballots.hasMany(Municipios, {
         foreignKey: "MunicipalityId",
         sourceKey: "municipio",
@@ -274,9 +182,24 @@ const initModels = () => {
         as: "province",
     });
 
-    /* #### relacionando los teams ### */
+    // --- TIES ---
+    Ties.hasOne(Census, {
+        foreignKey: "citizenID",
+        sourceKey: "aCiticenID",
+        as: "aties",
+    });
+    Ties.hasOne(Census, {
+        foreignKey: "citizenID",
+        sourceKey: "bCiticenID",
+        as: "bties",
+    });
+    Ties.hasOne(TiesTypes, {
+        foreignKey: "id",
+        sourceKey: "ties",
+        as: "tieType",
+    });
 
-    //extrayendo los equipos cuando sellama un mienbro
+    // --- TEAMS ---
     TeamsMembers.hasOne(Teams, {
         foreignKey: "id",
         sourceKey: "teamId",
@@ -298,7 +221,7 @@ const initModels = () => {
         as: "memberData",
     });
 
-    //trayendo ciudadanos desde la tabla gps
+    // --- GEOGRAPHY & PRECINCTS ---
     Gps.hasOne(Census, {
         foreignKey: "citizenID",
         sourceKey: "citicenID",
@@ -309,59 +232,56 @@ const initModels = () => {
         sourceKey: "IDSectorParaje",
         as: "PrecinctsSectorParaje",
     });
-    // 1. Un Recinto (Precincts) tiene muchos Colegios (College)
     Precincts.hasMany(College, {
-        foreignKey: "PrecinctId", // La FK en College
-        sourceKey: "PrecinctId", // La PK en Precincts (debe coincidir con la definición de Precincts)
+        foreignKey: "PrecinctId",
+        sourceKey: "PrecinctId",
         as: "colegios",
     });
-
-    Census.belongsTo(College, {
-        foreignKey: "CollegeId",
-        as: "colegio",
-    });
-
-    // Relación College.hasMany(Census) es la que define la FK en Census (¡CORRECTO!)
     College.hasMany(Census, {
         foreignKey: "CollegeId",
         sourceKey: "CollegeId",
         as: "ColegioCensus",
     });
-    // 2. Un Colegio pertenece a un Recinto (Esta línea crea la FK)
     College.belongsTo(Precincts, {
         foreignKey: "PrecinctId",
         as: "precinctData",
     });
 
-    // // 3. Relación HasOne para buscar el recinto desde el colegio (si la necesitas)
-    // College.hasOne(Precincts, {
-    //     foreignKey: "PrecinctId", // PK de Precincts
-    //     sourceKey: "PrecinctId", // FK en College
-    //     as: "recinto",
-    // });
-
-    Census.hasOne(Suffrage, {
-        foreignKey: "citizenID",
-        sourceKey: "citizenID",
-        as: "sufragio",
+    // --- TODO & CAMPAIGN MAPS ---
+    Todo.hasOne(Users, {
+        foreignKey: "id",
+        sourceKey: "responsible",
+        as: "Responsible",
+    });
+    Todo.hasOne(Users, {
+        foreignKey: "id",
+        sourceKey: "createdBy",
+        as: "Creador",
+    });
+    Campain.hasOne(Provincia, {
+        foreignKey: "ProvinciaId",
+        sourceKey: "provincia",
+        as: "provinces",
+    });
+    Campain.hasOne(Municipios, {
+        foreignKey: "MunicipalityId",
+        sourceKey: "municipio",
+        as: "municipalities",
     });
 
-    // 🔹 Usuarios y Municipios (muchos a muchos)
+    // --- MANY TO MANY: USUARIO & MUNICIPIO ---
     Users.belongsToMany(Municipios, {
         through: UsuarioMunicipio,
-        foreignKey: "idusuario", // FK dentro de UsuarioMunicipio que apunta a Users
-        otherKey: "idmunicipio", // FK dentro de UsuarioMunicipio que apunta a Municipios
-        as: "municipios", // alias para incluir en consultas
+        foreignKey: "idusuario",
+        otherKey: "idmunicipio",
+        as: "municipios",
     });
-
     Municipios.belongsToMany(Users, {
         through: UsuarioMunicipio,
         foreignKey: "idmunicipio",
         otherKey: "idusuario",
         as: "usuarios",
     });
-
-    // 🔹 Relaciones directas opcionales para consultas más específicas
     UsuarioMunicipio.belongsTo(Users, {
         foreignKey: "idusuario",
         as: "usuario",
@@ -370,15 +290,67 @@ const initModels = () => {
         foreignKey: "idmunicipio",
         as: "municipio",
     });
-
     Users.hasMany(UsuarioMunicipio, {
         foreignKey: "idusuario",
         as: "usuario_municipios",
     });
-
     Municipios.hasMany(UsuarioMunicipio, {
         foreignKey: "idmunicipio",
         as: "usuario_municipios",
+    });
+
+    // --- JERARQUÍA TERRITORIAL FINAL (UNICA VEZ) ---
+    SectorParaje.belongsTo(Ciudadseccion, {
+        foreignKey: "IDCiudadSeccion",
+        as: "ciudadseccion",
+    });
+    Ciudadseccion.belongsTo(Municipios, {
+        foreignKey: "idmunicipio",
+        as: "municipio",
+    });
+    Municipios.belongsTo(Provincia, {
+        foreignKey: "ProvinciaId",
+        as: "provincia",
+    });
+
+    Provincia.hasMany(Municipios, {
+        foreignKey: "ProvinciaId",
+        as: "municipios_detalles",
+    });
+    Municipios.hasMany(Ciudadseccion, {
+        foreignKey: "idmunicipio",
+        as: "ciudades_secciones",
+    });
+    Ciudadseccion.hasMany(SectorParaje, {
+        foreignKey: "IDCiudadSeccion",
+        as: "sectores",
+    });
+
+    // --- ASIGNACIÓN DE SECTORES (UNICA VEZ) ---
+    Users.belongsToMany(SectorParaje, {
+        through: UsuarioSectorParaje,
+        foreignKey: "idusuario",
+        otherKey: "idsectorparaje",
+        as: "sectores_asignados",
+    });
+    SectorParaje.belongsToMany(Users, {
+        through: UsuarioSectorParaje,
+        foreignKey: "idsectorparaje",
+        otherKey: "idusuario",
+        as: "usuarios_sector_directo",
+    });
+
+    UsuarioSectorParaje.belongsTo(SectorParaje, {
+        foreignKey: "idsectorparaje",
+        as: "sector_paraje",
+    });
+    UsuarioSectorParaje.belongsTo(Users, {
+        foreignKey: "idusuario",
+        as: "usuario",
+    });
+    SectorParaje.hasMany(UsuarioSectorParaje, {
+        foreignKey: "idsectorparaje",
+        as: "asignaciones_intermedias",
     });
 };
 

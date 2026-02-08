@@ -4,6 +4,21 @@ const { dbFotos } = require("../utils/database");
 const { QueryTypes } = require("sequelize");
 const sharp = require("sharp");
 
+// -------------------------------------------------------------------------
+// Constantes y Configuración
+// -------------------------------------------------------------------------
+const PATH_NO_IMAGE = path.resolve(
+    __dirname,
+    "../../uploads/images/system/nobody.jpg",
+);
+const BASE_UPLOAD_DIR = path.resolve(
+    __dirname,
+    "../../uploads/images/citizens",
+);
+
+// Mapa para evitar que múltiples peticiones procesen la misma imagen al mismo tiempo
+const pendingImageProcesses = new Map();
+
 // ---------------------------
 // Cubrir marca BIS en la imagen
 // ---------------------------
@@ -38,7 +53,7 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
 
     const cleaned = await image
         .composite([{ input: overlay, top: top, left: left }])
-        .jpeg({ quality: 100 })
+        .jpeg({ quality: 90, mozjpeg: true }) // Optimización de compresión
         .toBuffer();
 
     const outputPath = path.join(folderPath, `${cedula}.jpg`);
@@ -50,136 +65,149 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
     return outputPath;
 }
 
+// ---------------------------
 // Traer imagen desde DB
+// ---------------------------
 const fetchCitizenImageFromDB = async (cedula, folderPath) => {
-    try {
-        const [foto] = await dbFotos.query(
-            "SELECT Imagen FROM FOTOS_BIS_BIS WHERE Cedula = :cedula",
-            {
-                replacements: { cedula },
-                type: QueryTypes.SELECT,
-            }
-        );
-
-        if (!foto || !foto.Imagen) {
-            console.log(`❌ No se encontró imagen para cédula ${cedula}`);
-            return null;
-        }
-
-        const imageBuffer = Buffer.isBuffer(foto.Imagen)
-            ? foto.Imagen
-            : Buffer.from(foto.Imagen, "base64");
-
-        return await limpiarMarcaBIS(imageBuffer, cedula, folderPath);
-    } catch (error) {
-        console.error("❌ Error obteniendo imagen desde DB externa:", error);
-        return null;
+    // Si ya hay un proceso en marcha para esta cédula, devolvemos su promesa
+    if (pendingImageProcesses.has(cedula)) {
+        return pendingImageProcesses.get(cedula);
     }
+
+    const processPromise = (async () => {
+        try {
+            const [foto] = await dbFotos.query(
+                "SELECT Imagen FROM FOTOS_BIS_BIS WHERE Cedula = :cedula",
+                {
+                    replacements: { cedula },
+                    type: QueryTypes.SELECT,
+                },
+            );
+
+            if (!foto || !foto.Imagen) {
+                console.log(`❌ No se encontró imagen para cédula ${cedula}`);
+                return null;
+            }
+
+            const imageBuffer = Buffer.isBuffer(foto.Imagen)
+                ? foto.Imagen
+                : Buffer.from(foto.Imagen, "base64");
+
+            // folderPath es opcional si viene de getImage, aseguramos uno por defecto
+            const finalPath =
+                folderPath || path.join(BASE_UPLOAD_DIR, "default");
+
+            return await limpiarMarcaBIS(imageBuffer, cedula, finalPath);
+        } catch (error) {
+            console.error(
+                "❌ Error obteniendo imagen desde DB externa:",
+                error,
+            );
+            return null;
+        } finally {
+            // Importante: Eliminar del mapa al terminar para permitir futuros re-procesos si fallara
+            pendingImageProcesses.delete(cedula);
+        }
+    })();
+
+    pendingImageProcesses.set(cedula, processPromise);
+    return processPromise;
 };
 
 // -------------------------------------------
-// Obtener imagen según tipo
+// Obtener imagen según tipo (Ruta General)
 // -------------------------------------------
 const getImage = async (req, res) => {
-    const type = req.params.type;
-    const image = req.params.image;
+    const { type, image } = req.params;
     let pathImage;
 
+    // Opciones de caché para el navegador (30 días)
+    const cacheOptions = { maxAge: "30d" };
+
     if (type === "citizen") {
-        pathImage = path.resolve(
-            __dirname,
-            `../../uploads/images/citizens/${image}`
-        );
+        // Quitamos la extensión si el cliente la manda para evitar .jpg.jpg
+        const cleanCedula = image.replace(/\.[^/.]+$/, "");
+        pathImage = path.join(BASE_UPLOAD_DIR, cleanCedula + ".jpg");
 
         if (!fs.existsSync(pathImage)) {
             console.log(
-                `⚠️ Imagen ${image} no encontrada en disco. Buscando en base externa...`
+                `⚠️ Imagen ${cleanCedula} no encontrada. Buscando en DB...`,
             );
-            const newImagePath = await fetchCitizenImageFromDB(image);
-
-            if (newImagePath) {
-                pathImage = newImagePath; // usar la recién creada
-            }
+            const newImagePath = await fetchCitizenImageFromDB(cleanCedula);
+            if (newImagePath) pathImage = newImagePath;
         }
-    }
-
-    if (type === "candidate") {
+    } else if (type === "candidate") {
         pathImage = path.resolve(
             __dirname,
-            `../../uploads/images/candidates/${image}`
+            `../../uploads/images/candidates/${image}`,
         );
-    }
-
-    if (type === "user") {
+    } else if (type === "user") {
         pathImage = path.resolve(
             __dirname,
-            `../../uploads/images/users/${image}`
+            `../../uploads/images/users/${image}`,
         );
-    }
-
-    if (type === "teams") {
+    } else if (type === "teams") {
         pathImage = path.resolve(
             __dirname,
-            `../../uploads/images/teams/${image}`
+            `../../uploads/images/teams/${image}`,
         );
-    }
-
-    if (type === "qr") {
+    } else if (type === "qr") {
         pathImage = path.resolve(__dirname, `../whatsapp/qr/qr.png`);
     }
 
-    if (fs.existsSync(pathImage)) {
-        return res.sendFile(pathImage);
+    // Verificación final y envío
+    if (pathImage && fs.existsSync(pathImage)) {
+        return res.sendFile(pathImage, cacheOptions);
     } else {
-        const pathNoImage = path.resolve(
-            __dirname,
-            `../../uploads/images/system/nobody.jpg`
-        );
-        return res.sendFile(pathNoImage);
+        return res.sendFile(PATH_NO_IMAGE);
     }
 };
 
+// -------------------------------------------
+// Obtener imagen de Ciudadano (Ruta por Municipio)
+// -------------------------------------------
 const getCitizenImage = async (req, res) => {
     const { municipio, cedula } = req.params;
-
-    const folderPath = path.resolve(
-        __dirname,
-        `../../uploads/images/citizens/${municipio}`
-    );
+    const folderPath = path.join(BASE_UPLOAD_DIR, municipio);
     const filePath = path.join(folderPath, `${cedula}.jpg`);
 
-    if (await fs.pathExists(filePath)) {
-        return res.sendFile(filePath);
+    const cacheOptions = { maxAge: "30d" };
+
+    try {
+        // Intentar enviar el archivo (si existe, res.sendFile lo hace de inmediato)
+        return res.sendFile(filePath, cacheOptions, async (err) => {
+            if (err) {
+                // Si el error es porque no existe (code 404/ENOENT implicito)
+                console.log(
+                    `⚠️ Imagen ${cedula} no en disco, buscando en DB...`,
+                );
+                const newImagePath = await fetchCitizenImageFromDB(
+                    cedula,
+                    folderPath,
+                );
+
+                if (newImagePath && fs.existsSync(newImagePath)) {
+                    return res.sendFile(newImagePath, cacheOptions);
+                } else {
+                    return res.sendFile(PATH_NO_IMAGE);
+                }
+            }
+        });
+    } catch (error) {
+        return res.sendFile(PATH_NO_IMAGE);
     }
-
-    console.log(
-        `⚠️ Imagen ${cedula} no encontrada en ${folderPath}, buscando en DB...`
-    );
-    const newImagePath = await fetchCitizenImageFromDB(cedula, folderPath);
-
-    if (newImagePath && (await fs.pathExists(newImagePath))) {
-        return res.sendFile(newImagePath);
-    }
-
-    // Si no existe, devolver imagen por defecto
-    const pathNoImage = path.resolve(
-        __dirname,
-        `../../uploads/images/system/nobody.jpg`
-    );
-    return res.sendFile(pathNoImage);
 };
 
 // -------------------------------------------
 // Borrar imagen
 // -------------------------------------------
 const deleteImageController = async (folder, imageName) => {
-    console.log(`Antes de borrar la imagen: ${folder}/${imageName}`);
     try {
         const imagePath = path.resolve(
             __dirname,
-            `../../uploads/images/${folder}/${imageName}`
+            `../../uploads/images/${folder}/${imageName}`,
         );
-        if (await fs.existsSync(imagePath)) {
+        if (fs.existsSync(imagePath)) {
             await fs.unlink(imagePath);
             return { success: true, message: "Imagen borrada correctamente" };
         } else {
@@ -191,10 +219,9 @@ const deleteImageController = async (folder, imageName) => {
 };
 
 const deleteQrImage = async (folder, imageName) => {
-    console.log(`Antes de borrar la imagen: ${folder}/${imageName}`);
     try {
         const imagePath = path.resolve(__dirname, `${folder}/${imageName}`);
-        if (await fs.existsSync(imagePath)) {
+        if (fs.existsSync(imagePath)) {
             await fs.unlink(imagePath);
             return { success: true, message: "Imagen borrada correctamente" };
         } else {

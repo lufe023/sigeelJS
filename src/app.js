@@ -27,7 +27,7 @@ const reports = require("./reports/reports.router");
 const suffrage = require("./suffrage/suffrage.router");
 const whatsapp = require("./whatsapp/whatsapp.router");
 const UsuarioMunicipio = require("./usuarioMunicipio/usuarioMunicipio.router");
-
+const UsuarioSectorParaje = require("./usuarioSectorParaje/usuarioSectorParaje.router");
 //? Initial Configurations
 const app = express();
 
@@ -82,6 +82,7 @@ app.use("/api/v1/reports", reports);
 app.use("/api/v1/suffrages", suffrage);
 app.use("/api/v1/whatsapp", whatsapp);
 app.use("/api/v1/usuario-municipio", UsuarioMunicipio);
+app.use("/api/v1/sector", UsuarioSectorParaje);
 
 // app.listen(port, () => {
 //     console.log(`Server started at port ${port}`);
