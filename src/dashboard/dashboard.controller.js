@@ -42,6 +42,17 @@ const MyTotalCitizens = async (userId, campainId) => {
             },
             {
                 model: Condition,
+                where: {
+                    [Op.or]: [
+                        { dyslexia: true },
+                        { visual: true },
+                        { auditory: true },
+                        { motor: true },
+                        { cognitive: true },
+                        { outside: true },
+                    ],
+                },
+                required: false,
                 as: "condition",
             },
             {

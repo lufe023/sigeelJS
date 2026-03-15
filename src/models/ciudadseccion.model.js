@@ -1,25 +1,21 @@
 const { DataTypes } = require("sequelize");
 const db = require("../utils/database");
-
-// Asumiendo que Municipality es el modelo para IDMunicipio
 const Municipio = require("./municipio.models");
-// Asumiendo que District es el modelo para IDDistritoMunicipal
-// const District = require("./district.models");
-// O si ambos apuntan a Maps:
 
-const City = db.define(
+const Ciudadseccion = db.define(
     "ciudadseccion",
     {
         // Clave Primaria (ID)
         CiudadseccionId: {
-            type: DataTypes.INTEGER, // Mapeo de smallint
+            type: DataTypes.INTEGER,
             primaryKey: true,
-            allowNull: false, // Unchecked = NOT NULL
-            autoIncrement: false, // Crucial para la migración de IDs existentes
+            allowNull: false,
+            autoIncrement: false,
+            field: "CiudadseccionId",
         },
 
         // Clave Foránea a Municipio
-        IDMunicipio: {
+        idmunicipio: {
             type: DataTypes.INTEGER, // Mapeo de smallint
             allowNull: false, // Unchecked = NOT NULL
             references: {
@@ -29,71 +25,77 @@ const City = db.define(
         },
 
         // Clave Foránea a Distrito Municipal
-        IDDistritoMunicipal: {
+        iddistritomunicipal: {
             type: DataTypes.INTEGER, // Mapeo de smallint
             allowNull: true, // Checked = NULL
         },
 
         // Código de Ciudad/Barrio
-        CodigoCiudad: {
+        codigociudad: {
             type: DataTypes.STRING(2), // Mapeo de varchar(2)
             allowNull: true, // Checked = NULL
         },
 
         // Descripción
-        Descripcion: {
+        descripcion: {
             type: DataTypes.STRING(50), // Mapeo de varchar(50)
             allowNull: true,
         },
 
         // Oficio
-        Oficio: {
+        oficio: {
             type: DataTypes.BIGINT, // Mapeo de bigint
             allowNull: true,
         },
 
         // Estatus
-        Estatus: {
+        estatus: {
             type: DataTypes.CHAR(1), // Mapeo de char(1)
             allowNull: true,
         },
 
         // IdUsuarioCreacion
-        IdUsuarioCreacion: {
+        idusuariocreacion: {
             type: DataTypes.INTEGER, // Mapeo de int
             allowNull: true,
         },
 
         // FechaCreacion
-        FechaCreacion: {
+        fechacreacion: {
             type: DataTypes.DATE, // Mapeo de smalldatetime
             allowNull: false, // Unchecked = NOT NULL
         },
 
         // IdUsuarioModificacion
-        IdUsuarioModificacion: {
+        idusuariomodificacion: {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
 
         // FechaModificacion
-        FechaModificacion: {
+        fechamodificacion: {
             type: DataTypes.DATE, // Mapeo de smalldatetime
             allowNull: true,
         },
 
         // RegID (UUID de SQL Server)
-        RegID: {
+        regid: {
             type: DataTypes.UUID, // Mapeo de uniqueidentifier
             allowNull: true,
         },
     },
     {
-        // Deshabilita las columnas automáticas createdAt y updatedAt
+        tableName: "ciudadseccion",
+        freezeTableName: true,
         timestamps: false,
-        // Si quieres que el nombre de la tabla sea exactamente 'Ciudad' o 'Barrio', puedes usar:
-        // freezeTableName: true,
-    }
+    },
 );
 
-module.exports = City;
+// Relaciones explícitas
+Ciudadseccion.belongsTo(Municipio, {
+    foreignKey: "idmunicipio",
+    targetKey: "MunicipalityId",
+    as: "CiudadseccionMunicipio",
+});
+
+module.exports = Ciudadseccion;

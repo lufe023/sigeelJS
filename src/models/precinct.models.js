@@ -1,7 +1,8 @@
 const db = require("../utils/database");
 const Maps = require("./maps.models");
-
 const { DataTypes } = require("sequelize");
+const SectorParaje = require("./sectorParaje.model");
+const College = require("./college.models");
 
 const Precincts = db.define(
     "precincts",
@@ -16,7 +17,6 @@ const Precincts = db.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-
         descripcion: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -26,6 +26,10 @@ const Precincts = db.define(
         },
         IDSectorParaje: {
             type: DataTypes.INTEGER,
+            references: {
+                model: SectorParaje,
+                key: "SectorParajeId",
+            },
         },
         IDCircunscripcion: {
             type: DataTypes.INTEGER,
@@ -48,7 +52,6 @@ const Precincts = db.define(
         DireccionLarga: {
             type: DataTypes.STRING,
         },
-
         Tipo: {
             type: DataTypes.STRING,
         },
@@ -72,34 +75,13 @@ const Precincts = db.define(
         electExterior: {
             type: DataTypes.INTEGER,
         },
-        provincia: {
-            type: DataTypes.INTEGER,
-            references: {
-                key: "id",
-                model: Maps,
-            },
-        },
-        municipio: {
-            type: DataTypes.INTEGER,
-            references: {
-                key: "id",
-                model: Maps,
-            },
-        },
-
-        distrito: {
-            type: DataTypes.INTEGER,
-
-            allowNull: true,
-        },
         circunscripcion: {
             type: DataTypes.STRING,
         },
     },
     {
-        //? Evita que sequelize cree la columna de createdAt y updatedAt
         timestamps: false,
-    }
+    },
 );
 
 module.exports = Precincts;

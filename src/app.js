@@ -26,7 +26,8 @@ const campain = require("./campain/campain.router");
 const reports = require("./reports/reports.router");
 const suffrage = require("./suffrage/suffrage.router");
 const whatsapp = require("./whatsapp/whatsapp.router");
-
+const UsuarioMunicipio = require("./usuarioMunicipio/usuarioMunicipio.router");
+const UsuarioSectorParaje = require("./usuarioSectorParaje/usuarioSectorParaje.router");
 //? Initial Configurations
 const app = express();
 
@@ -36,7 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(cors());
 app.use(express.json());
 
-db.authenticate({ alter: false })
+db.authenticate()
     .then(() => {
         console.log("Database Authenticated");
     })
@@ -44,7 +45,7 @@ db.authenticate({ alter: false })
         console.log(err);
     });
 
-db.sync()
+db.sync({ alter: false })
     .then(() => {
         console.log("Database Synced");
     })
@@ -80,6 +81,8 @@ app.use("/api/v1/campains", campain);
 app.use("/api/v1/reports", reports);
 app.use("/api/v1/suffrages", suffrage);
 app.use("/api/v1/whatsapp", whatsapp);
+app.use("/api/v1/usuario-municipio", UsuarioMunicipio);
+app.use("/api/v1/sector", UsuarioSectorParaje);
 
 // app.listen(port, () => {
 //     console.log(`Server started at port ${port}`);
@@ -87,5 +90,5 @@ app.use("/api/v1/whatsapp", whatsapp);
 const key = fs.readFileSync("localhost-key.pem");
 const cert = fs.readFileSync("localhost.pem");
 https.createServer({ key, cert }, app).listen(port, "0.0.0.0", () => {
-    console.log(`🚀 Server running at https://192.168.100.5:${port}`);
+    console.log(`Server running at https://192.168.100.5:${port}`);
 });

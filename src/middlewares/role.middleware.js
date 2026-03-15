@@ -1,3 +1,6 @@
+const UsuarioMunicipio = require("../models/usuarioMunicipio.model");
+const UsuarioSectorParaje = require("../models/usuarioSectorParaje.models");
+
 const { getUserById } = require("../users/users.controllers");
 
 const adminValidate = (req, res, next) => {
@@ -27,7 +30,7 @@ const isDelegate = async (req, res, next) => {
     const permissionList = [
         { id: 2, roleName: "Administrador" },
         { id: 3, roleName: "Delegado" },
-        { id: 5, roleName: "super admin" },
+        { id: 99, roleName: "Super Admin" },
     ];
 
     try {
@@ -35,7 +38,7 @@ const isDelegate = async (req, res, next) => {
         const userRoleId = consulta.user_role.id;
 
         const tienePermiso = permissionList.some(
-            (item) => item.id === userRoleId
+            (item) => item.id === userRoleId,
         );
 
         if (tienePermiso) {
@@ -72,7 +75,7 @@ const isAdministratorBoolean = async (userId) => {
         const userRoleId = consulta.user_role.level;
 
         const tienePermiso = permissionList.some(
-            (item) => item.level === userRoleId
+            (item) => item.level === userRoleId,
         );
 
         if (tienePermiso) {
@@ -104,7 +107,7 @@ const isAdministrator = async (req, res, next) => {
         const userRoleId = consulta.user_role.id;
 
         const tienePermiso = permissionList.some(
-            (item) => item.id === userRoleId
+            (item) => item.id === userRoleId,
         );
 
         if (tienePermiso) {
@@ -174,6 +177,52 @@ const superAdminValidate = (req, res, next) => {
     }
 };
 
+const extractUserMunicipality = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        const permissions = await UsuarioMunicipio.findAll({
+            where: {
+                idusuario: userId,
+                estatus: true,
+            },
+            attributes: ["idmunicipio"],
+            raw: true,
+        });
+
+        // Guardamos el array de IDs en el objeto 'req' para que el servicio lo vea
+        req.userMunicipalityIds = permissions.map((p) => p.idmunicipio);
+
+        next();
+    } catch (err) {
+        console.error("Error en middleware de permisos:", err);
+        res.status(500).json({
+            message: "Error al validar permisos de municipio",
+        });
+    }
+};
+
+const extractUserSectorPermissions = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        const permissions = await UsuarioSectorParaje.findAll({
+            where: { idusuario: userId, estatus: true },
+            attributes: ["idsectorparaje"], // Asegúrate que coincida con el modelo
+            raw: true,
+        });
+
+        // Guardamos los IDs de los sectores parajes permitidos
+        req.allowedSectorIds = permissions.map((p) => p.idsectorparaje);
+
+        next();
+    } catch (err) {
+        res.status(500).json({
+            message: "Error al validar permisos de sector",
+        });
+    }
+};
+
 module.exports = {
     leaderValidate,
     adminValidate,
@@ -182,4 +231,6 @@ module.exports = {
     isAdministrator,
     isDelegate,
     isAdministratorBoolean,
+    extractUserMunicipality,
+    extractUserSectorPermissions,
 };

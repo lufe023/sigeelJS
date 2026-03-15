@@ -63,10 +63,11 @@ const getOnePeople = (req, res) => {
 
 const findPeople = (req, res) => {
     const findWord = req.body.findWord;
+    const allowedIds = req.allowedSectorIds;
 
     if (findWord) {
         censusControllers
-            .findPeople(findWord)
+            .findPeople(findWord, allowedIds)
             .then((data) => {
                 res.status(200).json({
                     data,
@@ -250,7 +251,7 @@ const getAllCensusByCollegeService = (req, res) => {
             collegeId,
             offset,
             limit,
-            includeExterior
+            includeExterior,
         )
         .then((data) => {
             const nexPage =

@@ -20,6 +20,8 @@ const Suffrages = require("../models/suffrage.models");
 const Provincia = require("../models/provincia.models");
 const Municipio = require("../models/municipio.models");
 const tiesController = require("../ties/ties.controllers");
+const SectorParaje = require("../models/sectorParaje.model");
+const Ciudadseccion = require("../models/ciudadseccion.model");
 
 const getPeoplesByPlaces = async (province, municipality) => {
     const peoples = await Census.findAndCountAll({
@@ -284,7 +286,7 @@ const getPeopleByUser = async (leaderId) => {
     const user = await getUser.getUserById(leaderId);
 
     const ties = await tiesController.getPeoplesTiesByCitizenIdController(
-        user?.censu?.citizenID
+        user?.censu?.citizenID,
     );
 
     return {
@@ -393,7 +395,7 @@ const getPeopleByUserToPdf = async (leaderId) => {
     const user = await getUser.getUserById(leaderId);
 
     const ties = await tiesController.getPeoplesTiesByCitizenIdController(
-        user?.censu?.citizenID
+        user?.censu?.citizenID,
     );
 
     return {
@@ -558,12 +560,15 @@ const getOnePeople = async (peopleid) => {
     };
 };
 
-const findPeople = async (findWord) => {
+const findPeople = async (findWord, allowedIds = []) => {
     try {
         const looking = findWord.trim().replace(/-/g, "");
-        const words = looking.split(/\s+/).filter(Boolean); // divide por espacios múltiples
+        const words = looking.split(/\s+/).filter(Boolean);
 
-        // Construimos condiciones flexibles: cada palabra puede aparecer en nombre o apellido
+        if (!allowedIds || allowedIds.length === 0) {
+            return { count: 0, rows: [] };
+        }
+
         const wordConditions = words.map((word) => ({
             [Op.or]: [
                 { firstName: { [Op.iLike]: `%${word}%` } },
@@ -577,7 +582,10 @@ const findPeople = async (findWord) => {
         const data = await Census.findAndCountAll({
             limit: 5,
             where: {
-                [Op.and]: wordConditions, // todas las palabras deben aparecer en algún campo
+                [Op.and]: [
+                    ...wordConditions,
+                    { IDSectorParaje: { [Op.in]: allowedIds } }, // <--- FILTRO DE SEGURIDAD
+                ],
             },
             include: [
                 {
@@ -596,6 +604,16 @@ const findPeople = async (findWord) => {
                     as: "municipalities",
                 },
                 {
+                    model: SectorParaje,
+                    as: "sector",
+                    include: [
+                        {
+                            model: Ciudadseccion,
+                            as: "ciudadseccion",
+                        },
+                    ],
+                },
+                {
                     model: Users,
                     attributes: ["id", "email"],
                     as: "leaders",
@@ -612,7 +630,39 @@ const findPeople = async (findWord) => {
             ],
         });
 
-        return data;
+        // Procesamos para agregar "district" solo si aplica
+        const processed = data.rows.map((c) => {
+            const cJson = c.toJSON();
+
+            const sector = cJson.sector;
+            let district = null;
+
+            if (sector && sector.ciudadseccion) {
+                const {
+                    idmunicipio,
+                    iddistritomunicipal,
+                    descripcion,
+                    codigociudad,
+                } = sector.ciudadseccion;
+
+                // Solo agregamos district si es distinto del municipio
+                if (idmunicipio !== iddistritomunicipal) {
+                    district = {
+                        iddistritomunicipal,
+                        idmunicipio,
+                        descripcion,
+                        codigociudad,
+                    };
+                }
+            }
+
+            // agregamos district al mismo nivel
+            cJson.district = district;
+
+            return cJson;
+        });
+
+        return { count: data.count, rows: processed };
     } catch (error) {
         console.error("Error executing query:", error);
         throw error;
@@ -643,7 +693,7 @@ const addPeople = async (peopleId, leaderId) => {
             where: {
                 id: peopleId,
             },
-        }
+        },
     );
     return result;
 };
@@ -660,7 +710,7 @@ const removePeople = async (peopleId, leaderId) => {
                     leader: leaderId,
                 },
             },
-        }
+        },
     );
 
     return result;
@@ -676,7 +726,7 @@ const transferCensusController = async (leaderIdA, leaderIdB) => {
             where: {
                 leader: leaderIdA,
             },
-        }
+        },
     );
     return result;
 };
@@ -758,16 +808,18 @@ const getAllCensusByCollegeController = async (
     collegeId,
     offset,
     limit,
-    includeExterior
+    includeExterior,
 ) => {
     const whereCondition = {
-        college: collegeId,
+        CollegeId: collegeId,
     };
 
-    if (!includeExterior) {
-        whereCondition.outside = false; // Filtrar registros con outside: false
+    if (includeExterior === "false" || includeExterior === false) {
+        whereCondition.outside = {
+            [Op.or]: [false, null],
+        };
     }
-
+    console.log("whereCondition", whereCondition);
     const data = await Census.findAndCountAll({
         where: whereCondition,
         order: [
@@ -789,6 +841,7 @@ const getAllCensusByCollegeController = async (
             "telephone",
             "otherPhone",
             "adress",
+            "municipality",
         ],
         include: [
             {
@@ -815,7 +868,7 @@ const getAllCensusByCollegeController = async (
 
     const college = await College.findOne({
         where: {
-            id: collegeId,
+            CollegeId: collegeId,
         },
         include: [
             {
