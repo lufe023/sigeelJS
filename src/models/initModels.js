@@ -352,6 +352,19 @@ const initModels = () => {
         foreignKey: "idsectorparaje",
         as: "asignaciones_intermedias",
     });
+
+    // --- PRECINCTS RELATIONSHIPS ---
+    Precincts.belongsTo(SectorParaje, {
+        foreignKey: "IDSectorParaje",
+        targetKey: "SectorParajeId",
+        as: "sectorParaje",
+    });
+
+    SectorParaje.belongsTo(Ciudadseccion, {
+        foreignKey: "IDCiudadSeccion",
+        targetKey: "CiudadseccionId",
+        as: "ciudadSeccion",
+    });
 };
 
 module.exports = initModels;

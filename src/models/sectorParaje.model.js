@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const db = require("../utils/database");
 const Ciudadseccion = require("./ciudadseccion.model");
+
 const SectorParaje = db.define(
     "sectorparaje",
     {
@@ -38,7 +39,7 @@ const SectorParaje = db.define(
     },
     {
         timestamps: false,
-    }
+    },
 );
 
 module.exports = SectorParaje;

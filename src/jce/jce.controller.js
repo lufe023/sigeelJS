@@ -8,6 +8,7 @@ const db = require("../utils/database");
 const { DataTypes, Op } = require("sequelize");
 const Provincia = require("../models/provincia.models");
 const SectorParaje = require("../models/sectorParaje.model");
+const Ciudadseccion = require("../models/ciudadseccion.model");
 //? Star Precints area ################################################# Star Precints area ###################################################
 //crear un nuevo recinto
 const createPrecintController = async (data) => {
@@ -37,7 +38,7 @@ const getAllPrecintController = async (allowedIds = []) => {
     // Forzamos que los IDs sean números por si acaso vienen como strings
     const cleanIds = allowedIds.map((id) => Number(id));
 
-    return await Precincts.findAndCountAll({
+    const precints = await Precincts.findAndCountAll({
         where: {
             IDSectorParaje: {
                 [Op.in]: cleanIds,
@@ -51,10 +52,24 @@ const getAllPrecintController = async (allowedIds = []) => {
             {
                 model: SectorParaje,
                 as: "PrecinctsSectorParaje",
+                include: [
+                    {
+                        model: Ciudadseccion,
+                        as: "ciudadSeccion",
+                        include: [
+                            {
+                                model: Municipios,
+                                as: "municipio",
+                            },
+                        ],
+                    },
+                ],
             },
         ],
         distinct: true,
     });
+
+    return precints;
 };
 
 //? End Precints area

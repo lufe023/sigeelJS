@@ -30,7 +30,7 @@ const isDelegate = async (req, res, next) => {
     const permissionList = [
         { id: 2, roleName: "Administrador" },
         { id: 3, roleName: "Delegado" },
-        { id: 5, roleName: "super admin" },
+        { id: 99, roleName: "Super Admin" },
     ];
 
     try {

@@ -1,11 +1,6 @@
 const { DataTypes } = require("sequelize");
 const db = require("../utils/database");
-
-// Asumiendo que Municipality es el modelo para IDMunicipio
 const Municipio = require("./municipio.models");
-// Asumiendo que District es el modelo para IDDistritoMunicipal
-// const District = require("./district.models");
-// O si ambos apuntan a Maps:
 
 const Ciudadseccion = db.define(
     "ciudadseccion",
@@ -93,7 +88,14 @@ const Ciudadseccion = db.define(
         tableName: "ciudadseccion",
         freezeTableName: true,
         timestamps: false,
-    }
+    },
 );
+
+// Relaciones explícitas
+Ciudadseccion.belongsTo(Municipio, {
+    foreignKey: "idmunicipio",
+    targetKey: "MunicipalityId",
+    as: "CiudadseccionMunicipio",
+});
 
 module.exports = Ciudadseccion;
