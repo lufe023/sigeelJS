@@ -28,7 +28,6 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
 
     const rectWidth = 38;
     const rectHeight = 23;
-
     const left = Math.round((metadata.width - rectWidth) / 2);
     const top = metadata.height - rectHeight;
 
@@ -36,32 +35,32 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
         <svg width="${rectWidth}" height="${rectHeight}">
             <rect width="${rectWidth}" height="${rectHeight}" fill="black" />
             <text 
-                x="50%" 
-                y="50%" 
-                font-size="16" 
-                fill="white" 
-                font-family="Arial, sans-serif" 
-                font-weight="bold" 
-                text-anchor="middle" 
-                dominant-baseline="middle"
-                dy="6">
+                x="50%" y="50%" font-size="16" fill="white" 
+                font-family="Arial, sans-serif" font-weight="bold" 
+                text-anchor="middle" dominant-baseline="middle" dy="6">
                 MEL
             </text>
         </svg>
     `;
     const overlay = Buffer.from(overlaySVG);
 
+    // CAMBIO AQUÍ: Usamos .webp() en lugar de .jpeg()
     const cleaned = await image
         .composite([{ input: overlay, top: top, left: left }])
-        .jpeg({ quality: 90, mozjpeg: true }) // Optimización de compresión
+        .webp({ 
+            quality: 80,     // Calidad vs peso
+            effort: 6,      // Mayor esfuerzo de compresión (0-6)
+            lossless: false // Compresión con pérdida para máximo ahorro
+        })
         .toBuffer();
 
-    const outputPath = path.join(folderPath, `${cedula}.jpg`);
+    // CAMBIO AQUÍ: Extensión .webp
+    const outputPath = path.join(folderPath, `${cedula}.webp`);
 
     await fs.ensureDir(folderPath);
     await fs.writeFile(outputPath, cleaned);
 
-    console.log(`✅ Imagen ${cedula}.jpg guardada en ${folderPath}`);
+    console.log(`✅ Imagen ${cedula}.webp guardada y optimizada.`);
     return outputPath;
 }
 
