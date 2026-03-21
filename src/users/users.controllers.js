@@ -81,7 +81,7 @@ const changeUserRoleController = async (id, newRole) => {
             where: {
                 id,
             },
-        }
+        },
     );
 
     return change;
@@ -97,7 +97,7 @@ const requestForgotPassword = async (email) => {
             where: {
                 email,
             },
-        }
+        },
     );
     return [result, codigo];
 };
@@ -112,7 +112,7 @@ const changeForgotPassword = async (idRequest, data) => {
             where: {
                 passwordRequest: idRequest,
             },
-        }
+        },
     );
     return result;
 };

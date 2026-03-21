@@ -188,6 +188,7 @@ const getMyPeople = async (leaderId) => {
     };
 };
 
+//esta funcion esta proxima a ser eliminada 
 const getPeopleByUser = async (leaderId) => {
     const data = await Census.findAndCountAll({
         where: {
@@ -669,15 +670,26 @@ const findPeople = async (findWord, allowedIds = []) => {
     }
 };
 
-const simpleFindPeople = async (findWord) => {
+const simpleFindPeople = async (findWord, allowedIds = []) => {
+    console.log("findWord:", findWord);
+    console.log("allowedIds son:", allowedIds);
+    if (!allowedIds || allowedIds.length === 0) {
+        return { count: 0, rows: [] };
+    }
+
     const data = await Census.findAndCountAll({
         limit: 5,
         where: {
-            [Op.or]: {
-                citizenID: {
-                    [Op.iLike]: `%${findWord}%`,
+            [Op.and]: [
+                { IDSectorParaje: { [Op.in]: allowedIds } }, // Filtro de seguridad
+                {
+                    [Op.or]: {
+                        citizenID: {
+                            [Op.iLike]: `%${findWord}%`,
+                        },
+                    },
                 },
-            },
+            ],
         },
         attributes: ["citizenID", "firstName", "lastName", "picture"],
     });

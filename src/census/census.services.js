@@ -28,7 +28,7 @@ const getMyPeople = (req, res) => {
 const getPeopleByUser = (req, res) => {
     const leaderId = req.body.leaderId;
     censusControllers
-        .getPeopleByUser(leaderId)
+        .getMyPeople(leaderId)
         .then((data) => {
             res.status(200).json(data);
         })
@@ -90,10 +90,11 @@ const findPeople = (req, res) => {
 
 const simpleFindPeople = (req, res) => {
     const findWord = req.body.findWord;
+    const allowedIds = req.allowedSectorIds;
 
     if (findWord) {
         censusControllers
-            .simpleFindPeople(findWord)
+            .simpleFindPeople(findWord, allowedIds)
             .then((data) => {
                 res.status(200).json({
                     data,

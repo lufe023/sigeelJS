@@ -97,9 +97,8 @@ const isAdministrator = async (req, res, next) => {
 
     //List of users who have permission to this area
     const permissionList = [
-        { id: 2, roleName: "Administrador" },
-        { id: 3, roleName: "Delegado" },
-        { id: 5, roleName: "super admin" },
+        { id: 3, roleName: "Administrador" },
+        { id: 99, roleName: "super admin" },
     ];
 
     try {
