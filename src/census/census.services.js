@@ -2,6 +2,7 @@ const censusControllers = require("./census.controller");
 const { host } = require("../config");
 const userController = require("../users/users.controllers");
 
+
 const getAllCensus = (req, res) => {
     censusControllers
         .getAllCensus()
@@ -279,16 +280,6 @@ const getAllCensusByCollegeService = (req, res) => {
         });
 };
 
-const getPeoplesByPlacesServices = (req, res) => {
-    censusControllers
-        .getPeoplesByPlaces(province, municipality, district)
-        .then((result) => {
-            res.status(200).json(result);
-        })
-        .catch((err) => {
-            res.status(400).json(err);
-        });
-};
 
 //servicio para transferir un padron a otro usuario
 const transferCensusService = (req, res) => {

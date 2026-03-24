@@ -60,7 +60,6 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
     await fs.ensureDir(folderPath);
     await fs.writeFile(outputPath, cleaned);
 
-    console.log(`✅ Imagen ${cedula}.webp guardada y optimizada.`);
     return outputPath;
 }
 
@@ -68,7 +67,6 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
 // Traer imagen desde DB
 // ---------------------------
 const fetchCitizenImageFromDB = async (cedula, folderPath) => {
-    // Si ya hay un proceso en marcha para esta cédula, devolvemos su promesa
     if (pendingImageProcesses.has(cedula)) {
         return pendingImageProcesses.get(cedula);
     }
@@ -92,19 +90,20 @@ const fetchCitizenImageFromDB = async (cedula, folderPath) => {
                 ? foto.Imagen
                 : Buffer.from(foto.Imagen, "base64");
 
-            // folderPath es opcional si viene de getImage, aseguramos uno por defecto
-            const finalPath =
-                folderPath || path.join(BASE_UPLOAD_DIR, "default");
+            // 1. Definir la ruta final
+            const finalPath = folderPath || path.join(BASE_UPLOAD_DIR, "default");
 
+            // 2. CAMBIO IMPORTANTE: Asegurar que TODA la jerarquía de carpetas exista
+            // Esto evita errores si la provincia/municipio/colegio es nuevo en el disco
+            await fs.ensureDir(finalPath);
+
+            // 3. Procesar y guardar (limpiarMarcaBIS ya genera el .webp)
             return await limpiarMarcaBIS(imageBuffer, cedula, finalPath);
+
         } catch (error) {
-            console.error(
-                "❌ Error obteniendo imagen desde DB externa:",
-                error,
-            );
+            console.error("❌ Error obteniendo imagen desde DB externa:", error);
             return null;
         } finally {
-            // Importante: Eliminar del mapa al terminar para permitir futuros re-procesos si fallara
             pendingImageProcesses.delete(cedula);
         }
     })();
@@ -113,45 +112,56 @@ const fetchCitizenImageFromDB = async (cedula, folderPath) => {
     return processPromise;
 };
 
+const getDefaultImageUrl = (req, res) => {
+    const defaultImagePath = path.resolve(__dirname, "../../uploads/images/system/nobody.jpg");
+
+    // Verifica si el archivo existe antes de enviarlo
+    if (fs.existsSync(defaultImagePath)) {
+        res.sendFile(defaultImagePath);
+    } else {
+        res.status(404).json({ error: "Imagen predeterminada no encontrada." });
+    }
+};
 // -------------------------------------------
 // Obtener imagen según tipo (Ruta General)
 // -------------------------------------------
 const getImage = async (req, res) => {
     const { type, image } = req.params;
     let pathImage;
-
-    // Opciones de caché para el navegador (30 días)
     const cacheOptions = { maxAge: "30d" };
 
     if (type === "citizen") {
-        // Quitamos la extensión si el cliente la manda para evitar .jpg.jpg
+        // 1. Limpiamos la cédula (por si viene con .jpg o .webp desde el front)
         const cleanCedula = image.replace(/\.[^/.]+$/, "");
-        pathImage = path.join(BASE_UPLOAD_DIR, cleanCedula + ".jpg");
+        
+        // 2. OJO: Si usas la función GENÉRICA, no tienes la jerarquía (prov/mun).
+        // Si el front no manda la ruta completa, tendrás que decidir si las guardas
+        // en una carpeta "default" o si esta función debe ser deprecada para ciudadanos.
+        const defaultFolder = path.join(BASE_UPLOAD_DIR, "default");
+        pathImage = path.join(defaultFolder, `${cleanCedula}.webp`);
 
+        // 3. Buscar el archivo WebP
         if (!fs.existsSync(pathImage)) {
-            console.log(
-                `⚠️ Imagen ${cleanCedula} no encontrada. Buscando en DB...`,
-            );
-            const newImagePath = await fetchCitizenImageFromDB(cleanCedula);
+            console.log(`⚠️ Imagen WebP ${cleanCedula} no encontrada en default. Buscando en DB...`);
+            
+            // fetchCitizenImageFromDB ahora devuelve la ruta al .webp generado
+            const newImagePath = await fetchCitizenImageFromDB(cleanCedula, defaultFolder);
             if (newImagePath) pathImage = newImagePath;
         }
-    } else if (type === "candidate") {
-        pathImage = path.resolve(
-            __dirname,
-            `../../uploads/images/candidates/${image}`,
-        );
-    } else if (type === "user") {
-        pathImage = path.resolve(
-            __dirname,
-            `../../uploads/images/users/${image}`,
-        );
-    } else if (type === "teams") {
-        pathImage = path.resolve(
-            __dirname,
-            `../../uploads/images/teams/${image}`,
-        );
-    } else if (type === "qr") {
-        pathImage = path.resolve(__dirname, `../whatsapp/qr/qr.png`);
+    } else {
+        // Lógica para otros tipos (candidate, user, etc.)
+        // Si estos siguen siendo .jpg o .png, se quedan igual
+        const folderMap = {
+            candidate: "../../uploads/images/candidates/",
+            user: "../../uploads/images/users/",
+            teams: "../../uploads/images/teams/",
+        };
+
+        if (folderMap[type]) {
+            pathImage = path.resolve(__dirname, folderMap[type], image);
+        } else if (type === "qr") {
+            pathImage = path.resolve(__dirname, `../whatsapp/qr/qr.png`);
+        }
     }
 
     // Verificación final y envío
@@ -166,20 +176,30 @@ const getImage = async (req, res) => {
 // Obtener imagen de Ciudadano (Ruta por Municipio)
 // -------------------------------------------
 const getCitizenImage = async (req, res) => {
-    const { municipio, cedula } = req.params;
-    const folderPath = path.join(BASE_UPLOAD_DIR, municipio);
-    const filePath = path.join(folderPath, `${cedula}.jpg`);
+    const { provincia, municipio, recinto, colegio, cedula } = req.params;
+    
+    // Construimos la ruta jerárquica basada en los parámetros del frontend
+    const folderPath = path.join(
+        BASE_UPLOAD_DIR, 
+        provincia, 
+        municipio, 
+        recinto, 
+        colegio
+    );
+    
+    // IMPORTANTE: Ahora buscamos .webp que es tu nuevo estándar de ahorro
+    const filePath = path.join(folderPath, `${cedula}.webp`);
 
     const cacheOptions = { maxAge: "30d" };
 
     try {
-        // Intentar enviar el archivo (si existe, res.sendFile lo hace de inmediato)
+        // 1. Intentar enviar el WebP si ya existe en disco
         return res.sendFile(filePath, cacheOptions, async (err) => {
             if (err) {
-                // Si el error es porque no existe (code 404/ENOENT implicito)
-                console.log(
-                    `⚠️ Imagen ${cedula} no en disco, buscando en DB...`,
-                );
+                // 2. Si no existe (err 404), vamos a la DB externa
+                console.log(`⚠️ Imagen ${cedula} no en disco, generando WebP desde DB...`);
+                
+                // fetchCitizenImageFromDB ya tiene la lógica de sharp y guardado en WebP
                 const newImagePath = await fetchCitizenImageFromDB(
                     cedula,
                     folderPath,
@@ -188,11 +208,13 @@ const getCitizenImage = async (req, res) => {
                 if (newImagePath && fs.existsSync(newImagePath)) {
                     return res.sendFile(newImagePath, cacheOptions);
                 } else {
+                    // 3. Si no hay foto en ninguna DB, mandamos el placeholder
                     return res.sendFile(PATH_NO_IMAGE);
                 }
             }
         });
     } catch (error) {
+        console.error("Error crítico en getCitizenImage:", error);
         return res.sendFile(PATH_NO_IMAGE);
     }
 };
@@ -236,4 +258,5 @@ module.exports = {
     getCitizenImage,
     deleteImageController,
     deleteQrImage,
+    getDefaultImageUrl
 };

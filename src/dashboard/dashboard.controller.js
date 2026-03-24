@@ -13,12 +13,35 @@ const { Op } = require("sequelize");
 const Precincts = require("../models/precinct.models");
 const Suffrages = require("../models/suffrage.models");
 
+require('dotenv').config();
+
+const injectPictureUrl = (citizen) => {
+    if (!citizen) return null;
+    const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
+
+    const province = c.province || 0;
+    const municipality = c.municipality || 0;
+    const precinct = c.PrecinctId || 0;
+    const college = c.CollegeId || 0;
+    const cedula = c.citizenID;
+
+    const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+    
+    // Si la cédula no existe, no podemos construir una URL válida
+    c.picture = cedula 
+        ? `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${cedula}`
+        : null;
+    
+    return c;
+};
+
+
 const MyTotalCitizens = async (userId, campainId) => {
     const citizens = await Census.findAndCountAll({
         where: {
             leader: userId,
         },
-        attributes: ["id", "citizenID", "firstName", "lastName", "picture"],
+        attributes: ["id", "citizenID", "firstName", "lastName", "picture","province", "municipality", "PrecinctId", "CollegeId"],
         include: [
             {
                 model: Suffrages,
@@ -140,14 +163,17 @@ const MyTotalCitizens = async (userId, campainId) => {
         ],
     });
 
-    let activities = await citizens.rows
+    const processedRows = citizens.rows.map(obj => injectPictureUrl(obj));
+
+
+    let activities = await processedRows
         .map((obj) => obj.Actividades)
         .filter((x) => x > []).length;
-    let beneficios = await citizens.rows
+    let beneficios = await processedRows
         .map((obj) => obj.Beneficios)
         .filter((x) => x > []).length;
 
-    let encuestas = await citizens.rows.map((obj) => obj.Encuestas);
+    let encuestas = await processedRows.map((obj) => obj.Encuestas);
 
     /* declaramos todas los arrays a enviar*/
     const preferedPartyArray = [];
@@ -448,7 +474,10 @@ const MyTotalCitizens = async (userId, campainId) => {
     //Fin sacando los votos de los Vo distritales preferidos
 
     const result = {
-        ciudadanos: citizens,
+        ciudadanos: {
+            count: citizens.count,
+            rows: processedRows 
+        },
         Activities: activities,
         Beneficios: beneficios,
         Encuestas: {

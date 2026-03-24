@@ -1,4 +1,3 @@
-
 const uuid = require('uuid')
 const Census = require("../models/census.models");
 const Ties = require('../models/ties.models')
@@ -29,77 +28,87 @@ const newTiesController = async (aCiticenID, bCiticenID, tiesType)=> {
 } 
 
 //conseguir las relaciones entre personas
-const getPeoplesTiesByCitizenIdController = async (citizenID)=> {
-
+const getPeoplesTiesByCitizenIdController = async (citizenID) => {
     const ties = await Ties.findAndCountAll({
-    
-        where:
-        {
-        [Op.or]:
-            {
-                aCiticenID: citizenID,
-                bCiticenID: citizenID,
-            }
+        where: {
+            [Op.or]: [ // Corregido: Op.or espera un array en versiones recientes de Sequelize
+                { aCiticenID: citizenID },
+                { bCiticenID: citizenID }
+            ]
         },
-        include:[
+        include: [
             {
                 model: Census,
                 as: 'aties',
                 include: [
-                    {
-                        model: College,
-                        as: 'colegio',
-                        include: [
-                            {
-                            model: Precincts,
-                            as: 'precinctData', // Usar el nombre del alias en la relación
-                            }
-                        ]
-                    },
-                    {
-                        model : Users,
-                        attributes: ['id', 'email'],
-                        as: 'leaders',
-                        include:[
-                            {
-                                attributes:['firstName', 'lastName'],
-                                model: Census
-                            }
-                        ]
-                    },
+                    { model: College, as: 'colegio', include: [{ model: Precincts, as: 'precinctData' }] },
+                    { 
+                        model: Users, as: 'leaders', 
+                        include: [{ model: Census }] // Si el líder necesita foto, se inyecta aquí también
+                    }
                 ]
             },
             {
                 model: Census,
                 as: 'bties',
                 include: [
-                {
-                    model: College,
-                    as: 'colegio',
-                    include: [
-                        {
-                        model: Precincts,
-                        as: 'precinctData', // Usar el nombre del alias en la relación
-                        }
-                    ]
-                },
-            ]
+                    { model: College, as: 'colegio', include: [{ model: Precincts, as: 'precinctData' }] }
+                ]
             },
             {
                 model: TiesTypes,
                 as: 'tieType'
             }
         ]
-    })
-    
-    return ties
-    }
+    });
+
+    // Inyectamos las fotos en los ciudadanos A y B de cada relación
+    const processedRows = ties.rows.map(tie => {
+        const t = tie.toJSON();
+        if (t.aties) t.aties = injectPictureUrl(t.aties);
+        if (t.bties) t.bties = injectPictureUrl(t.bties);
+        return t;
+    });
+
+    return {
+        count: ties.count,
+        rows: processedRows
+    };
+};
 
 //lista de tipos de enlaces
 const getAllTieTypesController = async () => {
-    const types = await TiesTypes.findAndCountAll()
-    return types
-}
+    const types = await TiesTypes.findAndCountAll();
+
+    const typesWithPictures = types.rows.map((type) => injectPictureUrl(type));
+
+    return {
+        count: types.count,
+        rows: typesWithPictures,
+    };
+};
+
+const injectPictureUrl = (citizen) => {
+    if (!citizen) return null;
+
+    const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
+
+    // Extraemos los datos geográficos del ciudadano
+    const province = c.province || 0;
+    const municipality = c.municipality || 0;
+    const precinct = c.PrecinctId || 0;
+    const college = c.CollegeId || 0;
+    const cedula = c.citizenID; // Usamos la cédula para la foto
+
+    const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+
+    // Construimos la URL basada en la cédula del ciudadano
+    c.picture = cedula
+        ? `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${cedula}`
+        : null;
+
+    return c;
+};
 
 //lista de tipos de enlaces
 const getTieById = async (id) => {
