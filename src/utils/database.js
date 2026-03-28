@@ -7,13 +7,10 @@ const db = new Sequelize({
     username: config.db.username, //? Variable de entorno del usuario
     password: config.db.password, //? Variable de entorno de la contraseña
     database: config.db.dbName, //? Variable de entorno de la base de datos
-    dialectOptions:
+   dialectOptions:
         process.env.NODE_ENV === "production"
             ? {
-                  ssl: {
-                      require: true,
-                      rejectUnauthorized: false,
-                  },
+                  ssl: false, // 👈 CAMBIO AQUÍ: Desactivamos SSL aunque sea producción
               }
             : {},
 });
