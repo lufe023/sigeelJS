@@ -2,6 +2,7 @@ const Census = require('../models/census.models');
 const Gps = require('../models/gps.models')
 const {Op} = require("sequelize");
 const uuid = require('uuid');
+const { injectPictureUrl } = require('../utils/injecPictureUrl');
 
 const getCitizensNearby = async (citizenID, meters) => {
     try {
@@ -34,14 +35,28 @@ const getCitizensNearby = async (citizenID, meters) => {
       });
   
       const nearbyCitizenData = nearbyCitizens.map((gps) => {
-        const { citizenID, latitud, longitud, citizen } = gps;
-        return {
-          citizenID,
-          latitud,
-          longitud,
-          censusData: citizen,
-        };
-      });
+            const { citizenID, latitud, longitud, citizen } = gps;
+            
+            // Convertimos el modelo de censo a JSON para extraer los datos
+            const c = citizen ? citizen.toJSON() : {};
+
+            return {
+                citizenID,
+                latitud,
+                longitud,
+                censusData: {
+                    ...c,
+                    // Usamos el helper pasando exactamente las variables que pide
+                    picture: injectPictureUrl({
+                        province: c.province,
+                        municipality: c.municipality,
+                        precinct: c.PrecinctId, // Mapeo de nombre de columna
+                        college: c.CollegeId,   // Mapeo de nombre de columna
+                        citizenID: c.citizenID
+                    })
+                },
+            };
+        });
   
       return nearbyCitizenData;
     } catch (error) {

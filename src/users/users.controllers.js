@@ -6,6 +6,29 @@ const { Sequelize, Op } = require("sequelize");
 const Users = require("../models/users.models");
 const { hashPassword } = require("../utils/crypto");
 
+require('dotenv').config();
+
+const injectPictureUrl = (citizen) => {
+    if (!citizen) return null;
+    const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
+
+    const province = c.province || 0;
+    const municipality = c.municipality || 0;
+    const precinct = c.PrecinctId || 0;
+    const college = c.CollegeId || 0;
+    const cedula = c.citizenID;
+
+    const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+    
+    // Si la cédula no existe, no podemos construir una URL válida
+    c.picture = cedula 
+        ? `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${cedula}`
+        : null;
+    
+    return c;
+};
+
+
 //conseguir todos los usuarios que existan en el sistema
 const getAllUsers = async (offset, limit) => {
     const data = await Users.findAndCountAll({
@@ -19,12 +42,15 @@ const getAllUsers = async (offset, limit) => {
                 model: Census,
                 attributes: [
                     "id",
-                    "first_name",
-                    "last_name",
+                    "firstName", 
+                    "lastName",
                     "picture",
                     "celphone",
                     "citizenID",
                     "municipality",
+                    "province",   
+                    "PrecinctId", 
+                    "CollegeId"
                 ],
             },
             {
@@ -32,7 +58,19 @@ const getAllUsers = async (offset, limit) => {
             },
         ],
     });
-    return data;
+
+
+const processedRows = data.rows.map(user => {
+        const userJson = user.toJSON(); 
+        
+        // Usamos el nombre que confirmaste: "censu"
+        if (userJson.censu) {
+            userJson.censu = injectPictureUrl(userJson.censu);
+        }
+        return userJson;
+    });
+
+    return { count: data.count, rows: processedRows };
 };
 
 const getUserById = async (id) => {
@@ -49,7 +87,6 @@ const getUserById = async (id) => {
             id: id,
         },
         include: [
-            //debo hacer una peticion a Census para pedir datos del usuario que estan en el padron
             {
                 model: Census,
             },
@@ -58,7 +95,16 @@ const getUserById = async (id) => {
             },
         ],
     });
-    return data;
+if (!data) return null;
+
+    const userJson = data.toJSON();
+    
+    // Aplicamos la lógica al campo "censu"
+    if (userJson.censu) {
+        userJson.censu = injectPictureUrl(userJson.censu);
+    }
+    
+    return userJson;
 };
 
 const createUser = async (data) => {
@@ -187,8 +233,9 @@ const findUserController = async (findWord) => {
             },
         ],
     });
+const processedRows = censusData.rows.map(citizen => injectPictureUrl(citizen));
 
-    return censusData;
+    return { count: censusData.count, rows: processedRows };
 };
 
 module.exports = {
