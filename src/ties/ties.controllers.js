@@ -6,6 +6,7 @@ const TiesTypes = require('../models/tiesTypes.models');
 const College = require('../models/college.models');
 const Precincts = require('../models/precinct.models');
 const Users = require('../models/users.models');
+const { injectPictureUrl: getPictureUrl } = require('../utils/injecPictureUrl');
 
 //crear una nueva relacion
 const newTiesController = async (aCiticenID, bCiticenID, tiesType)=> {
@@ -79,33 +80,26 @@ const getPeoplesTiesByCitizenIdController = async (citizenID) => {
 //lista de tipos de enlaces
 const getAllTieTypesController = async () => {
     const types = await TiesTypes.findAndCountAll();
-
-    const typesWithPictures = types.rows.map((type) => injectPictureUrl(type));
-
     return {
         count: types.count,
-        rows: typesWithPictures,
+        rows: types.rows,
     };
 };
 
+/**
+ * Helper local para transformar el objeto e inyectar la URL
+ */
 const injectPictureUrl = (citizen) => {
     if (!citizen) return null;
-
     const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
 
-    // Extraemos los datos geográficos del ciudadano
-    const province = c.province || 0;
-    const municipality = c.municipality || 0;
-    const precinct = c.PrecinctId || 0;
-    const college = c.CollegeId || 0;
-    const cedula = c.citizenID; // Usamos la cédula para la foto
-
-    const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
-
-    // Construimos la URL basada en la cédula del ciudadano
-    c.picture = cedula
-        ? `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${cedula}`
-        : null;
+    c.picture = getPictureUrl({
+        province: c.province,
+        municipality: c.municipality,
+        precinct: c.PrecinctId,
+        college: c.CollegeId,
+        citizenID: c.citizenID
+    });
 
     return c;
 };

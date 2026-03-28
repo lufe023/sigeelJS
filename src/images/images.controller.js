@@ -1,8 +1,15 @@
-const path = require("path");
 const fs = require("fs-extra");
+const path = require('path');
+
+const Census = require('../models/census.models');
+const Provincia = require('../models/provincia.models');
+const Municipios = require('../models/municipio.models');
+const Precincts = require('../models/precinct.models');
+const College = require('../models/college.models');
 const { dbFotos } = require("../utils/database");
 const { QueryTypes } = require("sequelize");
 const sharp = require("sharp");
+
 
 // -------------------------------------------------------------------------
 // Constantes y Configuración
@@ -54,7 +61,7 @@ async function limpiarMarcaBIS(imageBuffer, cedula, folderPath) {
         })
         .toBuffer();
 
-    // CAMBIO AQUÍ: Extensión .webp
+    // CAMBIO AQUÍ: Extensión .webp 
     const outputPath = path.join(folderPath, `${cedula}.webp`);
 
     await fs.ensureDir(folderPath);
@@ -122,6 +129,106 @@ const getDefaultImageUrl = (req, res) => {
         res.status(404).json({ error: "Imagen predeterminada no encontrada." });
     }
 };
+
+const generateImagesByMunicipio = async (req, res) => {
+    const { municipioId } = req.body;
+    const LOG_FILE_PATH = path.join(BASE_UPLOAD_DIR, 'reporte_fotografia.csv');
+
+    if (!municipioId) return res.status(400).json({ message: "municipioId requerido" });
+
+    try {
+        // 1. Buscamos los colegios usando los ALIAS de initModels
+        const colleges = await College.findAll({
+            where: { MunicipalityId: municipioId },
+            include: [
+                { 
+                    model: Precincts, 
+                    as: 'precinctData', // Alias corregido según initModels
+                    attributes: ['descripcion'] 
+                },
+                { 
+                    model: Municipios, 
+                    as: 'municipio', // Si esta relación no existe en College, asegúrate de añadirla en initModels
+                    attributes: ['description'],
+                    include: [{ 
+                        model: Provincia, 
+                        as: 'provincia', // Alias corregido según initModels
+                        attributes: ['Descripcion'] 
+                    }]
+                }
+            ]
+        });
+
+        if (colleges.length === 0) {
+            return res.status(404).json({ message: "No se encontraron colegios para este municipio" });
+        }
+
+        // Extraemos nombres para el LOG (usando los alias)
+        const nombreProvincia = colleges[0].municipio?.provincia?.Descripcion || "Provincia Desconocida";
+        const nombreMunicipio = colleges[0].municipio?.description || "Municipio Desconocido";
+
+        res.status(200).json({ 
+            message: `Iniciando proceso para ${nombreMunicipio}. Revisa el log en ${LOG_FILE_PATH}` 
+        });
+
+        // Escribir cabecera en el log
+     if (!fs.existsSync(LOG_FILE_PATH)) {
+    const header = "Fecha;Provincia;Municipio;Recinto;Colegio;Total;Nuevos;Existentes;Errores\n";
+    fs.writeFileSync(LOG_FILE_PATH, header, 'utf8');
+}
+
+        for (const col of colleges) {
+            const citizens = await Census.findAll({
+                where: { CollegeId: col.CollegeId },
+                attributes: ['citizenID', 'province', 'municipality', 'PrecinctId', 'CollegeId']
+            });
+
+            let procesados = 0;
+            let omitidos = 0;
+            let errores = 0;
+
+            for (const person of citizens) {
+                const folderPath = path.join(
+                    BASE_UPLOAD_DIR,
+                    String(person.province),
+                    String(person.municipality),
+                    String(person.PrecinctId),
+                    String(person.CollegeId)
+                );
+
+                const filePath = path.join(folderPath, `${person.citizenID}.webp`);
+
+                if (!fs.existsSync(filePath)) {
+                    try {
+                        await fetchCitizenImageFromDB(person.citizenID, folderPath);
+                        procesados++;
+                    } catch (err) {
+                        errores++;
+                    }
+                } else {
+                    omitidos++;
+                }
+            }
+
+            // Escribir en el TXT con nombres reales
+          const logEntry = `${new Date().toLocaleString()};` +
+                                        `"${nombreProvincia}";` +
+                                        `"${nombreMunicipio}";` +
+                                        `"${col.precinctData?.descripcion || 'N/A'}";` +
+                                        `"${col.collegeNumber}";` +
+                                        `${citizens.length};` +
+                                        `${procesados};` +
+                                        `${omitidos};` +
+                                        `${errores}\n`;
+
+                                    fs.appendFileSync(LOG_FILE_PATH, logEntry, 'utf8');
+                                            }
+
+    } catch (error) {
+        console.error("❌ Error en generación:", error);
+    }
+};
+
 // -------------------------------------------
 // Obtener imagen según tipo (Ruta General)
 // -------------------------------------------
@@ -258,5 +365,6 @@ module.exports = {
     getCitizenImage,
     deleteImageController,
     deleteQrImage,
-    getDefaultImageUrl
+    getDefaultImageUrl,
+    generateImagesByMunicipio
 };

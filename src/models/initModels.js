@@ -365,6 +365,9 @@ const initModels = () => {
         targetKey: "CiudadseccionId",
         as: "ciudadSeccion",
     });
+
+    // Dentro de initModels en tu archivo de asociaciones:
+College.belongsTo(Municipios, { foreignKey: "MunicipalityId", as: "municipio" });
 };
 
 module.exports = initModels;

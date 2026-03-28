@@ -22,28 +22,23 @@ const Municipio = require("../models/municipio.models");
 const tiesController = require("../ties/ties.controllers");
 const SectorParaje = require("../models/sectorParaje.model");
 const Ciudadseccion = require("../models/ciudadseccion.model");
-require('dotenv').config();
+const { injectPictureUrl } = require('../utils/injecPictureUrl');
 
+/**
+ * Helper local para transformar el objeto Sequelize a JSON e inyectar la URL
+ */
 const injectPictureUrl = (citizen) => {
     if (!citizen) return null;
     const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
-
-    const province = c.province || 0;
-    const municipality = c.municipality || 0;
-    const precinct = c.PrecinctId || 0;
-    const college = c.CollegeId || 0;
-    const cedula = c.citizenID;
-
-    const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
-    
-    // Si la cédula no existe, no podemos construir una URL válida
-    c.picture = cedula 
-        ? `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${cedula}`
-        : null;
-    
+    c.picture = getPictureUrl({
+        province: c.province,
+        municipality: c.municipality,
+        precinct: c.PrecinctId,
+        college: c.CollegeId,
+        citizenID: c.citizenID
+    });
     return c;
 };
-
 
 const getAllCensus = async () => {
     const data = await Census.findAndCountAll({
@@ -100,6 +95,8 @@ const getAllCensus = async () => {
             },
         ],
     });
+
+    data.rows = data.rows.map(citizen => injectPictureUrl(citizen));
     return data;
 };
 
@@ -192,7 +189,7 @@ const getMyPeople = async (leaderId) => {
     return { count: data.count, rows };
 };
 
-//esta funcion esta proxima a ser eliminada 
+// Función de compatibilidad para administradores
 const getPeopleByUser = async (leaderId) => {
     const data = await Census.findAndCountAll({
         where: {
@@ -271,22 +268,17 @@ const getPeopleByUser = async (leaderId) => {
         ],
     });
 
-    const peopleWithUpdates = [];
-
-    for (const citizen of data.rows) {
-        const citizenId = citizen.citizenID;
-
-        const lastUpdatedDates = await getLastUpdatedDates(citizenId);
-        const pendingUpdates = await getPendingUpdatesController(citizenId);
-
-        const citizenWithUpdates = {
-            ...citizen.toJSON(),
+    const rows = await Promise.all(data.rows.map(async (citizen) => {
+        const [lastUpdatedDates, pendingUpdates] = await Promise.all([
+            getLastUpdatedDates(citizen.citizenID),
+            getPendingUpdatesController(citizen.citizenID)
+        ]);
+        return {
+            ...injectPictureUrl(citizen),
             lastUpdatedDates,
             pendingUpdates,
         };
-
-        peopleWithUpdates.push(citizenWithUpdates);
-    }
+    }));
 
     const user = await getUser.getUserById(leaderId);
 
@@ -296,7 +288,7 @@ const getPeopleByUser = async (leaderId) => {
 
     return {
         count: data.count,
-        rows: peopleWithUpdates,
+        rows,
         user,
         ties,
     };
@@ -380,22 +372,17 @@ const getPeopleByUserToPdf = async (leaderId) => {
         ],
     });
 
-    const peopleWithUpdates = [];
-
-    for (const citizen of data.rows) {
-        const citizenId = citizen.citizenID;
-
-        const lastUpdatedDates = await getLastUpdatedDates(citizenId);
-        const pendingUpdates = await getPendingUpdatesController(citizenId);
-
-        const citizenWithUpdates = {
-            ...citizen.toJSON(),
+    const rows = await Promise.all(data.rows.map(async (citizen) => {
+        const [lastUpdatedDates, pendingUpdates] = await Promise.all([
+            getLastUpdatedDates(citizen.citizenID),
+            getPendingUpdatesController(citizen.citizenID)
+        ]);
+        return {
+            ...injectPictureUrl(citizen),
             lastUpdatedDates,
             pendingUpdates,
         };
-
-        peopleWithUpdates.push(citizenWithUpdates);
-    }
+    }));
 
     const user = await getUser.getUserById(leaderId);
 
@@ -405,7 +392,7 @@ const getPeopleByUserToPdf = async (leaderId) => {
 
     return {
         count: data.count,
-        rows: peopleWithUpdates,
+        rows,
         user,
         ties,
     };
