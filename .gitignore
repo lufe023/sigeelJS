@@ -7,3 +7,4 @@ node_modules/
 /whatsapp/qr/*
 /uploads/images/citizens/*
 /src/whatsapp/qr
+.pem
