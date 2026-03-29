@@ -44,7 +44,7 @@ db.authenticate()
     .then(() => {
         console.log("Database Authenticated");
         // Solo sincronizamos DESPUÉS de haber autenticado e inicializado modelos
-        return db.sync({ alter: shouldAlter }); 
+        return db.sync({ alter: false }); 
     })
     .then(() => {
         console.log("Database Synced");
@@ -89,7 +89,7 @@ app.use("/api/v1/sector", UsuarioSectorParaje);
 if (process.env.NODE_ENV === "production") {
     // En Railway (Nube): Usamos http estándar, Railway le pone el SSL
     app.listen(port, "0.0.0.0", () => {
-        console.log(`🚀 Server started in PRODUCTION at port ${port}`);
+        console.log(`Server started in PRODUCTION at port ${port}`);
     });
 } else {
     // En Local: Usamos tus certificados .pem
