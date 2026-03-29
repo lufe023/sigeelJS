@@ -6,44 +6,44 @@ const SectorParaje = require("./sectorParaje.model");
 
 const UsuarioSectorParaje = db.define(
     "usuario_sector_paraje",
-    {
+  {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
+            field: 'id' // Especificamos el nombre exacto de la columna
         },
         idusuario: {
             type: DataTypes.UUID,
             allowNull: false,
-            references: {
-                model: Usuario,
-                key: "id",
-            },
+            field: 'idusuario' // Forzamos que no busque id_usuario
         },
         idsectorparaje: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: SectorParaje,
-                key: "SectorParajeId",
-            },
+            field: 'idsectorparaje'
         },
-        estatus: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true,
-        },
+      estatus: {
+    type: DataTypes.BOOLEAN,
+    field: 'estatus',
+    defaultValue: true,
+    // A veces, omitir explícitamente el allowNull ayuda si en la DB dice NULL
+},
     },
     {
-        tableName: "usuario_sector_parajes", // <--- FUERZA el nombre exacto de la DB
+        tableName: "usuario_sector_parajes",
         timestamps: false,
-        underscored: true, // Ayuda si usas snake_case en la DB
+        // DESACTIVA underscored si tus nombres en la DB no tienen guiones bajos
+        underscored: false, 
         indexes: [
+            // Deja solo el índice que realmente quieres mantener controlado por Sequelize
             {
-                name: "idx_usuario_sector_active", // Nombre personalizado
+                name: "idx_usuario_sector_active",
                 fields: ["idusuario", "estatus"],
-                where: { estatus: true }, // Índice parcial (Postgres lo ama)
+                where: { estatus: true },
             },
             {
+                name: "usuario_sector_parajes_idusuario_idsectorparaje", // Usa el nombre exacto de la DB
                 unique: true,
                 fields: ["idusuario", "idsectorparaje"],
             },

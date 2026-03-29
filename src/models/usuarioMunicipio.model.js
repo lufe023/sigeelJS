@@ -16,37 +16,34 @@ const UsuarioMunicipio = db.define(
         idusuario: {
             type: DataTypes.UUID,
             allowNull: false,
-            references: {
-                model: Usuario,
-                key: "id",
-            },
+            field: "idusuario", // 💡 Crucial para que coincida con el DDL
         },
         idmunicipio: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: Municipio,
-                key: "MunicipalityId",
-            },
+            field: "idmunicipio", // 💡 Crucial para que coincida con el DDL
         },
         estatus: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
             defaultValue: true,
+            field: "estatus", // Evita que intente cambiar el tipo a BOOLEAN cada vez
         },
     },
     {
+        tableName: "usuario_municipios", // Forzamos el nombre exacto de tu DB
         timestamps: false,
+        underscored: false,
         indexes: [
             {
                 unique: true,
-                fields: ["idusuario", "idmunicipio"], // 🔹 evita duplicados
+                fields: ["idusuario", "idmunicipio"], 
             },
             {
-                fields: ["idusuario"], // 🔹 acelera búsquedas por usuario
+                fields: ["idusuario"], 
             },
             {
-                fields: ["idmunicipio"], // 🔹 acelera búsquedas por municipio
+                fields: ["idmunicipio"],
             },
         ],
     },
