@@ -7,6 +7,7 @@ const fs = require('fs-extra')
 const usersControllers = require('../users/users.controllers')
 const padron = require('../pdfCreator/padronToPdf')
 const borrardeleteOldPdfs = require('../pdfCreator/cleanUpOldPdfs')
+require('dotenv').config();
 const estado = [{
     cedula: '',
     fecha: ''
@@ -71,18 +72,35 @@ const generateQRImage = async (text, filePath) => {
 };
 
 const client = new Client({
-    authStrategy: new LocalAuth() // Usando LocalAuth para la autenticación
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        // 💡 ESTO ES LO QUE ARREGLA EL ERROR "Failed to launch the browser process!"
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process', // Ayuda a ahorrar memoria en Railway
+            '--disable-gpu'
+        ],
+        // Si estamos en Railway, usamos el ejecutable de Chrome que instala el buildpack
+        executablePath: process.env.NODE_ENV === 'production' 
+            ? '/usr/bin/google-chrome-stable' 
+            : undefined
+    }
 });
 
+const qrcodeTerminal = require('qrcode-terminal');
+
 client.on('qr', qr => {
+    // Esto te permitirá ver el QR directamente en la consola de Railway
+    qrcodeTerminal.generate(qr, {small: true});
+    
+    // Tu lógica actual de guardar el archivo
     const qrFilePath = path.join(__dirname, './qr/qr.png');
-    generateQRImage(qr, qrFilePath).then((success) => {
-        if (success) {
-            console.log('Código QR guardado en:', qrFilePath);
-        } else {
-            console.log('Error al guardar el código QR');
-        }
-    });
+    // ... resto de tu código
 });
 
 client.on('ready', () => {

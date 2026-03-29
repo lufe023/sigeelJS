@@ -85,8 +85,23 @@ app.use("/api/v1/sector", UsuarioSectorParaje);
 // app.listen(port, () => {
 //     console.log(`Server started at port ${port}`);
 // });
-const key = fs.readFileSync("localhost-key.pem");
-const cert = fs.readFileSync("localhost.pem");
-https.createServer({ key, cert }, app).listen(port, "0.0.0.0", () => {
-    console.log(`Server running at https://192.168.100.5:${port}`);
-});
+// --- ARRANQUE DEL SERVIDOR CONDICIONADO ---
+if (process.env.NODE_ENV === "production") {
+    // En Railway (Nube): Usamos http estándar, Railway le pone el SSL
+    app.listen(port, "0.0.0.0", () => {
+        console.log(`🚀 Server started in PRODUCTION at port ${port}`);
+    });
+} else {
+    // En Local: Usamos tus certificados .pem
+    try {
+        const key = fs.readFileSync("localhost-key.pem");
+        const cert = fs.readFileSync("localhost.pem");
+        
+        https.createServer({ key, cert }, app).listen(port, "0.0.0.0", () => {
+            console.log(`🔐 Local Server running at https://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error("❌ Error cargando certificados locales, arrancando en HTTP...");
+        app.listen(port, () => console.log(`Server started at port ${port}`));
+    }
+}
