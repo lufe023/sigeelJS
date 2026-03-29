@@ -41,7 +41,7 @@ router.post(
     censusServices.getSimpleCensus,
 );
 
-//busqueda en tiempo real de personas
+//busqueda en tiempo real de personas  json grande con los datos de personas
 router.post(
     "/search",
     passport.authenticate("jwt", { session: false }),
@@ -49,8 +49,13 @@ router.post(
     censusServices.findPeople,
 );
 
-//busqueda simple en tiempo real de personas
-router.post("/simplesearch", censusServices.simpleFindPeople);
+//busqueda simple en tiempo real de personas json corto para crear usuarios
+router.post(
+    "/simplesearch",
+    passport.authenticate("jwt", { session: false }),
+    extractUserSectorPermissions,
+    censusServices.simpleFindPeople,
+);
 
 //agegar personas a mi padron personal
 router.post(

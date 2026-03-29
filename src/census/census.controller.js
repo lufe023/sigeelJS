@@ -23,16 +23,23 @@ const tiesController = require("../ties/ties.controllers");
 const SectorParaje = require("../models/sectorParaje.model");
 const Ciudadseccion = require("../models/ciudadseccion.model");
 
-const getPeoplesByPlaces = async (province, municipality) => {
-    const peoples = await Census.findAndCountAll({
-        where: {
-            [Op.and]: [{ province }, { municipality }],
-        },
-        attributes: ["citizenID", "leader"],
+const { injectPictureUrl: getPictureUrl } = require("../utils/injecPictureUrl");
+
+const injectPictureUrl = (citizen) => {
+    if (!citizen) return null;
+    const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
+
+    c.picture = getPictureUrl({
+        province: c.province,
+        municipality: c.municipality,
+        precinct: c.PrecinctId,
+        college: c.CollegeId,
+        citizenID: c.citizenID
     });
 
-    return peoples;
+    return c;
 };
+
 
 const getAllCensus = async () => {
     const data = await Census.findAndCountAll({
@@ -117,11 +124,6 @@ const getMyPeople = async (leaderId) => {
                 ],
                 as: "municipalities",
             },
-            // {
-            //     model: Maps,
-            //     attributes: ["id", "name", "parent"],
-            //     as: "districts",
-            // },
 
             {
                 model: Users,
@@ -167,27 +169,26 @@ const getMyPeople = async (leaderId) => {
 
     const peopleWithUpdates = [];
 
-    for (const citizen of data.rows) {
-        const citizenId = citizen.citizenID;
+    const rows = await Promise.all(data.rows.map(async (citizen) => {
+            const citizenId = citizen.citizenID;
+            
+            // Ejecutamos ambas consultas de auditoría al mismo tiempo
+            const [lastUpdatedDates, pendingUpdates] = await Promise.all([
+                getLastUpdatedDates(citizenId),
+                getPendingUpdatesController(citizenId)
+            ]);
 
-        const lastUpdatedDates = await getLastUpdatedDates(citizenId);
-        const pendingUpdates = await getPendingUpdatesController(citizenId);
+            return {
+                ...injectPictureUrl(citizen),
+                lastUpdatedDates,
+                pendingUpdates,
+            };
+    }));
 
-        const citizenWithUpdates = {
-            ...citizen.toJSON(),
-            lastUpdatedDates,
-            pendingUpdates,
-        };
-
-        peopleWithUpdates.push(citizenWithUpdates);
-    }
-
-    return {
-        count: data.count,
-        rows: peopleWithUpdates,
-    };
+    return { count: data.count, rows };
 };
 
+//esta funcion esta proxima a ser eliminada 
 const getPeopleByUser = async (leaderId) => {
     const data = await Census.findAndCountAll({
         where: {
@@ -444,26 +445,20 @@ const getSimpleCensusController = async (leaderId) => {
         ],
     });
 
-    const peopleWithUpdates = [];
+   const rows = await Promise.all(data.rows.map(async (citizen) => {
+        const [lastUpdatedDates, pendingUpdates] = await Promise.all([
+            getLastUpdatedDates(citizen.citizenID),
+            getPendingUpdatesController(citizen.citizenID)
+        ]);
 
-    for (const citizen of data.rows) {
-        const citizenId = citizen.citizenID;
-
-        const lastUpdatedDates = await getLastUpdatedDates(citizenId);
-        const pendingUpdates = await getPendingUpdatesController(citizenId);
-
-        const citizenWithUpdates = {
-            ...citizen.toJSON(),
+        return {
+            ...injectPictureUrl(citizen),
             lastUpdatedDates,
             pendingUpdates,
         };
+    }));
 
-        peopleWithUpdates.push(citizenWithUpdates);
-    }
-
-    const user = await getUser.getUserById(leaderId);
-
-    return data;
+    return { count: data.count, rows };
 };
 //getting one People from db
 const getOnePeople = async (peopleid) => {
@@ -488,16 +483,7 @@ const getOnePeople = async (peopleid) => {
                 ],
                 as: "municipalities",
             },
-            // {
-            //     model : Maps,
-            //     attributes: ['id', 'name', 'parent'],
-            //     as: 'districts'
-            // },
-            // {
-            //     model : Maps,
-            //     attributes: ['id', 'name', 'parent'],
-            //     as: 'neighbourhoods'
-            // },
+
             {
                 model: Users,
                 attributes: ["id", "email"],
@@ -550,11 +536,15 @@ const getOnePeople = async (peopleid) => {
         ],
     });
 
+    if (!data) return null;
+
+    // Inyectamos la URL antes de devolver
+    const processedData = injectPictureUrl(data);
     const lastUpdatedDates = await getLastUpdatedDates(data.citizenID);
     const pendingUpdates = await getPendingUpdatesController(data.citizenID);
 
     return {
-        data,
+        data: processedData,
         lastUpdatedDates,
         pendingUpdates,
     };
@@ -632,9 +622,10 @@ const findPeople = async (findWord, allowedIds = []) => {
 
         // Procesamos para agregar "district" solo si aplica
         const processed = data.rows.map((c) => {
-            const cJson = c.toJSON();
+            
+            const cWithPic = injectPictureUrl(c);
 
-            const sector = cJson.sector;
+            const sector = cWithPic.sector;
             let district = null;
 
             if (sector && sector.ciudadseccion) {
@@ -657,9 +648,9 @@ const findPeople = async (findWord, allowedIds = []) => {
             }
 
             // agregamos district al mismo nivel
-            cJson.district = district;
+            cWithPic.district = district;
+            return cWithPic;
 
-            return cJson;
         });
 
         return { count: data.count, rows: processed };
@@ -669,19 +660,36 @@ const findPeople = async (findWord, allowedIds = []) => {
     }
 };
 
-const simpleFindPeople = async (findWord) => {
+const simpleFindPeople = async (findWord, allowedIds = []) => {
+
+    if (!allowedIds || allowedIds.length === 0) {
+        return { count: 0, rows: [] };
+    }
+
     const data = await Census.findAndCountAll({
         limit: 5,
         where: {
-            [Op.or]: {
-                citizenID: {
-                    [Op.iLike]: `%${findWord}%`,
+            [Op.and]: [
+                { IDSectorParaje: { [Op.in]: allowedIds } }, // Filtro de seguridad
+                {
+                    [Op.or]: {
+                        citizenID: {
+                            [Op.iLike]: `%${findWord}%`,
+                        },
+                    },
                 },
-            },
+            ],
         },
-        attributes: ["citizenID", "firstName", "lastName", "picture"],
+        attributes: ["citizenID", "firstName", "lastName", "picture",  "municipality",
+            "province", 
+            "PrecinctId",
+            "CollegeId"],
     });
-    return data;
+
+    const rowsWithPictures = data.rows.map((row) => injectPictureUrl(row));
+
+        return { count: data.count, rows: rowsWithPictures };
+
 };
 
 const addPeople = async (peopleId, leaderId) => {
@@ -819,7 +827,7 @@ const getAllCensusByCollegeController = async (
             [Op.or]: [false, null],
         };
     }
-    console.log("whereCondition", whereCondition);
+
     const data = await Census.findAndCountAll({
         where: whereCondition,
         order: [
@@ -842,6 +850,9 @@ const getAllCensusByCollegeController = async (
             "otherPhone",
             "adress",
             "municipality",
+            "province", 
+            "PrecinctId",
+            "CollegeId"
         ],
         include: [
             {
@@ -878,7 +889,9 @@ const getAllCensusByCollegeController = async (
         ],
     });
 
-    return [data, college];
+    const processedRows = data.rows.map(citizen => injectPictureUrl(citizen));
+
+  return [ { count: data.count, rows: processedRows }, college ];
 };
 
 const citizenBirthDay = async (citizenID) => {
@@ -911,7 +924,7 @@ module.exports = {
     getMyPeople,
     getPeopleByUser,
     removePeople,
-    getPeoplesByPlaces,
+
     updatePeopleController,
     getLastUpdatedDates,
     getPendingUpdatesController,
