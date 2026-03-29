@@ -5,57 +5,52 @@ const Municipality = require("./municipio.models");
 const Provincia = db.define(
     "provincia",
     {
-        // Clave Primaria (ID)
         ProvinciaId: {
-            type: DataTypes.INTEGER, // smallint en SQL Server se mapea a INTEGER
+            type: DataTypes.INTEGER,
             primaryKey: true,
-            unique: true,
-            allowNull: false, // NOT NULL en SQL Server
-            autoIncrement: false, // Crucial para importar IDs existentes
+            allowNull: false,
+            field: 'ProvinciaId' // Obligatorio por las mayúsculas
         },
-
-        // Descripcion
         Descripcion: {
-            type: DataTypes.STRING(30), // varchar(30)
+            type: DataTypes.STRING(30), // Coincide con varchar(30)
             allowNull: true,
+            field: 'Descripcion'
         },
-
-        // IDMunicipioCabecera (Asumo que es una FK a la tabla Municipio/Maps)
         IDMunicipioCabecera: {
-            type: DataTypes.INTEGER, // smallint se mapea a INTEGER
+            type: DataTypes.INTEGER,
             allowNull: true,
-            // Si tiene FK:
+            field: 'IDMunicipioCabecera'
         },
-
-        // Oficio
         Oficio: {
-            type: DataTypes.STRING(10), // varchar(10)
+            type: DataTypes.STRING(10), // Coincide con varchar(10)
             allowNull: true,
+            field: 'Oficio'
         },
-
-        // Estatus
         Estatus: {
-            type: DataTypes.CHAR(1), // char(1)
+            type: DataTypes.CHAR(1), // Coincide con bpchar(1)
             allowNull: true,
+            field: 'Estatus'
         },
-
-        // ZONA
         ZONA: {
-            type: DataTypes.STRING(2), // varchar(2)
+            type: DataTypes.STRING(2), // Coincide con varchar(2)
             allowNull: true,
+            field: 'ZONA'
         },
-
-        // RegID (UUID de SQL Server)
         RegID: {
-            type: DataTypes.UUID, // uniqueidentifier se mapea a UUID
+            type: DataTypes.UUID,
             allowNull: true,
+            field: 'RegID'
         },
-
-        // Region
         Region: {
-            type: DataTypes.INTEGER, // int se mapea a INTEGER
+            type: DataTypes.INTEGER,
             allowNull: true,
-        },
+            field: 'Region'
+        }
+    },
+    {
+        tableName: "provincia",
+        timestamps: false,
+        underscored: false // Evita que Sequelize meta guiones bajos donde no van
     },
     {
         timestamps: false,

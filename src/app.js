@@ -6,7 +6,8 @@ const { port } = require("./config");
 const db = require("./utils/database");
 const initModels = require("./models/initModels");
 const bodyParser = require("body-parser");
-
+require("dotenv").config();
+const shouldAlter = process.env.DB_SYNC_ALTER === 'true';
 //* Routes
 const userRouter = require("./users/users.router");
 const authRouter = require("./auth/auth.router");
@@ -37,23 +38,20 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(cors());
 app.use(express.json());
 
+initModels();
+
 db.authenticate()
     .then(() => {
         console.log("Database Authenticated");
+        // Solo sincronizamos DESPUÉS de haber autenticado e inicializado modelos
+        return db.sync({ alter: shouldAlter }); 
     })
-    .catch((err) => {
-        console.log(err);
-    });
-
-db.sync({ alter: false })
     .then(() => {
         console.log("Database Synced");
     })
     .catch((err) => {
-        console.log(err);
+        console.log("Error en la base de datos:", err);
     });
-
-initModels();
 
 app.get("/", (req, res) => {
     res.status(200).json({

@@ -8,68 +8,72 @@ const Provincia = require("./provincia.models"); // Importar el propio modelo si
 const Municipality = db.define(
     "municipio",
     {
-        // Clave Primaria (Mapeo de ID)
+        // 1. Clave Primaria - USAR FIELD POR LAS MAYÚSCULAS
         MunicipalityId: {
-            type: DataTypes.INTEGER, // Mapeo de smallint
+            type: DataTypes.INTEGER,
             primaryKey: true,
-            allowNull: false, // Unchecked en SQL Server = NOT NULL
-            autoIncrement: false, // Crucial para la migración
+            allowNull: false,
+            autoIncrement: false,
+            field: 'MunicipalityId' // Exactamente como en el DDL
         },
 
-        // 1. Descripcion
         description: {
-            type: DataTypes.STRING(35), // Mapeo de varchar(35)
-            allowNull: true, // Checked = NULL
+            type: DataTypes.STRING(35),
+            allowNull: true,
+            field: 'description'
         },
 
-        // 2. FK a Provincia (Mapeo de IDProvincia)
+        // 2. FK a Provincia
         ProvinciaId: {
-            type: DataTypes.INTEGER, // Mapeo de smallint
-            allowNull: false, // Unchecked = NOT NULL
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            field: 'ProvinciaId', // Exactamente como en el DDL
             references: {
-                model: Provincia, // Asumiendo que Provinces están en Maps
-                key: "ProvinciaId", // Asumiendo que la PK de Maps es 'id'
-            },
+                model: 'provincia', // Nombre de la tabla destino
+                key: 'ProvinciaId'
+            }
         },
 
-        // 3. FK a Municipio Padre (Mapeo de IDMunicipioPadre)
         parentMunicipalityId: {
-            type: DataTypes.INTEGER, // Mapeo de smallint
-            allowNull: true, // Checked = NULL
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            field: 'parentMunicipalityId'
         },
 
-        // 4. Oficio
         oficio: {
-            type: DataTypes.DECIMAL(18, 0), // Mapeo de decimal(18, 0)
+            type: DataTypes.DECIMAL(18, 0),
             allowNull: true,
+            field: 'oficio'
         },
 
-        // 5. Estatus
         status: {
-            type: DataTypes.STRING(1), // Mapeo de varchar(1)
+            type: DataTypes.STRING(1),
             allowNull: true,
+            field: 'status'
         },
 
-        // 6. DM (Distrito Municipal)
         dm: {
-            type: DataTypes.CHAR(1), // Mapeo de char(1)
+            type: DataTypes.CHAR(1),
             allowNull: true,
+            field: 'dm'
         },
 
-        // Campos de Auditoría: No crearemos las columnas de Sequelize 'createdAt' y 'updatedAt'
-        // ya que tienes tus propias columnas de auditoría. Usaremos la opción 'timestamps: false'.
-
-        // 7. IdUsuarioCreacion
         createdByUserId: {
-            type: DataTypes.INTEGER, // Mapeo de int
+            type: DataTypes.INTEGER,
             allowNull: true,
+            field: 'createdByUserId'
         },
 
-        // 11. RegID (UUID de SQL Server)
         regId: {
-            type: DataTypes.UUID, // Mapeo de uniqueidentifier
+            type: DataTypes.UUID,
             allowNull: true,
+            field: 'regId'
         },
+    },
+    {
+        tableName: "municipios", // <--- DEBE SER PLURAL SEGÚN TU DDL
+        timestamps: false,
+        underscored: false 
     },
     {
         // Deshabilita las columnas automáticas createdAt y updatedAt

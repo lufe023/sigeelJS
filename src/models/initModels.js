@@ -258,16 +258,19 @@ const initModels = () => {
         sourceKey: "createdBy",
         as: "Creador",
     });
-    Campain.hasOne(Provincia, {
-        foreignKey: "ProvinciaId",
-        sourceKey: "provincia",
-        as: "provinces",
-    });
-    Campain.hasOne(Municipios, {
-        foreignKey: "MunicipalityId",
-        sourceKey: "municipio",
-        as: "municipalities",
-    });
+ // Campaña pertenece a una Provincia
+Campain.belongsTo(Provincia, {
+    foreignKey: "provincia",   // La columna en la tabla Campain
+    targetKey: "ProvinciaId",  // La columna PK en la tabla Provincia
+    as: "provinces"
+});
+
+// Campaña pertenece a un Municipio
+Campain.belongsTo(Municipios, {
+    foreignKey: "municipio",      // La columna en la tabla Campain
+    targetKey: "MunicipalityId",  // La PK en la tabla Municipio
+    as: "municipalities"
+});
 
     // --- MANY TO MANY: USUARIO & MUNICIPIO ---
     Users.belongsToMany(Municipios, {
@@ -281,22 +284,27 @@ const initModels = () => {
         foreignKey: "idmunicipio",
         otherKey: "idusuario",
         as: "usuarios",
+        constraints: false,
     });
     UsuarioMunicipio.belongsTo(Users, {
         foreignKey: "idusuario",
         as: "usuario",
+        constraints: false,
     });
     UsuarioMunicipio.belongsTo(Municipios, {
         foreignKey: "idmunicipio",
         as: "municipio",
+        constraints: false,
     });
     Users.hasMany(UsuarioMunicipio, {
         foreignKey: "idusuario",
         as: "usuario_municipios",
+        constraints: false,
     });
     Municipios.hasMany(UsuarioMunicipio, {
         foreignKey: "idmunicipio",
         as: "usuario_municipios",
+        constraints: false,
     });
 
     // --- JERARQUÍA TERRITORIAL FINAL (UNICA VEZ) ---
@@ -332,25 +340,30 @@ const initModels = () => {
         foreignKey: "idusuario",
         otherKey: "idsectorparaje",
         as: "sectores_asignados",
+        constraints: false,
     });
     SectorParaje.belongsToMany(Users, {
         through: UsuarioSectorParaje,
         foreignKey: "idsectorparaje",
         otherKey: "idusuario",
         as: "usuarios_sector_directo",
+        constraints: false,
     });
 
     UsuarioSectorParaje.belongsTo(SectorParaje, {
         foreignKey: "idsectorparaje",
         as: "sector_paraje",
+        constraints: false,
     });
     UsuarioSectorParaje.belongsTo(Users, {
         foreignKey: "idusuario",
         as: "usuario",
+        constraints: false,
     });
     SectorParaje.hasMany(UsuarioSectorParaje, {
         foreignKey: "idsectorparaje",
         as: "asignaciones_intermedias",
+        constraints: false,
     });
 
     // --- PRECINCTS RELATIONSHIPS ---
