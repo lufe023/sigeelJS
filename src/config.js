@@ -8,7 +8,8 @@ const config = {
     host: process.env.HOST,
     frontendHost: process.env.FRONTENDHOST,
     db: {
-        host: process.env.DB_HOST ,
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 5432,
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASS,
         dbName: process.env.DB_NAME 

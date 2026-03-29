@@ -8,3 +8,5 @@ node_modules/
 /uploads/images/citizens/*
 /src/whatsapp/qr
 .pem
+local.env
+Produccion.env
