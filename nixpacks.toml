@@ -1,0 +1,9 @@
+[phases.setup]
+nixPkgs = ['node', 'google-chrome-stable']
+
+[phases.build]
+cmds = ['npm ci']
+
+[variables]
+NODE_ENV = 'production'
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = 'true'
