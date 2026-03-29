@@ -74,19 +74,9 @@ const generateQRImage = async (text, filePath) => {
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        // 💡 ESTO ES LO QUE ARREGLA EL ERROR "Failed to launch the browser process!"
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process', // Ayuda a ahorrar memoria en Railway
-            '--disable-gpu'
-        ],
-        // Si estamos en Railway, usamos el ejecutable de Chrome que instala el buildpack
-        executablePath: process.env.NODE_ENV === 'production' 
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        // Si el archivo existe lo usa, si no, deja que puppeteer busque el suyo
+        executablePath: require('fs').existsSync('/usr/bin/google-chrome-stable') 
             ? '/usr/bin/google-chrome-stable' 
             : undefined
     }
