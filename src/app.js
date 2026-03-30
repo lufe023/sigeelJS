@@ -43,6 +43,7 @@ const allowedOrigins = [
     "https://localhost:5173",
     "http://localhost:4173",
     "https://localhost:4173",
+    "https://192.168.100.13:5173",
     "http://192.168.100.13:5173",
     "http://192.168.100.13:4173",
     "http://192.168.100.13:9000",
