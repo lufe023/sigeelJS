@@ -15,7 +15,7 @@ const TiesTypes = require("../models/tiesTypes.models");
 const College = require("../models/college.models");
 const Precincts = require("../models/precinct.models");
 const AuditLog = require("../models/audit.models");
-const { Sequelize, Op } = require("sequelize");
+const { Op, fn, col, where: sequelizeWhere } = require("sequelize");
 const Suffrages = require("../models/suffrage.models");
 const Provincia = require("../models/provincia.models");
 const Municipio = require("../models/municipio.models");
@@ -550,31 +550,66 @@ const getOnePeople = async (peopleid) => {
     };
 };
 
-const findPeople = async (findWord, allowedIds = []) => {
+const findPeople = async (findWord, allowedIds = [], page = 1, size = 5, filters = {}) => {
     try {
-        const looking = findWord.trim().replace(/-/g, "");
-        const words = looking.split(/\s+/).filter(Boolean);
+        const limit = parseInt(size);
+        const offset = (parseInt(page) - 1) * limit;
 
-        if (!allowedIds || allowedIds.length === 0) {
-            return { count: 0, rows: [] };
+        // 1. Condiciones de búsqueda por texto (Nombre, Cédula, Teléfonos)
+        let mainConditions = [];
+        if (findWord) {
+            const looking = findWord.trim().replace(/-/g, "");
+            const words = looking.split(/\s+/).filter(Boolean);
+            
+            mainConditions = words.map((word) => ({
+                [Op.or]: [
+                    { firstName: { [Op.iLike]: `%${word}%` } },
+                    { lastName: { [Op.iLike]: `%${word}%` } },
+                    { lastNameB: { [Op.iLike]: `%${word}%` } },
+                    { citizenID: { [Op.iLike]: `%${word}%` } },
+                    { celphone: { [Op.iLike]: `%${word}%` } }, // Agregamos teléfonos
+                    { telephone: { [Op.iLike]: `%${word}%` } },
+                ],
+            }));
         }
 
-        const wordConditions = words.map((word) => ({
-            [Op.or]: [
-                { firstName: { [Op.iLike]: `%${word}%` } },
-                { lastName: { [Op.iLike]: `%${word}%` } },
-                { lastNameB: { [Op.iLike]: `%${word}%` } },
-                { nickname: { [Op.iLike]: `%${word}%` } },
-                { citizenID: { [Op.iLike]: `%${word}%` } },
-            ],
-        }));
+        // 2. Filtros Opcionales Dinámicos
+        const extraConditions = {};
+        
+        if (filters.gender) extraConditions.gender = filters.gender;
+        if (filters.IdEstadoCivil) extraConditions.IdEstadoCivil = filters.IdEstadoCivil;
+        if (filters.province) extraConditions.province = filters.province;
+        if (filters.municipality) extraConditions.municipality = filters.municipality;
+        if (filters.IDSectorParaje) extraConditions.IDSectorParaje = filters.IDSectorParaje;
+        if (filters.CollegeId) extraConditions.CollegeId = filters.CollegeId;
+
+        // 3. Filtro por Rango de Edad (Cálculo sobre birthDay)
+        if (filters.minAge || filters.maxAge) {
+            const minAge = filters.minAge || 0;
+            const maxAge = filters.maxAge || 120;
+            
+            // Usamos lógica de Sequelize para calcular la edad actual
+            extraConditions.birthDay = sequelizeWhere(
+                fn('age', col('birthDay')), 
+                { [Op.between]: [fn('make_interval', 0, 0, 0, minAge), fn('make_interval', 0, 0, 0, maxAge)] }
+            );
+            // Nota: Si usas SQLite o MySQL, la sintaxis de 'age' cambia, pero para PostgreSQL es ideal.
+            // Alternativa simple por fechas:
+            const today = new Date();
+            const dateMin = new Date(today.getFullYear() - maxAge - 1, today.getMonth(), today.getDate());
+            const dateMax = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate());
+            extraConditions.birthDay = { [Op.between]: [dateMin, dateMax] };
+        }
 
         const data = await Census.findAndCountAll({
-            limit: 5,
+            limit,
+            offset,
+            distinct: true,
             where: {
                 [Op.and]: [
-                    ...wordConditions,
-                    { IDSectorParaje: { [Op.in]: allowedIds } }, // <--- FILTRO DE SEGURIDAD
+                    ...mainConditions,
+                    extraConditions, // Filtros opcionales
+                    { IDSectorParaje: { [Op.in]: allowedIds } }, // Seguridad
                 ],
             },
             include: [

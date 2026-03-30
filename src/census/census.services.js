@@ -63,21 +63,25 @@ const getOnePeople = (req, res) => {
 };
 
 const findPeople = (req, res) => {
-    const findWord = req.body.findWord;
+    const { findWord, page, size, filters } = req.body;
     const allowedIds = req.allowedSectorIds;
 
     if (findWord) {
+        // Pasamos los parámetros de paginación al controlador de censo
         censusControllers
-            .findPeople(findWord, allowedIds)
+            .findPeople(findWord, allowedIds, page, size, filters) 
             .then((data) => {
                 res.status(200).json({
-                    data,
+                    data: data.rows,
+                    totalItems: data.count,
+                    currentPage: page || 1,
+                    totalPages: Math.ceil(data.count / (size || 5)),
                     busqueda: findWord,
                 });
             })
             .catch((err) => {
                 res.status(400).json({
-                    erorr: err,
+                    error: err,
                     mensaje: "Ha habido un error",
                 });
             });
