@@ -35,7 +35,35 @@ const app = express();
 app.use(bodyParser.json({ limit: "500mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 
-app.use(cors());
+const allowedOrigins = [
+    "https://luisalcalde.mielector.com",
+    "https://sigeeljs-production.up.railway.app",
+    "https://sigeelfront.pages.dev",
+    "http://localhost:5173",
+    "https://localhost:5173",
+    "http://localhost:4173",
+    "https://localhost:4173",
+    "http://192.168.100.13:5173",
+    "http://192.168.100.13:4173",
+    "http://192.168.100.13:9000",
+    "https://192.168.100.13:9000"
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Permitir si no hay origen (Postman/Apps) o si está en la lista
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.error("🚫 ORIGEN BLOQUEADO POR SIGEEL:", origin);
+            callback(new Error("No permitido por la política de seguridad Sigeel"));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 initModels();
