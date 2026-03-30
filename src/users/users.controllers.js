@@ -5,26 +5,20 @@ const Roles = require("../models/roles.models");
 const { Sequelize, Op } = require("sequelize");
 const Users = require("../models/users.models");
 const { hashPassword } = require("../utils/crypto");
-
-require('dotenv').config();
+const { injectPictureUrl: getPictureUrl } = require("../utils/injecPictureUrl");
 
 const injectPictureUrl = (citizen) => {
     if (!citizen) return null;
     const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
 
-    const province = c.province || 0;
-    const municipality = c.municipality || 0;
-    const precinct = c.PrecinctId || 0;
-    const college = c.CollegeId || 0;
-    const cedula = c.citizenID;
+    c.picture = getPictureUrl({
+        province: c.province,
+        municipality: c.municipality,
+        precinct: c.PrecinctId,
+        college: c.CollegeId,
+        citizenID: c.citizenID
+    });
 
-    const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
-    
-    // Si la cédula no existe, no podemos construir una URL válida
-    c.picture = cedula 
-        ? `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${cedula}`
-        : null;
-    
     return c;
 };
 
