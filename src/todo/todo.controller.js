@@ -2,6 +2,8 @@ const Todo = require('../models/todo.models')
 const uuid = require('uuid')
 const {Op, and} = require("sequelize")
 const Users = require('../models/users.models')
+const Census = require('../models/census.models')
+const { injectPictureUrl } = require('../utils/injecPictureUrl');
 
 const createTask = async (data) => {
     const newTask = await Todo.create({
@@ -30,6 +32,24 @@ const getAlltasks = async (id) => {
                     model:Users,
                     as: 'Responsible',
                     attributes: ['email'],
+                    include:[
+                        {
+                            model:Census,
+                            as: 'censu',
+                            attributes: [
+                             
+                                'lastName',
+                                'picture',
+                                'id',
+                                'firstName',
+                                'province',
+                                'municipality',
+                                'PrecinctId',
+                                'CollegeId',
+                                'citizenID',
+                            ],
+                        }
+                    ]
                 },
                 {
                     model:Users,
@@ -38,7 +58,23 @@ const getAlltasks = async (id) => {
                 }
             ]
     })
-    return data
+    // Inyectar URL de imagen para cada tarea (si existe Census)
+    const result = data.map((task) => {
+        const t = task.toJSON ? task.toJSON() : { ...task };
+        if (t.Responsible && (t.Responsible.censu || t.Responsible.Census)) {
+            const c = t.Responsible.censu || t.Responsible.Census;
+            c.picture = injectPictureUrl({
+                province: c.province,
+                municipality: c.municipality,
+                precinct: c.PrecinctId,
+                college: c.CollegeId,
+                citizenID: c.citizenID || c.id,
+            });
+        }
+        return t;
+    });
+
+    return result
 }
 
 const getTaskById = async (taskid, userid) => {
@@ -58,6 +94,24 @@ const getTaskById = async (taskid, userid) => {
                     model:Users,
                     as: 'Responsible',
                     attributes: ['email'],
+                    include:[
+                        {
+                            model:Census,
+                            as: 'censu',
+                            attributes: [
+                                'firstName',
+                                'lastName',
+                                'picture',
+                                'id',
+                                
+                                'province',
+                                'municipality',
+                                'PrecinctId',
+                                'CollegeId',
+                                'citizenID',
+                            ],
+                        }
+                    ]
                 },
                 {
                     model:Users,
@@ -66,7 +120,23 @@ const getTaskById = async (taskid, userid) => {
                 }
             ]
     })
-    return data
+    // Inyectar URL de imagen en el objeto Census (soporte para alias 'censu' y 'Census')
+    const result = data.map((task) => {
+        const t = task.toJSON ? task.toJSON() : { ...task };
+        if (t.Responsible && (t.Responsible.censu || t.Responsible.Census)) {
+            const c = t.Responsible.censu || t.Responsible.Census;
+            c.picture = injectPictureUrl({
+                province: c.province,
+                municipality: c.municipality,
+                precinct: c.PrecinctId,
+                college: c.CollegeId,
+                citizenID: c.citizenID || c.id,
+            });
+        }
+        return t;
+    });
+
+    return result
 }
 
 
