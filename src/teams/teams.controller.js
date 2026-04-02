@@ -3,6 +3,7 @@ const uuid = require('uuid')
 const Users = require('../models/users.models')
 const { Op, Sequelize } = require('sequelize');
 const Census = require("../models/census.models");
+const { injectPictureInto } = require('../utils/injecPictureUrl');
 const Roles = require("../models/roles.models");
 const teamsMembers = require("../models/teamsMembers.models");
 const Todo = require("../models/todo.models");
@@ -36,7 +37,8 @@ const allTeams = await Teams.findAll({
     ]
 })
 
-return allTeams
+// Inyectar picture en cualquier Census dentro del resultado
+return injectPictureInto(allTeams)
 } 
 
 
@@ -86,7 +88,7 @@ const getOneTeamController = async(id) => {
         ]
     })
 
-    return getTeam
+    return injectPictureInto(getTeam)
 
 }
 
@@ -218,7 +220,7 @@ const addMembersTeam = async (teamId, members, teamLeader) => {
                 },
             ]
         });
-        return teams;
+        return injectPictureInto(teams);
 };
 
 const deleteTeamMemberController = async (teamId, memberId) => {

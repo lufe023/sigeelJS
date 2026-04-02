@@ -8,6 +8,7 @@ const getAlltasks = (req, res) => {
         res.status(200).json(data);
       })
       .catch((err) => {
+        console.error('Error en getAlltasks:', err);
         res.status(400).json({ message: err.message });
       });
   };
@@ -22,6 +23,7 @@ const getAlltasks = (req, res) => {
         res.status(200).json(data);
       })
       .catch((err) => {
+        console.error('Error en getTaskById:', err);
         res.status(404).json({ message: err.message });
       });
   };
@@ -52,6 +54,7 @@ const getAlltasks = (req, res) => {
           res.status(201).json(data);
         })
         .catch((err) => {
+          console.error('Error en createTask service:', err);
           res.status(400).json({
             Error: err
           });
