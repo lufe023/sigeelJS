@@ -14,9 +14,14 @@ const getAllMaps = async () => {
     });
 
     const municipalitiesWithID = municipalityResult.rows.map((muni) => {
+        const m = muni.get({ plain: true });
+        const parentDiffers = m.parentMunicipalityId != null && String(m.parentMunicipalityId) !== String(m.MunicipalityId);
+        const dmFlag = m.dm === "1";
+        const isDistrict = parentDiffers || dmFlag;
+
         return {
-            ...muni.get({ plain: true }),
-            type: "municipality",
+            ...m,
+            type: isDistrict ? "district" : "municipality",
         };
     });
 
