@@ -8,6 +8,87 @@ const Census = require('../models/census.models')
 const Suffrages = require('../models/suffrage.models')
 const College = require('../models/college.models')
 const Precincts = require('../models/precinct.models')
+const Users = require('../models/users.models')
+const Municipio = require('../models/municipio.models')
+const SectorParaje = require('../models/sectorParaje.model')
+const Ciudadseccion = require('../models/ciudadseccion.model')
+
+const roundPercentage = (value, total) => {
+    if (!total) return 0;
+
+    return Number(((value / total) * 100).toFixed(2));
+};
+
+const resolveMetaGoal = (electLocal, meta) => {
+    const localElectors = Number(electLocal) || 0;
+    const rawMeta = Number(meta) || 0;
+
+    if (!rawMeta) {
+        return {
+            metaConfigured: false,
+            metaType: null,
+            metaTarget: 0,
+            metaPercent: 0,
+        };
+    }
+
+    if (rawMeta <= 100) {
+        return {
+            metaConfigured: true,
+            metaType: 'percentage',
+            metaTarget: Math.ceil((localElectors * rawMeta) / 100),
+            metaPercent: rawMeta,
+        };
+    }
+
+    return {
+        metaConfigured: true,
+        metaType: 'absolute',
+        metaTarget: rawMeta,
+        metaPercent: roundPercentage(rawMeta, localElectors),
+    };
+};
+
+const buildLeaderLocationScope = ({ municipalityId, districtId }) => {
+    const where = {};
+    const include = [
+        {
+            model: SectorParaje,
+            as: 'sector',
+            attributes: [
+                'SectorParajeId',
+                'CodigoSector',
+                'Descripcion',
+                'IDCiudadSeccion',
+            ],
+            required: Boolean(districtId),
+            include: [
+                {
+                    model: Ciudadseccion,
+                    as: 'ciudadseccion',
+                    attributes: [
+                        'CiudadseccionId',
+                        'idmunicipio',
+                        'iddistritomunicipal',
+                        'descripcion',
+                    ],
+                    required: Boolean(districtId),
+                    where: districtId
+                        ? {
+                            iddistritomunicipal: districtId,
+                        }
+                        : undefined,
+                },
+            ],
+        },
+    ];
+
+    if (municipalityId) {
+        where.municipality = municipalityId;
+    }
+
+    return { where, include };
+};
 
 const getCampainReport = async (campainId)=> {
     const report = await Campain.findAll({
@@ -337,46 +418,360 @@ const bocaUrna = async (college,campain) => {
   }
 };
 
-const coberturaController = async (precinct)=> {
-  
+const getPrecinctCoverageReportController = async (precinctId)=> {
     try {
-      // Obtener los citizenID de los registros de Census que tienen suffrage verdadero en Suffrages
-      const colleges = await College.findAndCountAll({
-        where: {
-          precinct: precinct,
-        },
-        raw: false,
-        include:[
-          {
-            model: Census,
-            attributes: ['id','firstName','lastName', 'citizenID', 'picture'],
-            as: 'ColegioCensus',
-            where: {
-              leader:null,
-              [Op.not]:{outside: true},
-            },
-            include:[
-              {model: Suffrages,
-              as: 'sufragio'
-            }
-            ]
-          }
-        ]
-      });
-
       const recinto = await Precincts.findOne({
         where:{
-          id: precinct
+          PrecinctId: precinctId
+        },
+        attributes: [
+          'PrecinctId',
+          'precintNumber',
+          'descripcion',
+          'direccionRecinto',
+          'electLocal',
+          'electExterior',
+          'circunscripcion',
+        ],
+      })
+
+      if (!recinto) {
+        return null
+      }
+
+      const colleges = await College.findAll({
+        where: {
+          PrecinctId: precinctId,
+        },
+        attributes: [
+          'CollegeId',
+          'collegeNumber',
+          'description',
+          'PrecinctId',
+          'electLocal',
+          'electExterior',
+          'meta',
+        ],
+        order: [['collegeNumber', 'ASC']],
+      });
+
+      const collegeIds = colleges.map((college) => college.CollegeId)
+
+      const assignedByCollege = collegeIds.length > 0
+        ? await Census.findAll({
+          where: {
+            CollegeId: {
+              [Op.in]: collegeIds,
+            },
+            leader: {
+              [Op.ne]: null,
+            },
+          },
+          attributes: [
+            'CollegeId',
+            [Sequelize.fn('COUNT', Sequelize.literal('*')), 'padroncilloTotal'],
+            [
+              Sequelize.fn(
+                'SUM',
+                Sequelize.literal('CASE WHEN "outside" = true THEN 0 ELSE 1 END')
+              ),
+              'padroncilloLocal',
+            ],
+            [
+              Sequelize.fn(
+                'SUM',
+                Sequelize.literal('CASE WHEN "outside" = true THEN 1 ELSE 0 END')
+              ),
+              'padroncilloExterior',
+            ],
+          ],
+          group: ['CollegeId'],
+          raw: true,
+        })
+        : [];
+
+      const assignedMap = new Map(
+        assignedByCollege.map((row) => [
+          Number(row.CollegeId),
+          {
+            padroncilloTotal: Number(row.padroncilloTotal) || 0,
+            padroncilloLocal: Number(row.padroncilloLocal) || 0,
+            padroncilloExterior: Number(row.padroncilloExterior) || 0,
+          },
+        ])
+      )
+
+      const collegesReport = colleges.map((college) => {
+        const baseCollege = college.toJSON()
+        const electLocal = Number(baseCollege.electLocal) || 0
+        const electExterior = Number(baseCollege.electExterior) || 0
+        const counts = assignedMap.get(baseCollege.CollegeId) || {
+          padroncilloTotal: 0,
+          padroncilloLocal: 0,
+          padroncilloExterior: 0,
+        }
+        const metaGoal = resolveMetaGoal(electLocal, baseCollege.meta)
+        const pendingToMeta = metaGoal.metaConfigured
+          ? Math.max(metaGoal.metaTarget - counts.padroncilloLocal, 0)
+          : null
+
+        return {
+          ...baseCollege,
+          padroncillo: {
+            local: counts.padroncilloLocal,
+            exterior: counts.padroncilloExterior,
+            total: counts.padroncilloTotal,
+          },
+          coverage: {
+            localCoveragePercent: roundPercentage(
+              counts.padroncilloLocal,
+              electLocal
+            ),
+            exteriorCoveragePercent: roundPercentage(
+              counts.padroncilloExterior,
+              electExterior
+            ),
+            metaConfigured: metaGoal.metaConfigured,
+            metaType: metaGoal.metaType,
+            metaPercent: metaGoal.metaPercent,
+            metaTarget: metaGoal.metaTarget,
+            metaReached: metaGoal.metaConfigured
+              ? counts.padroncilloLocal >= metaGoal.metaTarget
+              : null,
+            pendingToMeta,
+            metaProgressPercent: metaGoal.metaConfigured
+              ? roundPercentage(counts.padroncilloLocal, metaGoal.metaTarget)
+              : null,
+          },
         }
       })
 
-      return [recinto, colleges]
+      const summary = collegesReport.reduce(
+        (acc, college) => {
+          acc.collegeCount += 1
+          acc.electLocal += Number(college.electLocal) || 0
+          acc.electExterior += Number(college.electExterior) || 0
+          acc.padroncilloLocal += college.padroncillo.local
+          acc.padroncilloExterior += college.padroncillo.exterior
+          acc.padroncilloTotal += college.padroncillo.total
+
+          if (college.coverage.metaConfigured) {
+            acc.metaConfiguredColleges += 1
+            acc.metaTarget += college.coverage.metaTarget
+            acc.pendingToMeta += college.coverage.pendingToMeta
+
+            if (college.coverage.metaReached) {
+              acc.metaReachedColleges += 1
+            }
+          }
+
+          return acc
+        },
+        {
+          collegeCount: 0,
+          electLocal: 0,
+          electExterior: 0,
+          padroncilloLocal: 0,
+          padroncilloExterior: 0,
+          padroncilloTotal: 0,
+          metaConfiguredColleges: 0,
+          metaReachedColleges: 0,
+          metaTarget: 0,
+          pendingToMeta: 0,
+        }
+      )
+
+      return {
+        precinct: recinto.toJSON(),
+        summary: {
+          ...summary,
+          localCoveragePercent: roundPercentage(
+            summary.padroncilloLocal,
+            summary.electLocal
+          ),
+          exteriorCoveragePercent: roundPercentage(
+            summary.padroncilloExterior,
+            summary.electExterior
+          ),
+          metaReached:
+            summary.metaConfiguredColleges > 0
+              ? summary.pendingToMeta === 0
+              : null,
+          metaProgressPercent:
+            summary.metaConfiguredColleges > 0
+              ? roundPercentage(summary.padroncilloLocal, summary.metaTarget)
+              : null,
+        },
+        colleges: collegesReport,
+      }
     } catch (error) {
-      // Manejar errores aquí
       console.error(error);
       throw error;
     }
   };
+
+const getLeaderCoverageReportController = async ({
+    municipalityId,
+    districtId,
+    leaderGoal = 10,
+}) => {
+    const normalizedMunicipalityId = municipalityId ? Number(municipalityId) : null;
+    const normalizedDistrictId = districtId ? Number(districtId) : null;
+    const parsedGoal = Number(leaderGoal);
+    const normalizedGoal = Number.isFinite(parsedGoal) && parsedGoal > 0
+        ? parsedGoal
+        : 10;
+    const scope = buildLeaderLocationScope({
+        municipalityId: normalizedMunicipalityId,
+        districtId: normalizedDistrictId,
+    });
+
+    const [municipality, district] = await Promise.all([
+        normalizedMunicipalityId
+            ? Municipio.findOne({
+                where: { MunicipalityId: normalizedMunicipalityId },
+                attributes: ['MunicipalityId', 'description', 'parentMunicipalityId', 'dm'],
+            })
+            : null,
+        normalizedDistrictId
+            ? Municipio.findOne({
+                where: { MunicipalityId: normalizedDistrictId },
+                attributes: ['MunicipalityId', 'description', 'parentMunicipalityId', 'dm'],
+            })
+            : null,
+    ]);
+
+    const leaders = await Census.findAll({
+        where: scope.where,
+        attributes: [
+            'citizenID',
+            'firstName',
+            'lastName',
+            'nickname',
+            'municipality',
+            'IDSectorParaje',
+        ],
+        include: [
+            {
+                model: Users,
+                as: 'colaborador',
+                required: true,
+                attributes: ['id', 'email', 'userRoleId', 'active', 'censuCitizenID'],
+            },
+            {
+                model: Municipio,
+                as: 'municipalities',
+                required: false,
+                attributes: ['MunicipalityId', 'description', 'parentMunicipalityId', 'dm'],
+            },
+            ...scope.include,
+        ],
+        order: [
+            ['firstName', 'ASC'],
+            ['lastName', 'ASC'],
+        ],
+    });
+
+    const affiliatedCounts = await Census.findAll({
+        where: {
+            ...scope.where,
+            leader: {
+                [Op.ne]: null,
+            },
+        },
+        attributes: [
+            'leader',
+            [Sequelize.fn('COUNT', Sequelize.literal('*')), 'affiliatedCount'],
+        ],
+        include: scope.include.map((includeItem) => ({
+            ...includeItem,
+            attributes: [],
+            include: includeItem.include.map((nestedInclude) => ({
+                ...nestedInclude,
+                attributes: [],
+            })),
+        })),
+        group: ['leader'],
+        raw: true,
+    });
+
+    const affiliatedMap = new Map(
+        affiliatedCounts.map((row) => [
+            row.leader,
+            Number(row.affiliatedCount) || 0,
+        ])
+    );
+
+    const rows = leaders.map((leaderCensus) => {
+        const leader = leaderCensus.toJSON();
+        const affiliatedCount = affiliatedMap.get(leader.colaborador.id) || 0;
+        const missingToGoal = Math.max(normalizedGoal - affiliatedCount, 0);
+
+        return {
+            leaderId: leader.colaborador.id,
+            email: leader.colaborador.email,
+            userRoleId: leader.colaborador.userRoleId,
+            active: leader.colaborador.active,
+            censuCitizenID: leader.colaborador.censuCitizenID,
+            citizenID: leader.citizenID,
+            firstName: leader.firstName,
+            lastName: leader.lastName,
+            nickname: leader.nickname,
+            municipality: leader.municipalities || null,
+            citySection: leader.sector?.ciudadseccion || null,
+            sector: leader.sector || null,
+            affiliatedCount,
+            leaderGoal: normalizedGoal,
+            goalReached: affiliatedCount >= normalizedGoal,
+            missingToGoal,
+        };
+    });
+
+    const summary = rows.reduce(
+        (acc, row) => {
+            acc.totalLeaders += 1;
+            acc.totalAffiliated += row.affiliatedCount;
+
+            if (row.goalReached) {
+                acc.goalReachedCount += 1;
+            } else {
+                acc.goalPendingCount += 1;
+            }
+
+            return acc;
+        },
+        {
+            totalLeaders: 0,
+            totalAffiliated: 0,
+            goalReachedCount: 0,
+            goalPendingCount: 0,
+        }
+    );
+
+    rows.sort((a, b) => {
+        if (b.affiliatedCount !== a.affiliatedCount) {
+            return b.affiliatedCount - a.affiliatedCount;
+        }
+
+        return `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(
+            `${b.firstName || ''} ${b.lastName || ''}`
+        );
+    });
+
+    return {
+        filters: {
+            municipalityId: normalizedMunicipalityId,
+            districtId: normalizedDistrictId,
+            leaderGoal: normalizedGoal,
+        },
+        location: {
+            municipality,
+            district,
+        },
+        summary,
+        leaders: rows,
+    };
+};
 
   
 
@@ -386,6 +781,7 @@ module.exports = {
     getPartyCollegeReportController,
     getPreferedPresidentReportByPlaceController,
     bocaUrna,
-    coberturaController,
+    getPrecinctCoverageReportController,
+    getLeaderCoverageReportController,
     bocaUrnaAlcalde
 }

@@ -24,7 +24,6 @@ const campainId = req.query.campainId
     }
 };
 
-
 // controlador para reportes de encuestas pero en el colegio electoral que se seleccione
 const getPartyCollegeReportService = (req, res) => {
     const campainId = req.query.campainId
@@ -74,15 +73,51 @@ const bocaUrnaService = (req, res) => {
               .catch((err) => {res.status(400).json({ err })});
           };
 
-const coberturaService = (req, res) => {
+const getPrecinctCoverageReportService = (req, res) => {
+    const precinctId = req.query.precinctId || req.query.precinct
 
-    const precinct = req.query.precinct
+    if (precinctId) {
+        reportController.getPrecinctCoverageReportController(precinctId)
+        .then((data) => {
+            if (!data) {
+                return res.status(404).json({ message: "recinto no encontrado" })
+            }
 
-    reportController.coberturaController(precinct)
-    .then((data) => {res.status(200).json(data);})
-    .catch((err) => {res.status(400).json({ err })});
+            res.status(200).json(data);
+        })
+        .catch((err) => {res.status(400).json({ err })});
+    } else {
+        res.status(400).json({
+            message: "debe enviar como parametro precinctId de tipo integer",
+        })
+    }
 }
 
+const getLeaderCoverageReportService = (req, res) => {
+    const municipalityId = req.query.municipalityId || req.query.municipality
+    const districtId = req.query.districtId || req.query.district
+    const leaderGoal = req.query.leaderGoal || req.query.leadergoal || 10
+
+    if (!municipalityId && !districtId) {
+        return res.status(400).json({
+            message: "debe enviar municipalityId o districtId como parametro",
+        })
+    }
+
+    reportController.getLeaderCoverageReportController({
+        municipalityId,
+        districtId,
+        leaderGoal,
+    })
+    .then((data) => {
+        if (!data) {
+            return res.status(404).json({ message: "no se encontraron líderes con esos parámetros" })
+        }
+
+        res.status(200).json(data);
+    })
+    .catch((err) => {res.status(400).json({ err })});
+}
 module.exports = {
     getCampainReport,
     getPartyReport,
@@ -90,5 +125,6 @@ module.exports = {
     getPreferedPresidentReportByPlaceService,
     bocaUrnaService,
     bocaUrnaServiceAlcalde,
-    coberturaService
+    getPrecinctCoverageReportService,
+    getLeaderCoverageReportService
 }

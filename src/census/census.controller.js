@@ -188,101 +188,8 @@ const getMyPeople = async (leaderId) => {
     return { count: data.count, rows };
 };
 
-//esta funcion esta proxima a ser eliminada 
 const getPeopleByUser = async (leaderId) => {
-    const data = await Census.findAndCountAll({
-        where: {
-            leader: leaderId,
-        },
-        include: [
-            {
-                model: Suffrages,
-                as: "sufragio",
-            },
-            {
-                model: Maps,
-                attributes: ["id", "name", "parent"],
-                as: "provinces",
-            },
-            {
-                model: Maps,
-                attributes: ["id", "name", "parent"],
-                as: "municipalities",
-            },
-            {
-                model: Maps,
-                attributes: ["id", "name", "parent"],
-                as: "districts",
-            },
-            {
-                model: Maps,
-                attributes: ["id", "name", "parent"],
-                as: "neighbourhoods",
-            },
-            {
-                model: Users,
-                attributes: ["id", "email"],
-                as: "leaders",
-            },
-            {
-                model: Benefit,
-                //attributes: ['id', 'email'],
-                as: "Beneficios",
-            },
-            {
-                model: Job,
-                //attributes: ['id', 'email'],
-                as: "Empleos",
-            },
-            {
-                model: Participation,
-                //attributes: ['id', 'email'],
-                as: "Actividades",
-            },
-            {
-                model: Gps,
-                //attributes: ['id', 'email'],
-                as: "geolocation",
-            },
-            {
-                model: Poll,
-                //attributes: ['id', 'citizenID', 'campain'],
-                as: "Encuestas",
-                include: [{ model: Campain, as: "Campain" }],
-            },
-            {
-                model: Condition,
-                as: "condition",
-            },
-            {
-                model: College,
-                as: "colegio",
-                include: [
-                    {
-                        model: Precincts,
-                        as: "precinctData", // Usar el nombre del alias en la relación
-                    },
-                ],
-            },
-        ],
-    });
-
-    const peopleWithUpdates = [];
-
-    for (const citizen of data.rows) {
-        const citizenId = citizen.citizenID;
-
-        const lastUpdatedDates = await getLastUpdatedDates(citizenId);
-        const pendingUpdates = await getPendingUpdatesController(citizenId);
-
-        const citizenWithUpdates = {
-            ...citizen.toJSON(),
-            lastUpdatedDates,
-            pendingUpdates,
-        };
-
-        peopleWithUpdates.push(citizenWithUpdates);
-    }
+    const peopleData = await getMyPeople(leaderId);
 
     const user = await getUser.getUserById(leaderId);
 
@@ -291,8 +198,8 @@ const getPeopleByUser = async (leaderId) => {
     );
 
     return {
-        count: data.count,
-        rows: peopleWithUpdates,
+        count: peopleData.count,
+        rows: peopleData.rows,
         user,
         ties,
     };

@@ -49,7 +49,6 @@ const allowedOrigins = [
     "http://192.168.100.13:9000",
     "https://192.168.100.13:9000"
 ];
-
 app.use(cors({
     origin: function (origin, callback) {
         // Permitir si no hay origen (Postman/Apps) o si está en la lista
