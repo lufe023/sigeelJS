@@ -197,102 +197,45 @@ const newCitizenController = async (citizen, filename) => {
 };
 
 const getDataConsistencyController = async () => {
-    try {
-        const precinctsData = await Precincts.findAll({
-            order: [
-                [{ model: Maps, as: "PrecinctsMunicipio" }, "id", "ASC"],
-                ["precintNumber", "ASC"],
-            ],
+    // 1. Trae solo lo necesario y como objetos planos (raw)
+    const precinctsData = await Precincts.findAll({
+        include: [
+            { model: College, as: "colegios" },
+            { model: Maps, as: "PrecinctsProvincia" },
+            { model: Maps, as: "PrecinctsMunicipio" }
+        ],
+        raw: false, // Necesitamos false si usas métodos de instancia, pero mejor procesa a mano
+        nest: true
+    });
 
-            include: [
-                {
-                    model: College,
-                    as: "colegios",
-                },
-                {
-                    model: Maps,
-                    as: "PrecinctsProvincia",
-                },
-                {
-                    model: Maps,
-                    as: "PrecinctsMunicipio",
-                },
+    // 2. En lugar de miles de counts, podrías hacer una sola consulta 
+    // agrupada por colegio para obtener todos los totales de una vez.
+    
+    // 3. Procesa en bloques o secuencialmente
+    const finalResult = [];
+    for (const p of precinctsData) {
+        const plainPrecinct = p.get({ plain: true }); // Convierte a objeto simple
+        
+        // Ejecuta los conteos pero de forma controlada
+        const collegeIds = plainPrecinct.colegios.map(c => c.id);
+        
+        // Usa una sola consulta para contar todo lo del recinto
+        const counts = await Census.findAll({
+            attributes: [
+                'outside',
+                [db.fn('COUNT', db.col('id')), 'total']
             ],
+            where: { college: collegeIds },
+            group: ['outside'],
+            raw: true
         });
 
-        const result = await Promise.all(
-            precinctsData.map(async (precinct) => {
-                const {
-                    id,
-                    precintNumber,
-                    recintoNombre,
-                    electLocal,
-                    electExterior,
-                    colegios,
-                    PrecinctsProvincia,
-                    PrecinctsMunicipio,
-                } = precinct;
-
-                const collegeIds = colegios.map((college) => college.id);
-
-                const collegeCitizensPromises = colegios.map(
-                    async (college) => {
-                        const collegeCitizensLocal = await Census.count({
-                            where: {
-                                college: college.id,
-                                outside: { [Op.or]: [false, null] },
-                            },
-                        });
-
-                        const collegeCitizensExterior = await Census.count({
-                            where: {
-                                college: college.id,
-                                outside: true,
-                            },
-                        });
-
-                        return {
-                            ...college.dataValues,
-                            collegeCitizensLocal,
-                            collegeCitizensExterior,
-                        };
-                    },
-                );
-
-                const collegeCitizens = await Promise.all(
-                    collegeCitizensPromises,
-                );
-
-                return {
-                    id,
-                    precintNumber,
-                    recintoNombre,
-                    electLocal,
-                    electExterior,
-                    PrecinctsProvincia,
-                    PrecinctsMunicipio,
-                    localCitizens: await Census.count({
-                        where: {
-                            college: collegeIds,
-                            outside: { [Op.or]: [false, null] },
-                        },
-                    }),
-                    exteriorCitizens: await Census.count({
-                        where: {
-                            college: collegeIds,
-                            outside: true,
-                        },
-                    }),
-                    colegios: collegeCitizens,
-                };
-            }),
-        );
-
-        return result;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error;
+        finalResult.push({
+            ...plainPrecinct,
+            counts // Procesa estos totales en JS simple
+        });
     }
+    return finalResult;
 };
 
 module.exports = {

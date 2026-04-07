@@ -16,5 +16,6 @@
     "peacock.color": "#42b883",
     "prettier.bracketSameLine": true,
     "prettier.bracketSpacing": true,
-    "prettier.enableDebugLogs": true
+    "prettier.enableDebugLogs": true,
+    "CodeGPT.apiKey": "Ollama"
 }

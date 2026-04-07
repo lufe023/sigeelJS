@@ -28,14 +28,20 @@ const getMyPeople = (req, res) => {
 
 const getPeopleByUser = (req, res) => {
     const leaderId = req.body.leaderId;
-    censusControllers
-        .getMyPeople(leaderId)
-        .then((data) => {
-            res.status(200).json(data);
-        })
-        .catch((err) => {
-            res.status(400).json({ message: err });
+    if (leaderId) {
+        censusControllers
+            .getPeopleByUser(leaderId)
+            .then((data) => {
+                res.status(200).json(data);
+            })
+            .catch((err) => {
+                res.status(400).json({ message: err });
+            });
+    } else {
+        res.status(400).json({
+            message: "Se debe enviar leaderId de tipo UUID",
         });
+    }
 };
 
 const getSimpleCensus = (req, res) => {
