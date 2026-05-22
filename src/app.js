@@ -34,10 +34,23 @@ const app = express();
 
 app.use(bodyParser.json({ limit: "500mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
+app.use((req, res, next) => {
 
+    console.log("METHOD:", req.method);
+    console.log("PATH:", req.path);
+    console.log("ORIGIN:", req.headers.origin);
+    console.log("HOST:", req.headers.host);
+    console.log("REFERER:", req.headers.referer);
+
+    next();
+
+});
+app.options("*", cors({
+    origin: true,
+    credentials: true
+}));
 const allowedOrigins = [
     "https://luisalcalde.mielector.com",
-    "https://sigeeljs-production.up.railway.app",
     "https://sigeelfront.pages.dev",
     "http://localhost:5173",
     "https://localhost:5173",
@@ -51,22 +64,90 @@ const allowedOrigins = [
 ];
 app.use(cors({
     origin: function (origin, callback) {
-        // Permitir si no hay origen (Postman/Apps) o si está en la lista
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.error("🚫 ORIGEN BLOQUEADO POR SIGEEL:", origin);
-            callback(new Error("No permitido por la política de seguridad Sigeel"));
+
+        console.log("🌍 ORIGIN:", origin);
+
+        // Postman, apps móviles, server-to-server
+        if (!origin) {
+            return callback(null, true);
         }
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        console.error(
+            "🚫 ORIGEN BLOQUEADO POR SIGEEL:",
+            origin
+        );
+
+        // NO lanzar Error mientras depuras
+        return callback(null, false);
+
     },
+
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+
+    methods: [
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE',
+        'PATCH',
+        'OPTIONS'
+    ],
+
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Accept',
+        'Origin',
+        'X-Requested-With'
+    ]
 }));
 
 app.use(express.json());
 
+console.log("INICIANDO APP");
+console.log(
+    "PORT:",
+    process.env.PORT
+);
+
+console.log(
+    "NODE_ENV:",
+    process.env.NODE_ENV
+);
 initModels();
+
+app.listen(port, "0.0.0.0", () => {
+    console.log(
+        `SERVER UP ${port}`
+    );
+});
+
+db.authenticate()
+.then(() => {
+    console.log(
+        "DB AUTH OK"
+    );
+
+    return db.sync({
+        alter:false
+    });
+
+})
+.then(() => {
+    console.log(
+        "DB SYNC OK"
+    );
+})
+.catch(err=>{
+    console.log(
+        "DB ERROR",
+        err
+    );
+});
 
 db.authenticate()
     .then(() => {
