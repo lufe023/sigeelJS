@@ -120,35 +120,6 @@ console.log(
 );
 initModels();
 
-app.listen(port, "0.0.0.0", () => {
-    console.log(
-        `SERVER UP ${port}`
-    );
-});
-
-db.authenticate()
-.then(() => {
-    console.log(
-        "DB AUTH OK"
-    );
-
-    return db.sync({
-        alter:false
-    });
-
-})
-.then(() => {
-    console.log(
-        "DB SYNC OK"
-    );
-})
-.catch(err=>{
-    console.log(
-        "DB ERROR",
-        err
-    );
-});
-
 db.authenticate()
     .then(() => {
         console.log("Database Authenticated");
