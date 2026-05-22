@@ -7,6 +7,7 @@ const fs = require('fs-extra')
 const usersControllers = require('../users/users.controllers')
 const padron = require('../pdfCreator/padronToPdf')
 const borrardeleteOldPdfs = require('../pdfCreator/cleanUpOldPdfs')
+const { updateWhatsAppStatus, emitWhatsAppQr } = require('../socket/io')
 require('dotenv').config();
 const estado = [{
     cedula: '',
@@ -71,6 +72,35 @@ const generateQRImage = async (text, filePath) => {
     }
 };
 
+const isIgnorablePuppeteerProtocolError = (errorLike) => {
+    const raw = errorLike?.stack || errorLike?.message || String(errorLike || "");
+    return raw.includes("Protocol error (Runtime.callFunctionOn): Target closed")
+        || raw.includes("Protocol error (Runtime.callFunctionOn): Session closed")
+        || raw.includes("Execution context was destroyed");
+};
+
+const installProcessGuards = () => {
+    if (global.__WHATSAPP_PROCESS_GUARDS_INSTALLED__) return;
+    global.__WHATSAPP_PROCESS_GUARDS_INSTALLED__ = true;
+
+    process.on("unhandledRejection", (reason) => {
+        if (isIgnorablePuppeteerProtocolError(reason)) {
+            console.warn("WARN whatsapp-web.js unhandledRejection controlado:", reason?.message || reason);
+            return;
+        }
+    });
+
+    process.on("uncaughtException", (error) => {
+        if (isIgnorablePuppeteerProtocolError(error)) {
+            console.warn("WARN whatsapp-web.js uncaughtException controlado:", error?.message || error);
+            return;
+        }
+        throw error;
+    });
+};
+
+installProcessGuards();
+
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
@@ -84,19 +114,84 @@ const client = new Client({
 
 const qrcodeTerminal = require('qrcode-terminal');
 
-client.on('qr', qr => {
+client.on('qr', async qr => {
     // Esto te permitirá ver el QR directamente en la consola de Railway
     qrcodeTerminal.generate(qr, {small: true});
-    
-    // Tu lógica actual de guardar el archivo
+
+    // Guarda el QR para servirlo por HTTP y notifícalo por websocket
     const qrFilePath = path.join(__dirname, './qr/qr.png');
-    // ... resto de tu código
+    await fs.ensureDir(path.dirname(qrFilePath));
+
+    const generated = await generateQRImage(qr, qrFilePath);
+
+    if (generated) {
+        const qrImageUrl = `/api/v1/images/qr/qr.png?t=${Date.now()}`;
+        emitWhatsAppQr(qrImageUrl);
+        updateWhatsAppStatus({
+            status: 'qr',
+            message: 'Esperando escaneo del QR en WhatsApp',
+            qrImageUrl,
+            clientState: 'UNPAIRED',
+        });
+    } else {
+        updateWhatsAppStatus({
+            status: 'qr_error',
+            message: 'No se pudo generar la imagen del QR',
+            qrImageUrl: null,
+            clientState: null,
+        });
+    }
 });
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log('Client is ready!');
-    deleteQrImage('../whatsapp/qr','qr.png')
+    try {
+        await deleteQrImage('../whatsapp/qr','qr.png')
+    } catch (error) {
+        console.warn("No se pudo borrar QR local tras conexion:", error?.message || error);
+    }
+    updateWhatsAppStatus({
+        status: 'ready',
+        message: 'Cliente de WhatsApp conectado',
+        qrImageUrl: null,
+        clientState: 'CONNECTED',
+    });
 
+});
+
+client.on('authenticated', () => {
+    updateWhatsAppStatus({
+        status: 'authenticated',
+        message: 'Sesión autenticada en WhatsApp',
+        qrImageUrl: null,
+        clientState: 'OPENING',
+    });
+});
+
+client.on('auth_failure', (msg) => {
+    updateWhatsAppStatus({
+        status: 'auth_failure',
+        message: `Falló la autenticación de WhatsApp: ${msg}`,
+        qrImageUrl: null,
+        clientState: null,
+    });
+});
+
+client.on('disconnected', (reason) => {
+    updateWhatsAppStatus({
+        status: 'disconnected',
+        message: `WhatsApp desconectado: ${reason}`,
+        qrImageUrl: null,
+        clientState: 'DISCONNECTED',
+    });
+});
+
+client.on('loading_screen', (percent, message) => {
+    updateWhatsAppStatus({
+        status: 'loading',
+        message: `Cargando WhatsApp ${percent}%: ${message}`,
+        clientState: 'OPENING',
+    });
 });
 
 // Listener de mensajes
@@ -216,6 +311,21 @@ client.on('message', async message => {
             }  
 })
 
-client.initialize();
+updateWhatsAppStatus({
+    status: 'starting',
+    message: 'Inicializando cliente de WhatsApp',
+    qrImageUrl: null,
+    clientState: 'OPENING',
+});
+
+client.initialize()
+    .catch((error) => {
+        updateWhatsAppStatus({
+            status: 'init_error',
+            message: `Error inicializando WhatsApp: ${error.message}`,
+            qrImageUrl: null,
+            clientState: null,
+        });
+    });
 
 module.exports = client

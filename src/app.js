@@ -1,11 +1,13 @@
 const express = require("express");
 const fs = require("fs");
+const http = require("http");
 const https = require("https");
 const cors = require("cors");
 const { port } = require("./config");
 const db = require("./utils/database");
 const initModels = require("./models/initModels");
 const bodyParser = require("body-parser");
+const { initSocket } = require("./socket/io");
 require("dotenv").config();
 const shouldAlter = process.env.DB_SYNC_ALTER === 'true';
 //* Routes
@@ -166,22 +168,31 @@ app.use("/api/v1/sector", UsuarioSectorParaje);
 //     console.log(`Server started at port ${port}`);
 // });
 // --- ARRANQUE DEL SERVIDOR CONDICIONADO ---
+let server;
+
 if (process.env.NODE_ENV === "production") {
-    // En Railway (Nube): Usamos http estándar, Railway le pone el SSL
-    app.listen(port, "0.0.0.0", () => {
+    server = http.createServer(app);
+    initSocket(server, allowedOrigins);
+
+    server.listen(port, "0.0.0.0", () => {
         console.log(`Server started in PRODUCTION at port ${port}`);
     });
 } else {
-    // En Local: Usamos tus certificados .pem
     try {
         const key = fs.readFileSync("localhost-key.pem");
         const cert = fs.readFileSync("localhost.pem");
-        
-        https.createServer({ key, cert }, app).listen(port, "0.0.0.0", () => {
-            console.log(`🔐 Local Server running at https://localhost:${port}`);
+
+        server = https.createServer({ key, cert }, app);
+        initSocket(server, allowedOrigins);
+
+        server.listen(port, "0.0.0.0", () => {
+            console.log(`Local Server running at https://localhost:${port}`);
         });
     } catch (error) {
-        console.error("❌ Error cargando certificados locales, arrancando en HTTP...");
-        app.listen(port, () => console.log(`Server started at port ${port}`));
+        console.error("Error cargando certificados locales, arrancando en HTTP...");
+        server = http.createServer(app);
+        initSocket(server, allowedOrigins);
+
+        server.listen(port, () => console.log(`Server started at port ${port}`));
     }
 }
