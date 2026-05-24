@@ -22,6 +22,119 @@ const Municipio = require("../models/municipio.models");
 const tiesController = require("../ties/ties.controllers");
 const SectorParaje = require("../models/sectorParaje.model");
 const Ciudadseccion = require("../models/ciudadseccion.model");
+const ProtectedCitizen = require("../models/protectedCitizen.model");
+const path = require('path');
+
+const maskProtectedCitizen = (citizen) => {
+    if (!citizen) return null;
+    const c = citizen.toJSON ? citizen.toJSON() : { ...citizen };
+
+    let baseUrl = process.env.BACKEND_URL || 'http://localhost:9000';
+    if (baseUrl.includes('192.168.100.13') || baseUrl.includes('localhost')) {
+        baseUrl = baseUrl.replace('https://', 'http://');
+    }
+
+    const restrictedImageUrl = `${baseUrl.replace(/\/$/, "")}/uploads/images/system/restringedProfile.png`;
+
+    return {
+        ...c,
+        // 1. Datos Personales Ofuscados
+        citizenID: "00000000000",
+        firstName: "RESTRINGIDO",
+        lastName: "RESTRINGIDO",
+        lastNameB: "RESTRINGIDO",
+        nickname: "RESTRINGIDO",
+        celphone: "RESTRINGIDO",
+        telephone: "RESTRINGIDO",
+        otherPhone: "RESTRINGIDO",
+        adress: "RESTRINGIDO",
+        birthDay: "1900-01-01",
+        picture: restrictedImageUrl,
+        position: null,
+        nombresplastico: null,
+        apellidosplastico: null,
+
+        // 2. 🚫 Ofuscación Total de Campos Geográficos Electorales Planos
+        province: 0,
+        municipality: 0,
+        IDSectorParaje: 0,
+        IdMunicipioOrigen: null,
+        IdRecintoOrigen: null,
+        CodigoRecintoOrigen: "00000",
+        IdColegioOrigen: null,
+        ColegioOrigen: "0000",
+        CodigoCircunscripcion: null,
+        PrecinctId: null,
+        PrecintCode: "00000",
+        CollegeId: null,
+        CollegeCode: "0000",
+        LugarVotacion: null,
+
+        // 3. 🛡️ Vaciado Estricto de Objetos Relacionales Geográficos
+        provinces: c.provinces ? { ProvinciaId: 0, Descripcion: "RESTRINGIDO" } : null,
+        municipalities: c.municipalities ? { MunicipalityId: 0, description: "RESTRINGIDO", parentMunicipalityId: 0, ProvinciaId: 0 } : null,
+        
+        sector: c.sector ? {
+            SectorParajeId: 0,
+            IDCiudadSeccion: 0,
+            CodigoSector: "0",
+            Descripcion: "RESTRINGIDO",
+            ciudadseccion: c.sector.ciudadseccion ? {
+                CiudadseccionId: 0,
+                idmunicipio: 0,
+                iddistritomunicipal: 0,
+                codigociudad: "00",
+                descripcion: "RESTRINGIDO"
+            } : null
+        } : null,
+
+        colegio: c.colegio ? {
+            CollegeId: 0,
+            collegeNumber: "0",
+            MunicipalityId: 0,
+            PrecinctId: 0,
+            TieneCupo: "N",
+            precinctData: c.colegio.precinctData ? {
+                PrecinctId: 0,
+                precintNumber: 0,
+                descripcion: "RESTRINGIDO",
+                direccionRecinto: "RESTRINGIDO",
+                IDSectorParaje: 0,
+                IDCircunscripcion: 0
+            } : null
+        } : null,
+
+        // 4. Otras Relaciones de Gestión
+        Beneficios: c.Beneficios ? (Array.isArray(c.Beneficios) ? [] : null) : c.Beneficios,
+        Empleos: c.Empleos ? (Array.isArray(c.Empleos) ? [] : null) : c.Empleos,
+        Actividades: c.Actividades ? (Array.isArray(c.Actividades) ? [] : null) : c.Actividades,
+        Encuestas: c.Encuestas ? (Array.isArray(c.Encuestas) ? [] : null) : c.Encuestas,
+        geolocation: c.geolocation ? null : c.geolocation,
+        leaders: c.leaders ? null : c.leaders,
+        sufragio: c.sufragio ? null : c.sufragio,
+        condition: c.condition ? null : c.condition,
+        district: null
+    };
+};
+
+const handleProtection = async (citizen) => {
+    if (!citizen) return null;
+
+    // Buscamos en la tabla si la cédula está marcada como protegida
+    const isProtected = await ProtectedCitizen.findOne({
+        where: { 
+            citizenID: citizen.citizenID,
+            protected: true 
+        },
+        attributes: ["id"] // Solo pedimos el ID por velocidad (index scan rápido)
+    });
+
+    if (isProtected) {
+        return maskProtectedCitizen(citizen);
+    }
+
+    return citizen;
+};
 
 const { injectPictureUrl: getPictureUrl } = require("../utils/injecPictureUrl");
 
@@ -445,10 +558,11 @@ const getOnePeople = async (peopleid) => {
 
     if (!data) return null;
 
-    // Inyectamos la URL antes de devolver
-    const processedData = injectPictureUrl(data);
-    const lastUpdatedDates = await getLastUpdatedDates(data.citizenID);
-    const pendingUpdates = await getPendingUpdatesController(data.citizenID);
+const protectedData = await handleProtection(data);
+    
+    const processedData = injectPictureUrl(protectedData);
+    const lastUpdatedDates = await getLastUpdatedDates(processedData.citizenID);
+    const pendingUpdates = await getPendingUpdatesController(processedData.citizenID);
 
     return {
         data: processedData,
@@ -563,37 +677,28 @@ const findPeople = async (findWord, allowedIds = [], page = 1, size = 5, filters
         });
 
         // Procesamos para agregar "district" solo si aplica
-        const processed = data.rows.map((c) => {
-            
-            const cWithPic = injectPictureUrl(c);
+   const processed = await Promise.all(data.rows.map(async (c) => {
+    
+    // 1. Validamos si está protegido a nivel global
+    const protectedCitizen = await handleProtection(c);
+    
+    // 2. Inyectamos la URL de la foto (si está protegido, cWithPic recibirá null automáticamente)
+    const cWithPic = injectPictureUrl(protectedCitizen);
 
-            const sector = cWithPic.sector;
-            let district = null;
+    const sector = cWithPic.sector;
+    let district = null;
 
-            if (sector && sector.ciudadseccion) {
-                const {
-                    idmunicipio,
-                    iddistritomunicipal,
-                    descripcion,
-                    codigociudad,
-                } = sector.ciudadseccion;
+    if (sector && sector.ciudadseccion) {
+        const { idmunicipio, iddistritomunicipal, descripcion, codigociudad } = sector.ciudadseccion;
 
-                // Solo agregamos district si es distinto del municipio
-                if (idmunicipio !== iddistritomunicipal) {
-                    district = {
-                        iddistritomunicipal,
-                        idmunicipio,
-                        descripcion,
-                        codigociudad,
-                    };
-                }
-            }
+        if (idmunicipio !== iddistritomunicipal) {
+            district = { iddistritomunicipal, idmunicipio, descripcion, codigociudad };
+        }
+    }
 
-            // agregamos district al mismo nivel
-            cWithPic.district = district;
-            return cWithPic;
-
-        });
+    cWithPic.district = district;
+    return cWithPic;
+}));
 
         return { count: data.count, rows: processed };
     } catch (error) {
@@ -603,7 +708,6 @@ const findPeople = async (findWord, allowedIds = [], page = 1, size = 5, filters
 };
 
 const simpleFindPeople = async (findWord, allowedIds = []) => {
-
     if (!allowedIds || allowedIds.length === 0) {
         return { count: 0, rows: [] };
     }
@@ -612,28 +716,21 @@ const simpleFindPeople = async (findWord, allowedIds = []) => {
         limit: 5,
         where: {
             [Op.and]: [
-                { IDSectorParaje: { [Op.in]: allowedIds } }, // Filtro de seguridad
-                {
-                    [Op.or]: {
-                        citizenID: {
-                            [Op.iLike]: `%${findWord}%`,
-                        },
-                    },
-                },
+                { IDSectorParaje: { [Op.in]: allowedIds } },
+                { citizenID: { [Op.iLike]: `%${findWord}%` } },
             ],
         },
-        attributes: ["citizenID", "firstName", "lastName", "picture",  "municipality",
-            "province", 
-            "PrecinctId",
-            "CollegeId"],
+        attributes: ["citizenID", "firstName", "lastName", "picture", "municipality", "province", "PrecinctId", "CollegeId"],
     });
 
-    const rowsWithPictures = data.rows.map((row) => injectPictureUrl(row));
+    // Validamos protección e inyectamos foto
+    const rowsWithPictures = await Promise.all(data.rows.map(async (row) => {
+        const protectedRow = await handleProtection(row);
+        return injectPictureUrl(protectedRow);
+    }));
 
-        return { count: data.count, rows: rowsWithPictures };
-
+    return { count: data.count, rows: rowsWithPictures };
 };
-
 const addPeople = async (peopleId, leaderId) => {
     const result = await Census.update(
         {
@@ -710,28 +807,23 @@ const updatePeopleController = async (data, citizenID) => {
 };
 
 const getPendingUpdatesController = async (citizenId) => {
+    if (citizenId === "00000000000") return []; // Cortocircuito de seguridad
+    
     const pendingUpdates = await AuditLog.findAll({
         where: {
             recordId: citizenId,
-            changedFields: {
-                [Op.ne]: null,
-            },
+            changedFields: { [Op.ne]: null },
         },
         attributes: ["changedFields", "createdAt"],
         order: [["createdAt", "DESC"]],
     });
-
     return pendingUpdates;
 };
 
 const getLastUpdatedDates = async (citizenID) => {
-    const fields = [
-        "firstName",
-        "lastName",
-        "nickname",
-        "age",
-        "gender" /* ... */,
-    ];
+    if (citizenID === "00000000000") return {}; // Cortocircuito de seguridad
+    
+    const fields = ["firstName", "lastName", "nickname", "age", "gender"];
     const lastUpdatedDates = {};
 
     for (const field of fields) {
@@ -739,11 +831,9 @@ const getLastUpdatedDates = async (citizenID) => {
             where: {
                 tableName: "census",
                 recordId: citizenID,
-                changedFields: {
-                    [field]: { [Op.ne]: null }, // Cambiado a [Op.ne] para buscar campos no nulos
-                },
+                changedFields: { [field]: { [Op.ne]: null } },
             },
-            order: [["createdAt", "DESC"]], // Ordenar por fecha descendente
+            order: [["createdAt", "DESC"]],
         });
 
         if (auditLog) {

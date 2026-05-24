@@ -161,20 +161,20 @@ const itSupportValidate = (req, res, next) => {
     }
 };
 
-const superAdminValidate = (req, res, next) => {
-    const role = req.user.role;
+// const superAdminValidate = (req, res, next) => {
+//     const role = req.user.role;
 
-    //aqui se configura el nivel de los roles de los usuario para permitir entrar o no a distintos lugares
-    if (role === 5) {
-        next();
-    } else {
-        res.status(401).json({
-            message: "Access Denied!",
-            reason: "You need to be GodLevel",
-            requiredLevel: 9999999999,
-        });
-    }
-};
+//     //aqui se configura el nivel de los roles de los usuario para permitir entrar o no a distintos lugares
+//     if (role === 5) {
+//         next();
+//     } else {
+//         res.status(401).json({
+//             message: "Access Denied!",
+//             reason: "You need to be GodLevel",
+//             requiredLevel: 9999999999,
+//         });
+//     }
+// };
 
 const extractUserMunicipality = async (req, res, next) => {
     try {
@@ -222,6 +222,22 @@ const extractUserSectorPermissions = async (req, res, next) => {
     }
 };
 
+// Agrega esto antes del module.exports junto a las demás validaciones
+const superAdminValidate = (req, res, next) => {
+    const role = req.user.role;
+
+    // Aquí validamos que el rol sea exactamente 5 (Super Admin)
+    if (role === 99) {
+        next();
+    } else {
+        res.status(401).json({
+            message: "Access Denied!",
+            reason: "You do not have the required access level: Super Admin",
+            requiredLevel: 999,
+            your: role,
+        });
+    }
+};
 module.exports = {
     leaderValidate,
     adminValidate,
@@ -232,4 +248,5 @@ module.exports = {
     isAdministratorBoolean,
     extractUserMunicipality,
     extractUserSectorPermissions,
+    superAdminValidate
 };

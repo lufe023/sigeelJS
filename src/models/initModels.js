@@ -27,8 +27,13 @@ const Banners = require("./banner.model");
 const UsuarioMunicipio = require("./usuarioMunicipio.model");
 const UsuarioSectorParaje = require("./usuarioSectorParaje.models");
 const { Op } = require("sequelize");
+const ProtectedCitizen = require("./protectedCitizen.model");
 
 const initModels = () => {
+
+    // En tu archivo de configuración de modelos/asociaciones:
+ProtectedCitizen.belongsTo(Census, { foreignKey: 'citizenID', targetKey: 'citizenID', as: 'citizen' });
+
     // --- CENSUS ---
     Census.hasOne(Provincia, {
         foreignKey: "ProvinciaId",

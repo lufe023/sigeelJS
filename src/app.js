@@ -10,6 +10,9 @@ const bodyParser = require("body-parser");
 const { initSocket } = require("./socket/io");
 require("dotenv").config();
 const shouldAlter = process.env.DB_SYNC_ALTER === 'true';
+const path = require('path');
+
+initModels();
 //* Routes
 const userRouter = require("./users/users.router");
 const authRouter = require("./auth/auth.router");
@@ -31,22 +34,13 @@ const suffrage = require("./suffrage/suffrage.router");
 const whatsapp = require("./whatsapp/whatsapp.router");
 const UsuarioMunicipio = require("./usuarioMunicipio/usuarioMunicipio.router");
 const UsuarioSectorParaje = require("./usuarioSectorParaje/usuarioSectorParaje.router");
+const protectedRouter = require("./protectedCitizen/protected.routes");
 //? Initial Configurations
 const app = express();
 
 app.use(bodyParser.json({ limit: "500mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
-app.use((req, res, next) => {
 
-    console.log("METHOD:", req.method);
-    console.log("PATH:", req.path);
-    console.log("ORIGIN:", req.headers.origin);
-    console.log("HOST:", req.headers.host);
-    console.log("REFERER:", req.headers.referer);
-
-    next();
-
-});
 app.options("*", cors({
     origin: true,
     credentials: true
@@ -120,7 +114,7 @@ console.log(
     "NODE_ENV:",
     process.env.NODE_ENV
 );
-initModels();
+
 
 db.authenticate()
     .then(() => {
@@ -141,7 +135,7 @@ app.get("/", (req, res) => {
         users: `localhost:${port}/api/v1/users`,
     });
 });
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 //path of routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
@@ -163,7 +157,7 @@ app.use("/api/v1/suffrages", suffrage);
 app.use("/api/v1/whatsapp", whatsapp);
 app.use("/api/v1/usuario-municipio", UsuarioMunicipio);
 app.use("/api/v1/sector", UsuarioSectorParaje);
-
+app.use("/api/v1/protected-citizens", protectedRouter);
 // app.listen(port, () => {
 //     console.log(`Server started at port ${port}`);
 // });
