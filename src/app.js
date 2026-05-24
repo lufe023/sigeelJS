@@ -47,6 +47,7 @@ app.options("*", cors({
 }));
 const allowedOrigins = [
     "https://luisalcalde.mielector.com",
+    "https://prueba.mielector.com",
     "https://sigeelfront.pages.dev",
     "http://localhost:5173",
     "https://localhost:5173",
