@@ -9,17 +9,27 @@ const injectPictureUrl = ({
 }) => {
     if (!citizenID) return null;
 
+    // 1. Jalamos tu BACKEND_URL normal del .env
+    let baseUrl = process.env.BACKEND_URL || 'http://localhost:9000';
+
+    // 2. 🪄 EL TRUCO LOCAL: Si detecta la IP de tu casa o localhost, le limpia la "s" al https en caliente
+    if (baseUrl.includes('192.168.100.13') || baseUrl.includes('localhost')) {
+        baseUrl = baseUrl.replace('https://', 'http://');
+    }
+
+    // 🛡️ ESCUDO DEFINITIVO: Si la cédula ya fue anonimizada con 11 ceros, devolvemos la imagen estática del sistema
+    if (citizenID === "00000000000" || citizenID === "000-0000000-0") {
+        return `${baseUrl.replace(/\/$/, "")}/uploads/images/system/restringedProfile.png`;
+    }
+
     const isProd = process.env.NODE_ENV === 'production';
     
     if (isProd) {
-        // Obtenemos la base y quitamos cualquier barra al final por si acaso
+        // En producción (cuando ya no sea la IP local), Cloudflare R2 sigue su curso normal con HTTPS nativo
         const r2Base = process.env.R2_PUBLIC_URL.replace(/\/$/, ""); 
-        
-        // Si al subir los archivos con Cyberduck creaste la carpeta "citizens", esta ruta es correcta:
         return `${r2Base}/citizens/${province}/${municipality}/${precinct}/${college}/${citizenID}.webp`;
     } else {
-        const baseUrl = (process.env.BACKEND_URL || 'http://localhost:9000').replace(/\/$/, "");
-        return `${baseUrl}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${citizenID}`;
+        return `${baseUrl.replace(/\/$/, "")}/api/v1/images/pic/${province}/${municipality}/${precinct}/${college}/${citizenID}`;
     }
 };
 
@@ -30,7 +40,6 @@ const injectPictureInto = (data) => {
     const tryInject = (obj) => {
         if (!obj || typeof obj !== 'object') return;
 
-        // Posibles aliases usados en las respuestas
         const candidates = ['censu', 'Census'];
 
         candidates.forEach((alias) => {
@@ -59,7 +68,6 @@ const injectPictureInto = (data) => {
         }
     };
 
-    // Trabaja sobre copia para evitar mutaciones involuntarias
     const cloned = JSON.parse(JSON.stringify(data));
     walk(cloned);
     return cloned;
