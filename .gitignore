@@ -10,3 +10,6 @@ node_modules/
 .pem
 local.env
 Produccion.env
+.blackboxrules
+todo.md
+blackbox_mcp_settings.json
