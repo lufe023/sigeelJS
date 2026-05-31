@@ -17,5 +17,7 @@
     "prettier.bracketSameLine": true,
     "prettier.bracketSpacing": true,
     "prettier.enableDebugLogs": true,
-    "CodeGPT.apiKey": "Ollama"
+    "CodeGPT.apiKey": "Ollama",
+    "editor.defaultFoldingRangeProvider": "Blackboxapp.blackbox",
+    "notebook.defaultFormatter": "Blackboxapp.blackbox"
 }

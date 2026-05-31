@@ -28,10 +28,16 @@ const UsuarioMunicipio = require("./usuarioMunicipio.model");
 const UsuarioSectorParaje = require("./usuarioSectorParaje.models");
 const { Op } = require("sequelize");
 const ProtectedCitizen = require("./protectedCitizen.model");
+const Advice = require("./advice.model");
 
 const initModels = () => {
 
     // En tu archivo de configuración de modelos/asociaciones:
+    Advice.belongsTo(Users, {
+        foreignKey: "createdBy",
+        targetKey: "id",
+        as: "creator",
+    });
 ProtectedCitizen.belongsTo(Census, { foreignKey: 'citizenID', targetKey: 'citizenID', as: 'citizen' });
 
     // --- CENSUS ---

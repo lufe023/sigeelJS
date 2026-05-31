@@ -35,6 +35,7 @@ const whatsapp = require("./whatsapp/whatsapp.router");
 const UsuarioMunicipio = require("./usuarioMunicipio/usuarioMunicipio.router");
 const UsuarioSectorParaje = require("./usuarioSectorParaje/usuarioSectorParaje.router");
 const protectedRouter = require("./protectedCitizen/protected.routes");
+const adviceRouter = require("./advice/advice.router");
 //? Initial Configurations
 const app = express();
 
@@ -159,6 +160,7 @@ app.use("/api/v1/whatsapp", whatsapp);
 app.use("/api/v1/usuario-municipio", UsuarioMunicipio);
 app.use("/api/v1/sector", UsuarioSectorParaje);
 app.use("/api/v1/protected-citizens", protectedRouter);
+app.use("/api/v1/advice", adviceRouter);
 // app.listen(port, () => {
 //     console.log(`Server started at port ${port}`);
 // });
